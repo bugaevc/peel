@@ -1,0 +1,260 @@
+<?xml version="1.0"?>
+<repository version="1.2"
+            xmlns="http://www.gtk.org/introspection/core/1.0"
+            xmlns:c="http://www.gtk.org/introspection/c/1.0"
+            xmlns:glib="http://www.gtk.org/introspection/glib/1.0">
+  <include name="GObject" version="2.0"/>
+  <package name="peel-test"/>
+  <c:include name="peel-test/peel-test.h"/>
+  <namespace name="Test"
+             version="1"
+             shared-library="libpeel-test.so.0"
+             c:identifier-prefixes="Test"
+             c:symbol-prefixes="test">
+    <callback name="CoolCallback" c:type="TestCoolCallback">
+      <return-value transfer-ownership="full">
+        <type name="Testy" c:type="TestTesty*"/>
+      </return-value>
+      <parameters>
+        <parameter name="b" direction="out">
+          <type name="gboolean" c:type="gboolean*"/>
+        </parameter>
+        <parameter name="user_data"
+                   nullable="1"
+                   allow-none="2"
+                   closure="2">
+          <type name="gpointer" c:type="gpointer"/>
+        </parameter>
+      </parameters>
+    </callback>
+    <class name="Testy"
+           c:type="TestTesty"
+           parent="GObject.Object"
+           glib:get-type="test_testy_get_type"
+           glib:type-struct="TestyClass">
+      <constructor name="new" c:identifier="test_testy_new">
+        <return-value transfer-ownership="full">
+          <type name="Testy" c:type="TestTesty*"/>
+        </return-value>
+      </constructor>
+      <method name="get_int" c:identifier="test_testy_get_int">
+        <return-value>
+          <type name="gint" c:type="int"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+        </parameters>
+      </method>
+      <method name="pass_bool" c:identifier="test_testy_pass_bool">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="b">
+            <type name="gboolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="pass_gtype" c:identifier="test_testy_pass_gtype">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="gt">
+            <type name="GType" c:type="GType"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_out_int" c:identifier="test_testy_get_out_int">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter direction="out" name="int_ptr">
+            <type name="gint" c:type="int*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_out_bool" c:identifier="test_testy_get_out_bool">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="b" direction="out">
+            <type name="gboolean" c:type="gboolean*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_out_gtype" c:identifier="test_testy_get_out_gtype">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="gt" direction="out">
+            <type name="GType" c:type="GType*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_out_object" c:identifier="test_testy_get_out_object">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter direction="out" name="obj_ptr">
+            <type name="GObject.Object" c:type="GObject**"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_out_owned_object" c:identifier="test_testy_get_out_owned_object">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter direction="out" name="obj_ptr" transfer-ownership="full">
+            <type name="GObject.Object" c:type="GObject**"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="pass_value" c:identifier="test_testy_pass_value">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="v">
+            <type name="GObject.Value" c:type="const GValue*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="get_out_value" c:identifier="test_testy_get_out_value">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter direction="out" name="value_ptr" caller-allocates="1">
+            <type name="GObject.Value" c:type="GValue*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="nested_types" c:identifier="test_testy_nested_types">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="construct_param">
+            <type name="GObject.ObjectConstructParam" c:type="GObjectConstructParam*"/>
+          </parameter>
+          <parameter name="binding_flags">
+            <type name="GObject.BindingFlags" c:type="GObjectBindingFlags"/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="add_cool_callback" c:identifier="test_testy_add_cool_callback">
+        <return-value>
+          <type name="gint" c:type="int"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="binding" transfer-ownership="full">
+            <type name="GObject.Binding" c:type="GBinding*"/>
+          </parameter>
+          <parameter name="s" transfer-ownership="full">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+          <parameter name="callback"
+                     scope="async"
+                     closure="3">
+            <type name="CoolCallback" c:type="TestCoolCallback"/>
+          </parameter>
+          <parameter name="user_data" nullable="1" allow-none="1">
+            <type name="gpointer" c:type="gpointer"/>
+          </parameter>
+        </parameters>
+      </method>
+      <virtual-method name="add_cool_callback" invoker="add_cool_callback">
+        <return-value>
+          <type name="gint" c:type="int"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="binding" transfer-ownership="full">
+            <type name="GObject.Binding" c:type="GBinding*"/>
+          </parameter>
+          <parameter name="s" transfer-ownership="full">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+          <parameter name="callback"
+                     scope="async"
+                     closure="3">
+            <type name="CoolCallback" c:type="TestCoolCallback"/>
+          </parameter>
+          <parameter name="user_data" nullable="1" allow-none="1">
+            <type name="gpointer" c:type="gpointer"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <method name="return_byte_array" c:identifier="test_testy_return_byte_array">
+        <return-value transfer-ownership="none">
+          <array length="0" null-terminated="0" c:type="gconstpointer">
+            <type name="guint8"/>
+          </array>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter direction="out"
+                     name="size"
+                     caller-allocates="0"
+                     transfer-ownership="full"
+                     optional="1"
+                     allow-none="1">
+            <type name="gsize" c:type="gsize*"/>
+          </parameter>
+        </parameters>
+      </method>
+    </class>
+    <record name="TestyClass"
+            c:type="TestTestyClass"
+            glib:is-gtype-struct-for="Testy">
+      <field name="parent_class">
+        <type name="GObject.ObjectClass" c:type="GObjectClass"/>
+      </field>
+    </record>
+  </namespace>
+</repository>

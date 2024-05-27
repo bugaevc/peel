@@ -1,0 +1,604 @@
+# GLib
+
+skip	g_ascii_dtostr
+skip	g_ascii_formatd
+skip	g_assertion_message_cmpstrv
+skip	g_atomic_int_add
+skip	g_atomic_int_and
+skip	g_atomic_int_compare_and_exchange
+skip	g_atomic_int_dec_and_test
+skip	g_atomic_int_exchange
+skip	g_atomic_int_exchange_and_add
+skip	g_atomic_int_get
+skip	g_atomic_int_inc
+skip	g_atomic_int_or
+skip	g_atomic_int_set
+skip	g_atomic_int_xor
+skip	g_atomic_pointer_add
+skip	g_atomic_pointer_and
+skip	g_atomic_pointer_compare_and_exchange
+skip	g_atomic_pointer_exchange
+skip	g_atomic_pointer_get
+skip	g_atomic_pointer_or
+skip	g_atomic_pointer_set
+skip	g_atomic_pointer_xor
+skip	g_atomic_rc_box_dup
+skip	g_atomic_ref_count_compare
+skip	g_atomic_ref_count_dec
+skip	g_atomic_ref_count_inc
+skip	g_atomic_ref_count_init
+skip	g_bit_lock
+skip	g_bit_trylock
+skip	g_bit_unlock
+#skip	g_build_filename_valist
+skip	g_clear_signal_handler
+skip	g_completion_complete
+skip	g_completion_complete_utf8
+skip	g_date_strftime
+skip	g_freopen
+skip	g_hmac_new
+skip	g_hmac_get_digest
+skip	g_hmac_update
+skip	g_iconv
+skip	g_log_writer_default_set_debug_domains
+skip	g_io_channel_read
+skip	g_io_channel_read_line_string
+skip	g_io_channel_write
+skip	g_slice_get_config_state
+skip	g_mkdtemp
+skip	g_mkdtemp_full
+skip	g_mkstemp
+skip	g_mkstemp_full
+skip	g_once_init_enter_impl
+skip	g_once_init_enter_pointer
+skip	g_once_init_leave_pointer
+skip	g_pointer_bit_lock
+skip	g_pointer_bit_trylock
+skip	g_pointer_bit_unlock
+skip	g_pointer_bit_unlock_and_set
+skip	g_rand_new_with_seed_array
+skip	g_rand_set_seed_array
+skip	g_rc_box_dup
+#skip	g_variant_get_fixed_array
+skip	g_ref_count_compare
+skip	g_ref_count_dec
+skip	g_ref_count_inc
+skip	g_ref_count_init
+skip	g_ref_string_acquire
+skip	g_ref_string_length
+skip	g_ref_string_release
+skip	g_set_prgname_once
+skip	g_stpcpy
+skip	g_strcanon
+skip	g_strchomp
+skip	g_strchug
+skip	g_strdelimit
+skip	g_strdown
+skip	g_strlcat
+skip	g_strlcpy
+skip	g_strreverse
+skip	g_strup
+skip	g_string_free_and_steal
+skip	g_string_free_to_bytes
+skip	g_test_log_buffer_push
+skip	g_timer_elapsed
+skip	g_type_class_adjust_private_offset
+skip	g_unicode_canonical_decomposition
+skip	g_utf8_strncpy
+skip	g_utime
+skip	g_value_set_string_take_ownership
+#skip	g_variant_get_va
+#skip	g_variant_new_parsed_va
+#owned	g_variant_new_take_string	string
+#skip	g_variant_new_va
+#skip	g_variant_parse
+skip	g_vsnprintf
+skip	g_vsprintf
+skip	g_tree_search
+skip	g_tree_search_node
+skip	g_idle_add
+skip	g_idle_add_once
+skip	g_datalist_id_replace_data
+skip	GUnixPipeEnd
+skip	GUnixPipe
+unowned	g_variant_type_string_scan	endptr
+no-autoref GHook
+no-autofree GArray
+no-autofree GByteArray
+no-autofree GHook
+no-autofree GKeyFile
+no-autofree GMappedFile
+no-autofree GMarkupParseContext
+no-autofree GMatchInfo
+no-autofree GMemChunk
+no-autofree GOptionGroup
+no-autofree GPtrArray
+no-autofree GString
+no-autofree GThreadPool
+include	g_access			glib/gstdio.h
+include	g_chmod				glib/gstdio.h
+include	g_open				glib/gstdio.h
+include	g_creat				glib/gstdio.h
+float	GVariant
+#ref-sink GVariant			g_variant_ref_sink
+nest	GVariantType			Variant::Type
+nest	GVariantClass			Variant::Class
+nest-alias GVariantIter			Variant::Iter
+nest	GVariantBuilder			Variant::Builder
+onstack	GTimeVal
+onstack	GDate
+opaque	GSource
+
+# Should have explicit bindings
+skip	GVariant
+
+# GObject
+# These all have (or should have) explicit bindings.
+skip	GType
+skip	GObject
+ref	GObject				g_object_ref
+unref	GObject				g_object_unref
+ref-sink GObject			g_object_ref_sink
+skip	GTypeInstance
+skip	GTypeClass
+skip	GTypeInterface
+type-struct-for GTypeClass		GObject.TypeInstance
+# The following line is a lie, but close enough.
+type-struct	GTypeInstance		GObject.TypeClass
+nest	GObjectConstructParam		Object::ConstructParam
+skip	GObjectConstructParam
+nest-alias GBindingFlags		Binding::Flags
+skip	GValue
+onstack	GValue
+float	GInitiallyUnowned
+skip	g_gtype_get_type
+skip	g_type_check_instance
+skip	g_type_check_instance_cast
+skip	g_type_check_instance_is_a
+skip	g_type_check_instance_is_fundamentally_a
+skip	g_type_check_is_value_type
+skip	g_type_check_value
+skip	g_type_check_value_holds
+skip	g_type_create_instance
+skip	g_type_depth
+skip	g_type_ensure
+skip	g_type_from_name
+skip	g_type_fundamental
+skip	g_type_fundamental_next
+skip	g_type_get_instance_count
+skip	g_type_init
+skip	g_type_is_a
+skip	g_type_name
+skip	g_type_name_from_class
+skip	g_type_name_from_instance
+skip	g_type_parent
+skip	g_type_class_peek
+skip	g_type_free_instance
+skip	g_type_next_base
+skip	g_type_test_flags
+skip	g_type_check_class_cast
+skip	g_type_check_class_is_a
+
+skip	g_type_interface_peek
+skip	g_closure_add_finalize_notifier
+skip	g_closure_add_invalidate_notifier
+skip	g_closure_add_marshal_guards
+skip	g_closure_set_meta_marshal
+skip	g_signal_group_connect
+skip	g_signal_group_connect_after
+skip	g_signal_group_connect_swapped
+skip	g_signal_handler_find
+skip	g_signal_handlers_block_matched
+skip	g_signal_handlers_disconnect_matched
+skip	g_signal_handlers_unblock_matched
+
+ref	GParamSpec			g_param_spec_ref
+ref-sink GParamSpec			g_param_spec_ref_sink
+float	GParamSpec
+
+# Gio
+skip	g_buffered_input_stream_peek_buffer
+skip	g_networking_init
+skip	g_inet_address_to_bytes
+skip	g_keyfile_settings_backend_new
+skip	g_memory_settings_backend_new
+skip	g_null_settings_backend_new
+skip	g_cancellable_connect
+skip	g_vfs_register_uri_scheme
+skip	g_file_copy_async
+skip	GDBusProxy::vfunc_g_properties_changed
+skip	GDBusObjectManagerClient::vfunc_interface_proxy_properties_changed
+skip	GInetAddress::vfunc_to_bytes
+skip	GSettings::vfunc_change_event
+skip	GVfs::vfunc_local_file_add_info
+skip	GThreadedResolver
+ifdef	GSettingsBackend		G_SETTINGS_ENABLE_BACKEND
+
+onstack	GInputVector
+onstack	GOutputVector
+onstack	GActionEntry
+
+nest	GApplicationFlags		Application::Flags
+nest	GTlsPasswordFlags		TlsPassword::Flags
+# FIXME: returning C arrays
+skip	GTlsPassword::vfunc_get_value
+
+# cairo
+raw	cairo
+#skip	cairo_image_surface_create
+nest	cairo_surface_type_t		Surface::Type
+
+# freetype2
+raw	freetype2
+
+# HarfBuzz
+raw	HarfBuzz
+#skip	hb_aat_layout_feature_selector_info_t
+#skip	hb_aat_layout_feature_selector_t
+#skip	hb_aat_layout_feature_type_get_name_id
+#skip	hb_aat_layout_feature_type_t
+#skip	hb_aat_layout_has_positioning
+#skip	hb_aat_layout_has_substitution
+#skip	hb_aat_layout_has_tracking
+#skip	hb_buffer_get_language
+#skip	hb_font_set_funcs
+#skip	hb_font_set_funcs_data
+#skip	hb_ft_face_create
+#skip	hb_ft_face_create_cached
+#skip	hb_ft_face_create_referenced
+#skip	hb_ft_font_changed
+#skip	hb_ft_font_create
+#skip	hb_ft_font_create_referenced
+#skip	hb_ft_font_get_face
+#skip	hb_ft_font_get_load_flags
+#skip	hb_ft_font_lock_face
+#skip	hb_ft_font_set_funcs
+#skip	hb_ft_font_set_load_flags
+#skip	hb_ft_font_unlock_face
+#skip	hb_ft_hb_font_changed
+#skip	hb_glib_blob_create
+#skip	hb_glib_get_unicode_funcs
+#skip	hb_glib_script_from_script
+#skip	hb_glib_script_to_script
+#skip	hb_language_get_default
+#skip	hb_ot_color_glyph_has_paint
+#skip	hb_ot_color_has_layers
+#skip	hb_ot_color_has_paint
+#skip	hb_ot_color_has_palettes
+#skip	hb_ot_color_has_png
+#skip	hb_ot_color_has_svg
+#skip	hb_ot_color_layer_t
+#skip	hb_ot_color_palette_color_get_name_id
+#skip	hb_ot_color_palette_get_count
+#skip	hb_ot_color_palette_get_name_id
+#skip	hb_ot_font_set_funcs
+#skip	hb_ot_layout_baseline_tag_t
+#skip	hb_ot_layout_get_glyph_class
+#skip	hb_ot_layout_get_horizontal_baseline_tag_for_script
+#skip	hb_ot_layout_glyph_class_t
+#skip	hb_ot_layout_has_glyph_classes
+#skip	hb_ot_layout_has_positioning
+#skip	hb_ot_layout_has_substitution
+#skip	hb_ot_layout_lookup_get_optical_bound
+#skip	hb_ot_layout_lookup_would_substitute
+#skip	hb_ot_layout_script_find_language
+#skip	hb_ot_layout_table_get_lookup_count
+#skip	hb_ot_math_constant_t
+#skip	hb_ot_math_get_constant
+#skip	hb_ot_math_get_glyph_italics_correction
+#skip	hb_ot_math_get_glyph_kerning
+#skip	hb_ot_math_get_glyph_top_accent_attachment
+#skip	hb_ot_math_get_min_connector_overlap
+#skip	hb_ot_math_glyph_part_t
+#skip	hb_ot_math_glyph_variant_t
+#skip	hb_ot_math_has_data
+#skip	hb_ot_math_is_glyph_extended_shape
+#skip	hb_ot_math_kern_entry_t
+#skip	hb_ot_math_kern_t
+#skip	hb_ot_meta_reference_entry
+#skip	hb_ot_meta_tag_t
+#skip	hb_ot_metrics_get_variation
+#skip	hb_ot_metrics_get_x_variation
+#skip	hb_ot_metrics_get_y_variation
+#skip	hb_ot_metrics_tag_t
+#skip	hb_ot_name_entry_t
+#skip	hb_ot_name_id_predefined_t
+#skip	hb_ot_tag_from_language
+#skip	hb_ot_tag_to_language
+#skip	hb_ot_tag_to_script
+#skip	hb_ot_var_axis_info_t
+#skip	hb_ot_var_axis_t
+#skip	hb_ot_var_get_axis_count
+#skip	hb_ot_var_get_named_instance_count
+#skip	hb_ot_var_has_data
+#skip	hb_ot_var_named_instance_get_postscript_name_id
+#skip	hb_ot_var_named_instance_get_subfamily_name_id
+
+onstack	hb_color_stop_t
+onstack	hb_font_extents_t
+onstack	hb_glyph_extents_t
+onstack	hb_feature_t
+onstack	hb_variation_t
+
+# Pango
+skip	pango_get_mirror_char
+skip	pango_log2vis_get_embedding_levels
+onstack	PangoLogAttr
+opaque	PangoLogAttr
+onstack	PangoGlyphInfo
+
+# Graphene
+onstack	graphene_rect_t
+onstack	graphene_point_t
+onstack	graphene_matrix_t
+onstack	graphene_size_t
+onstack	graphene_vec3_t
+onstack	graphene_box_t
+onstack	graphene_simd4f_t
+opaque	graphene_simd4f_t
+onstack	graphene_simd4x4f_t
+opaque	graphene_simd4x4f_t
+
+# GdkPixbuf
+skip	gdk_pixbuf_read_pixels
+ifdef	GdkPixbufNonAnim		GDK_PIXBUF_ENABLE_BACKEND
+opaque-ifndef	GdkPixbufFormat		GDK_PIXBUF_ENABLE_BACKEND
+opaque-ifndef	GdkPixbufModule		GDK_PIXBUF_ENABLE_BACKEND
+opaque-ifndef	GdkPixbufModulePattern	GDK_PIXBUF_ENABLE_BACKEND
+opaque-ifndef	GdkPixbufAnimation	GDK_PIXBUF_ENABLE_BACKEND
+opaque-ifndef	GdkPixbufAnimationIter	GDK_PIXBUF_ENABLE_BACKEND
+
+# Gdk
+skip	gdk_pango_layout_get_clip_region
+skip	gdk_content_register_serializer
+skip	gdk_content_register_deserializer
+typed	gdk_clipboard_set		gdk_clipboard_set_value
+typed	gdk_content_provider_new_typed	gdk_content_provider_new_for_value
+
+nest	GdkDevicePadFeature		DevicePad::Feature
+nest	GdkDeviceToolType		DeviceTool::Type
+nest	GdkDragCancelReason		Drag::CancelReason
+nest	GdkEventType			Event::Type
+
+nest	GdkDragAction			Drag::Action
+nest	GdkFrameClockPhase		FrameClock::Phase
+nest	GdkPaintableFlags		Paintable::Flags
+nest	GdkSeatCapabilities		Seat::Capabilities
+nest	GdkToplevelState		Toplevel::State
+
+nest	GdkTextureError			Texture::Error
+
+nest	GdkToplevelSize			Toplevel::Size
+nest	GdkToplevelLayout		Toplevel::Layout
+nest	GdkDragSurfaceSize		DragSurface::Size
+
+nest	GdkContentFormatsBuilder	ContentFormats::Builder
+
+pointer	GdkToplevelSize
+pointer	GdkDragSurfaceSize
+onstack	GdkRGBA
+onstack	GdkRectangle
+
+# Gsk
+#ifdef	GskBroadwayRenderer		GDK_WINDOWING_BROADWAY
+skip	GskBroadwayRenderer
+
+nest	GskPathDirection		Path::Direction
+nest	GskPathOperation		Path::Operation
+nest	GskPathForeachFlags		Path::ForeachFlags
+nest	GskRenderNodeType		RenderNode::Type
+nest	GskTransformCategory		Transform::Category
+
+onstack	GskColorStop
+onstack	GskRoundedRect
+
+# Gtk
+skip	gtk_tree_model_rows_reordered
+skip	gtk_tree_path_get_indices
+
+# These ones are bound as Traits<Gtk::Expression>
+skip	gtk_value_dup_expression
+skip	gtk_value_get_expression
+skip	gtk_value_set_expression
+skip	gtk_value_take_expression
+
+skip	GtkPageSetupUnixDialog
+skip	GtkPrintJob
+skip	GtkPrintCapabilities
+skip	GtkPrintUnixDialog
+skip	GtkPrinter
+skip	gtk_enumerate_printers
+
+out	GtkWidget::vfunc_compute_expand	hexpand_p
+out	GtkWidget::vfunc_compute_expand	vexpand_p
+out	GtkEntryBuffer::vfunc_get_text	n_bytes
+
+onstack	GtkRequestedSize
+onstack	GtkRequisition
+onstack	GtkAllocation
+onstack	GtkTreeIter
+onstack	GtkTextIter
+nest	GtkBitsetIter			Bitset::Iter
+onstack	GtkBitsetIter
+onstack	GtkBorder
+onstack	GtkBuildableParser
+nest	GtkBuildableParser		Buildable::Parser
+nest	GtkBuildableParseContext	Buildable::ParseContext
+
+float	gtk_window_set_child		child
+float	gtk_window_set_titlebar		titlebar
+float	gtk_box_append			child
+float	gtk_box_prepend			child
+float	gtk_box_insert_child_after	child
+float	gtk_list_box_set_adjustment	adjustment
+float	gtk_list_box_row_set_header	header
+float	gtk_tree_view_insert_column	column
+float	gtk_spin_button_configure	adjustment
+float	gtk_cell_area_box_pack_start	renderer
+float	gtk_cell_area_box_pack_end	renderer
+float	gtk_column_view_cell_set_child	child
+float	gtk_list_header_set_child	child
+float	gtk_list_item_set_child		child
+float	gtk_window_handle_set_child	child
+float	gtk_text_view_child_add		widget
+float	gtk_graphics_offload_set_child	child
+float	gtk_column_view_row_widget_add_child child
+float	gtk_aspect_frame_set_child	child
+float	gtk_flow_box_child_set_child	child
+float	gtk_stack_add_titled		child
+float	gtk_stack_add_child		child
+float	gtk_stack_add_named		child
+float	gtk_popover_set_child		child
+float	gtk_center_box_set_start_widget	child
+float	gtk_center_box_set_center_widget child
+float	gtk_center_box_set_end_widget	child
+float	gtk_header_bar_pack_start	child
+float	gtk_header_bar_pack_end		child
+float	gtk_header_bar_set_title_widget	title_widget
+float	gtk_grid_attach			child
+float	gtk_grid_attach_next_to		child
+float	gtk_fixed_put			widget
+float	gtk_button_set_child		child
+float	gtk_viewport_set_child		child
+float	gtk_menu_button_set_child	child
+float	gtk_menu_button_set_popover	popover
+float	gtk_revealer_set_child		child
+float	gtk_frame_set_label_widget	label_widget
+float	gtk_frame_set_child		child
+float	gtk_tree_expander_set_child	child
+float	gtk_scrolled_window_set_child	child
+float	gtk_range_set_adjustment	adjustment
+float	gtk_scrollbar_set_adjustment	adjustment
+float	gtk_scrolled_window_set_hadjustment hadjustment
+float	gtk_scrolled_window_set_vadjustment vadjustment
+unowned	GtkWindow			construct
+typed	gtk_constant_expression_new	gtk_constant_expression_new_for_value
+
+nest	GtkAccessibleAnnouncementPriority Accessible::AnnouncementPriority
+nest	GtkAccessibleAutocomplete	Accessible::Autocomplete
+nest	GtkAccessibleInvalidState	Accessible::InvalidState
+nest	GtkAccessiblePlatformState	Accessible::PlatformState
+nest	GtkAccessibleProperty		Accessible::Property
+nest	GtkAccessibleRelation		Accessible::Relation
+nest	GtkAccessibleRole		Accessible::Role
+nest	GtkAccessibleSort		Accessible::Sort
+nest	GtkAccessibleState		Accessible::State
+nest	GtkAccessibleTristate		Accessible::Tristate
+
+nest	GtkAccessibleTextContentChange	AccessibleText::ContentChange
+nest	GtkAccessibleTextGranularity	AccessibleText::Granularity
+nest	GtkAccessibleTextRange		AccessibleText::Range
+onstack	GtkAccessibleTextRange
+
+nest	GtkAssistantPageType		Assistant::PageType
+nest	GtkCellRendererAccelMode	CellRendererAccel::Mode
+nest	GtkCellRendererMode		CellRenderer::Mode
+nest	GtkEditableProperties		Editable::Properties
+nest	GtkEntryIconPosition		Entry::IconPosition
+# EventSequence is in GDK, so no nest here
+#nest	GtkEventSequenceState		EventSequence::State
+nest	GtkFileChooserAction		FileChooser::Action
+nest	GtkFilterChange			Filter::Change
+nest	GtkFilterMatch			Filter::Match
+nest	GtkGraphicsOffloadEnabled	GraphicsOffload::Enabled
+nest	GtkIconViewDropPosition		IconView::DropPosition
+nest	GtkImageType			Image::Type
+nest	GtkInscriptionOverflow		Inscription::Overflow
+nest	GtkLevelBarMode			LevelBar::Mode
+nest	GtkNotebookTab			Notebook::Tab
+nest	GtkPrintOperationAction		PrintOperation::Action
+nest	GtkPrintOperationResult		PrintOperation::Result
+nest	GtkRevealerTransitionType	Revealer::TransitionType
+nest	GtkScrollablePolicy		Scrollable::Policy
+nest-alias GtkShortcutScope		Shortcut::Scope
+nest	GtkSizeGroupMode		SizeGroup::Mode
+nest	GtkSorterChange			Sorter::Change
+nest	GtkSorterOrder			Sorter::Order
+nest	GtkSpinButtonUpdatePolicy	SpinButton::UpdatePolicy
+nest	GtkStackTransitionType		Stack::TransitionType
+nest	GtkStringFilterMatchMode	StringFilter::MatchMode
+nest	GtkTextViewLayer		TextView::Layer
+
+nest	GtkTreeViewColumnSizing		TreeView::ColumnSizing
+nest	GtkTreeViewDropPosition		TreeView::DropPosition
+nest	GtkTreeViewGridLines		TreeView::GridLines
+
+nest	GtkConstraintAttribute		Constraint::Attribute
+nest	GtkConstraintRelation		Constraint::Relation
+nest	GtkConstraintStrength		Constraint::Strength
+
+nest	GtkApplicationInhibitFlags	Application::InhibitFlags
+nest	GtkBuilderClosureFlags		Builder::ClosureFlags
+nest	GtkCellRendererState		CellRenderer::State
+nest	GtkDialogFlags			Dialog::Flags
+nest	GtkEventControllerScrollFlags	EventControllerScroll::Flags
+nest	GtkFontChooserLevel		FontChooser::Level
+nest	GtkPopoverMenuFlags		PopoverMenu::Flags
+nest	GtkShortcutActionFlags		ShortcutAction::Flags
+nest	GtkStyleContextPrintFlags	StyleContext::PrintFlags
+nest	GtkTreeModelFlags		TreeModel::Flags
+
+nest	GtkBuilderError			Builder::Error
+nest	GtkConstraintVflParserError	Constraint::VflParserError
+nest	GtkFileChooserError		FileChooser::Error
+nest	GtkIconThemeError		IconTheme::Error
+nest	GtkRecentManagerError		RecentManager::Error
+
+nest	GtkConstraintTarget		Constraint::Target
+
+nest	GtkColumnViewColumn		ColumnView::Column
+nest	GtkColumnViewRow		ColumnView::Row
+nest	GtkColumnViewCell		ColumnView::Cell
+nest	GtkColumnViewSorter		ColumnView::Sorter
+
+nest	GtkBuilderScope			Builder::Scope
+nest	GtkBuilderCScope		Builder::CScope
+nest	GtkCellAreaContext		CellArea::Context
+
+no-autobase GtkBuildable
+no-autobase GtkAccessible
+prefer-autobase GtkSectionModel		SelectionModel
+
+# Adw
+float	adw_window_set_content		content
+float	adw_application_window_set_content content
+float	adw_header_bar_set_title_widget	title_widget
+float	adw_header_bar_pack_start	child
+float	adw_header_bar_pack_end		child
+float	adw_toolbar_view_add_top_bar	widget
+float	adw_toolbar_view_add_bottom_bar	widget
+float	adw_toolbar_view_set_content	content
+float	adw_tab_overview_set_child	child
+float	adw_tab_view_add_page		child
+float	adw_tab_view_append		child
+float	adw_tab_view_append_pinned	child
+float	adw_tab_view_insert		child
+float	adw_tab_view_insert_pinned	child
+float	adw_tab_view_prepend		child
+float	adw_tab_view_prepend_pinned	child
+
+nest	AdwBreakpointConditionLengthType BreakpointCondition::LengthType
+nest	AdwBreakpointConditionRatioType	BreakpointCondition::RatioType
+
+nest	AdwAnimationState		Animation::State
+nest	AdwAnimationTarget		Animation::Target
+nest	AdwViewSwitcherPolicy		ViewSwitcher::Policy
+nest	AdwToastPriority		Toast::Priority
+nest	AdwDialogPresentationMode	Dialog::PresentationMode
+
+skip	adw_breakpoint_add_settersv
+skip	AdwSwipeable::vfunc_get_snap_points
+
+hide	AdwWindow			set_child
+hide	AdwWindow			get_child
+hide	AdwWindow			set_titlebar
+hide	AdwWindow			get_titlebar
+hide	AdwWindow			prop_child
+hide	AdwApplicationWindow		set_child
+hide	AdwApplicationWindow		get_child
+hide	AdwApplicationWindow		set_titlebar
+hide	AdwApplicationWindow		get_titlebar
+hide	AdwApplicationWindow		prop_child
+
+# Gee
+opaque	GeeHazardPointer

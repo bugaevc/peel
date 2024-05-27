@@ -1,0 +1,213 @@
+#include <peel/Adw/Adw.h>
+#include <peel/Gtk/Gtk.h>
+#include <peel/Gio/Gio.h>
+#include <peel/class.h>
+
+using namespace peel;
+
+namespace Demo
+{
+
+class Window : public Adw::ApplicationWindow
+{
+  PEEL_SIMPLE_CLASS (Window, Adw::ApplicationWindow)
+
+  Adw::TabView *tab_view;
+
+  inline void
+  init (Class *);
+
+  void
+  open_new_tab ();
+
+  static void
+  new_tab_action (Window *);
+
+  Adw::TabView *
+  on_create_window (Adw::TabView *);
+
+public:
+
+  static Window *
+  create (Gtk::Application *app)
+  {
+    Window *window = Object::create<Window> (prop_application (), app);
+    window->open_new_tab ();
+    return window;
+  }
+};
+
+PEEL_CLASS_IMPL (Window, "DemoWindow", Adw::ApplicationWindow)
+
+void
+Window::new_tab_action (Window *window)
+{
+  window->open_new_tab ();
+}
+
+inline void
+Window::Class::init ()
+{
+  install_action ("win.new-tab", nullptr, GtkWidgetActionActivateFunc (new_tab_action));
+}
+
+inline void
+Window::init (Class *)
+{
+  set_title ("Demo Adwaita app, written with peel");
+  set_default_size (700, 500);
+
+  FloatPtr<Adw::HeaderBar> header_bar = Adw::HeaderBar::create ();
+  FloatPtr<Adw::WindowTitle> window_title = Adw::WindowTitle::create (
+    "Demo Adwaita app", "Written with peel");
+  header_bar->set_title_widget (std::move (window_title));
+
+  // New Tab button
+  FloatPtr<Gtk::Button> new_tab_button = Gtk::Button::create_from_icon_name (
+    "tab-new-symbolic");
+  new_tab_button->set_action_name ("win.new-tab");
+  new_tab_button->set_tooltip_text ("New Tab");
+  new_tab_button->set_focus_on_click (false);
+  header_bar->pack_start (std::move (new_tab_button));
+
+  RefPtr<Gio::Menu> menu = Gio::Menu::create ();
+  menu->append ("New Window", "app.new-window");
+  menu->append ("Quit", "app.quit");
+  FloatPtr<Gtk::PopoverMenu> popover_menu = Gtk::PopoverMenu::create_from_model (menu);
+
+  // Menu button
+  FloatPtr<Gtk::MenuButton> menu_button = Gtk::MenuButton::create ();
+  menu_button->set_popover (std::move (popover_menu));
+  menu_button->set_icon_name ("open-menu-symbolic");
+  menu_button->set_tooltip_text ("Menu");
+  menu_button->set_focus_on_click (false);
+  header_bar->pack_end (std::move (menu_button));
+
+  // Tab Overview button
+  FloatPtr<Gtk::Button> tab_overview_button = Gtk::Button::create_from_icon_name (
+    "view-grid-symbolic");
+  tab_overview_button->set_action_name ("overview.open");
+  tab_overview_button->set_tooltip_text ("Tab Overview");
+  tab_overview_button->set_focus_on_click (false);
+  header_bar->pack_end (std::move (tab_overview_button));
+
+  FloatPtr<Adw::TabView> float_tab_view = Adw::TabView::create ();
+  tab_view = float_tab_view;
+  tab_view->connect_create_window (this, &Window::on_create_window);
+
+  FloatPtr<Adw::TabBar> tab_bar = Adw::TabBar::create ();
+  tab_bar->set_view (tab_view);
+
+  FloatPtr<Adw::ToolbarView> toolbar_view = Adw::ToolbarView::create ();
+  toolbar_view->set_top_bar_style (Adw::ToolbarStyle::RAISED);
+  toolbar_view->add_top_bar (std::move (header_bar));
+  toolbar_view->add_top_bar (std::move (tab_bar));
+  toolbar_view->set_content (std::move (float_tab_view));
+
+  FloatPtr<Adw::TabOverview> tab_overview = Adw::TabOverview::create ();
+  tab_overview->set_view (tab_view);
+  tab_overview->set_child (std::move (toolbar_view));
+  set_content (std::move (tab_overview));
+}
+
+void
+Window::open_new_tab ()
+{
+  FloatPtr<Adw::StatusPage> status_page = Adw::StatusPage::create ();
+
+  static unsigned tabs_open_this_far;
+  char *title = g_strdup_printf ("Tab #%d", ++tabs_open_this_far);
+  status_page->set_title (title);
+
+  Adw::TabPage *tab_page = tab_view->append (std::move (status_page));
+  tab_page->set_title (title);
+
+  g_free (title);
+}
+
+Adw::TabView *
+Window::on_create_window (Adw::TabView *)
+{
+  Window *new_window = Object::create<Window> (prop_application (), get_application ());
+  new_window->present ();
+  return new_window->tab_view;
+}
+
+class Application : public Adw::Application
+{
+  PEEL_SIMPLE_CLASS (Application, Adw::Application)
+  friend class Gio::Application;
+
+  inline void
+  init (Class *);
+
+  inline void
+  vfunc_activate ();
+
+  void
+  action_quit (Gio::SimpleAction *, GLib::Variant *);
+
+  void
+  action_new_window (Gio::SimpleAction *, GLib::Variant *);
+
+public:
+  static RefPtr<Application>
+  create ()
+  {
+    return Object::create<Application> (
+      prop_application_id (), "org.example.Demo",
+      prop_flags (), Gio::Application::Flags::DEFAULT_FLAGS);
+  }
+};
+
+PEEL_CLASS_IMPL (Application, "DemoApplication", Adw::Application)
+
+inline void
+Application::init (Class *)
+{
+  RefPtr<Gio::SimpleAction> action = Gio::SimpleAction::create ("quit", nullptr);
+  action->connect_activate (this, &Application::action_quit);
+  cast<Gio::ActionMap> ()->add_action (action);
+
+  action = Gio::SimpleAction::create ("new-window", nullptr);
+  action->connect_activate (this, &Application::action_new_window);
+  cast<Gio::ActionMap> ()->add_action (action);
+}
+
+inline void
+Application::Class::init ()
+{
+  override_vfunc_activate<Application> ();
+}
+
+inline void
+Application::vfunc_activate ()
+{
+  parent_vfunc_activate<Application> ();
+
+  Window *window = Window::create (this);
+  window->present ();
+}
+
+void
+Application::action_quit (Gio::SimpleAction *, GLib::Variant *)
+{
+  quit ();
+}
+
+void
+Application::action_new_window (Gio::SimpleAction *, GLib::Variant *)
+{
+  Window *window = Window::create (this);
+  window->present ();
+}
+
+} /* namespace Demo */
+
+int
+main (int argc, char *argv[])
+{
+  RefPtr<Demo::Application> app = Demo::Application::create ();
+  ArrayRef<const char *> args { const_cast<const char **> (argv), static_cast<unsigned> (argc) };
+  return app->run (args);
+}
