@@ -145,6 +145,14 @@ protected:                                                                     \
 private:                                                                       \
 /* end of PEEL_SIMPLE_CLASS */
 
+#if defined (GLIB_VERSION_2_80) && GLIB_VERSION_MAX_ALLOWED >= GLIB_VERSION_2_80
+#define _peel_once_init_enter g_once_init_enter_pointer
+#define _peel_once_init_leave g_once_init_leave_pointer
+#else
+#define _peel_once_init_enter g_once_init_enter
+#define _peel_once_init_leave g_once_init_leave
+#endif
+
 #define PEEL_CLASS_IMPL(Subclass, type_name, ParentClass)                      \
 peel_nothrow G_GNUC_CONST                                                      \
 ::peel::GObject::Type                                                          \
@@ -152,11 +160,11 @@ Subclass::get_type ()                                                          \
 {                                                                              \
   static ::GType _peel_tp;                                                     \
                                                                                \
-  if (g_once_init_enter_pointer (&_peel_tp))                                   \
+  if (_peel_once_init_enter (&_peel_tp))                                       \
     {                                                                          \
       ::GType _peel_actual_tp = ::peel::internals::ClassHelper<Subclass>::     \
         register_type_static (::peel::Type::of<ParentClass> (), (type_name));  \
-      g_once_init_leave_pointer (&_peel_tp, _peel_actual_tp);                  \
+      _peel_once_init_leave (&_peel_tp, _peel_actual_tp);                      \
     }                                                                          \
                                                                                \
   return _peel_tp;                                                             \
