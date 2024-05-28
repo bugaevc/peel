@@ -217,6 +217,8 @@ skip	GVfs::vfunc_local_file_add_info
 skip	GThreadedResolver
 ifdef	GSettingsBackend		G_SETTINGS_ENABLE_BACKEND
 
+in	g_socket_receive		size
+
 onstack	GInputVector
 onstack	GOutputVector
 onstack	GActionEntry

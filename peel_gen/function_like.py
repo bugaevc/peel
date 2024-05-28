@@ -62,6 +62,8 @@ class FunctionLike(NodeHandler):
                     p.ownership = 'none'
                 elif tweak[0] == 'owned':
                     p.ownership = 'full'
+                elif tweak[0] == 'in':
+                    p.direction = 'in'
                 elif tweak[0] == 'out':
                     p.direction = 'out'
 
