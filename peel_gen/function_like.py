@@ -47,7 +47,7 @@ class FunctionLike(NodeHandler):
             for p in self.params.params:
                 p.resolve_stuff()
         for tweak in api_tweaks.lookup(self.tweak_ident):
-            if tweak[0] in ('float', 'unowned', 'owned', 'out'):
+            if tweak[0] in ('float', 'unowned', 'owned', 'in', 'out'):
                 p = self.find_param_for_tweak(tweak[1])
                 if tweak[0] == 'float':
                     assert(not p.is_instance)
