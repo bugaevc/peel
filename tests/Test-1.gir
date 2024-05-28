@@ -47,6 +47,16 @@
           </instance-parameter>
         </parameters>
       </method>
+      <virtual-method name="get_int">
+        <return-value>
+          <type name="gint" c:type="int"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+        </parameters>
+      </virtual-method>
       <method name="pass_bool" c:identifier="test_testy_pass_bool">
         <return-value>
           <type name="none" c:type="void"/>
@@ -60,6 +70,19 @@
           </parameter>
         </parameters>
       </method>
+      <virtual-method name="pass_bool">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="b">
+            <type name="gboolean" c:type="gboolean"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
       <method name="pass_gtype" c:identifier="test_testy_pass_gtype">
         <return-value>
           <type name="none" c:type="void"/>
@@ -86,6 +109,19 @@
           </parameter>
         </parameters>
       </method>
+      <virtual-method name="get_out_int">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter direction="out" name="int_ptr">
+            <type name="gint" c:type="int*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
       <method name="get_out_bool" c:identifier="test_testy_get_out_bool">
         <return-value>
           <type name="none" c:type="void"/>
@@ -99,6 +135,19 @@
           </parameter>
         </parameters>
       </method>
+      <virtual-method name="get_out_bool">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="b" direction="out">
+            <type name="gboolean" c:type="gboolean*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
       <method name="get_out_gtype" c:identifier="test_testy_get_out_gtype">
         <return-value>
           <type name="none" c:type="void"/>
@@ -125,6 +174,19 @@
           </parameter>
         </parameters>
       </method>
+      <virtual-method name="get_out_object">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter direction="out" name="obj_ptr">
+            <type name="GObject.Object" c:type="GObject**"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
       <method name="get_out_owned_object" c:identifier="test_testy_get_out_owned_object">
         <return-value>
           <type name="none" c:type="void"/>
@@ -138,6 +200,19 @@
           </parameter>
         </parameters>
       </method>
+      <virtual-method name="get_out_owned_object">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter direction="out" name="obj_ptr" transfer-ownership="full">
+            <type name="GObject.Object" c:type="GObject**"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
       <method name="pass_value" c:identifier="test_testy_pass_value">
         <return-value>
           <type name="none" c:type="void"/>
@@ -164,6 +239,19 @@
           </parameter>
         </parameters>
       </method>
+      <virtual-method name="get_out_value">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter direction="out" name="value_ptr" caller-allocates="1">
+            <type name="GObject.Value" c:type="GValue*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
       <method name="nested_types" c:identifier="test_testy_nested_types">
         <return-value>
           <type name="none" c:type="void"/>
@@ -230,7 +318,7 @@
       </virtual-method>
       <method name="return_byte_array" c:identifier="test_testy_return_byte_array">
         <return-value transfer-ownership="none">
-          <array length="0" null-terminated="0" c:type="gconstpointer">
+          <array length="0" c:type="gconstpointer">
             <type name="guint8"/>
           </array>
         </return-value>
@@ -248,6 +336,94 @@
           </parameter>
         </parameters>
       </method>
+<!--
+      <virtual-method name="return_byte_array">
+        <return-value transfer-ownership="none">
+          <array length="0" c:type="gconstpointer">
+            <type name="guint8"/>
+          </array>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter direction="out"
+                     name="size"
+                     caller-allocates="0"
+                     transfer-ownership="full"
+                     optional="1"
+                     allow-none="1">
+            <type name="gsize" c:type="gsize*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+-->
+      <method name="return_fixed_size_array" c:identifier="test_testy_return_fixed_size_array">
+        <return-value transfer-ownership="none">
+          <array zero-terminated="0" c:type="const float*" fixed-size="4">
+            <type name="gfloat" c:type="float"/>
+          </array>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+        </parameters>
+      </method>
+      <virtual-method name="return_fixed_size_array">
+        <return-value transfer-ownership="none">
+          <array zero-terminated="0" c:type="const float*" fixed-size="4">
+            <type name="gfloat" c:type="float"/>
+          </array>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+        </parameters>
+      </virtual-method>
+      <method name="return_flags_array" c:identifier="test_testy_return_flags_array">
+        <return-value transfer-ownership="none">
+          <array length="0" c:type="const GBindingFlags*">
+            <type name="GObject.BindingFlags"/>
+          </array>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter direction="out"
+                     name="size"
+                     caller-allocates="0"
+                     transfer-ownership="full"
+                     optional="1"
+                     allow-none="1">
+            <type name="gsize" c:type="gsize*"/>
+          </parameter>
+        </parameters>
+      </method>
+<!--
+      <virtual-method name="return_flags_array">
+        <return-value transfer-ownership="none">
+          <array length="0" c:type="const GBindingFlags*">
+            <type name="GObject.BindingFlags"/>
+          </array>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter direction="out"
+                     name="size"
+                     caller-allocates="0"
+                     transfer-ownership="full"
+                     optional="1"
+                     allow-none="1">
+            <type name="gsize" c:type="gsize*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+-->
     </class>
     <record name="TestyClass"
             c:type="TestTestyClass"

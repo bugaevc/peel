@@ -214,8 +214,7 @@ class Parameter(NodeHandler):
                 return s + out_asterisk + name
             elif tp.fixed_size is not None:
                 if name is None:
-                    raise UnsupportedForNowException('return fixed-size array')
-                    # return '{} (&)[{}]'.format(s, tp.fixed_size)
+                    return '{} (&)[{}]'.format(s, tp.fixed_size)
                 if out_asterisk:
                     raise UnsupportedForNowException('out fixed-size array')
                 return '{} (&{})[{}]'.format(s, name, tp.fixed_size)
@@ -227,6 +226,7 @@ class Parameter(NodeHandler):
                     return 'peel::ArrayRef<{}>'.format(s)
                 return 'peel::ArrayRef<{}> {}{}'.format(s, out_asterisk, name)
             else:
+                # TODO support null-terminated arrays
                 raise UnsupportedForNowException('Complex array')
 
         if isinstance(itp, DefinedType) and itp.ns.emit_raw:
@@ -246,8 +246,10 @@ class Parameter(NodeHandler):
         if not itp.is_passed_by_ref():
             if isinstance(itp, VoidType):
                 assert(self.is_rv)
-                assert(name is None)
-                return 'void'
+                if name is None:
+                    return 'void'
+                assert(name == 'fake-return-name')
+                return 'void fake-return-name'
             elif isinstance(itp, VaListType):
                 assert(self.direction == 'in')
                 return make_type(self.c_type)
@@ -258,8 +260,8 @@ class Parameter(NodeHandler):
                     return make_type('/* owned */ char *' + constness1)
                 else:
                     return make_type('const char *' + constness1)
-            elif isinstance(tp, (Enumeration, Bitfield)):
-                return make_type(type_name)
+            elif isinstance(itp, (Enumeration, Bitfield)):
+                return make_type(constness0 + type_name)
             else:
                 raise UnsupportedForNowException('unsupported type {}'.format(itp))
 

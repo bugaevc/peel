@@ -199,7 +199,103 @@ public:
     return peel::ArrayRef<const uint8_t> (reinterpret_cast<const uint8_t *> (_peel_return), _peel_size);
   }
 
+  peel_nothrow
+  const float
+  (&return_fixed_size_array ())[4]
+  {
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    const float * _peel_return = test_testy_return_fixed_size_array (_peel_this);
+    return reinterpret_cast<const float (&)[4]> (*_peel_return);
+  }
+
+  peel_nothrow
+  peel::ArrayRef<const GObject::Binding::Flags>
+  return_flags_array ()
+  {
+    gsize _peel_size;
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    const ::GBindingFlags * _peel_return = test_testy_return_flags_array (_peel_this, &_peel_size);
+    return peel::ArrayRef<const GObject::Binding::Flags> (reinterpret_cast<const GObject::Binding::Flags *> (_peel_return), _peel_size);
+  }
+
 protected:
+  template<typename DerivedClass>
+  peel_nothrow
+  int
+  parent_vfunc_get_int ()
+  {
+    ::TestTestyClass *_p_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    return _p_class->get_int (_peel_this);
+  }
+
+  template<typename DerivedClass>
+  peel_nothrow
+  void
+  parent_vfunc_pass_bool (bool b)
+  {
+    ::TestTestyClass *_p_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    gboolean _peel_b = static_cast<gboolean> (b);
+    _p_class->pass_bool (_peel_this, _peel_b);
+  }
+
+  template<typename DerivedClass>
+  peel_nothrow peel_arg_out (2) peel_nonnull_args (2)
+  void
+  parent_vfunc_get_out_int (int *int_ptr)
+  {
+    ::TestTestyClass *_p_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    _p_class->get_out_int (_peel_this, int_ptr);
+  }
+
+  template<typename DerivedClass>
+  peel_nothrow peel_arg_out (2) peel_nonnull_args (2)
+  void
+  parent_vfunc_get_out_bool (bool *b)
+  {
+    ::TestTestyClass *_p_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    gboolean _peel_b;
+    _p_class->get_out_bool (_peel_this, &_peel_b);
+    *b = !!_peel_b;
+  }
+
+  template<typename DerivedClass>
+  peel_nothrow peel_arg_out (2) peel_nonnull_args (2)
+  void
+  parent_vfunc_get_out_object (GObject::Object **obj_ptr)
+  {
+    ::TestTestyClass *_p_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    ::GObject ** _peel_obj_ptr = reinterpret_cast<::GObject **> (obj_ptr);
+    _p_class->get_out_object (_peel_this, _peel_obj_ptr);
+  }
+
+  template<typename DerivedClass>
+  peel_nothrow peel_arg_out (2)
+  void
+  parent_vfunc_get_out_owned_object (peel::RefPtr<GObject::Object> *obj_ptr)
+  {
+    ::TestTestyClass *_p_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    ::GObject * _peel_obj_ptr;
+    _p_class->get_out_owned_object (_peel_this, &_peel_obj_ptr);
+    *obj_ptr = peel::RefPtr<GObject::Object>::adopt_ref (reinterpret_cast<GObject::Object *> (_peel_obj_ptr));
+  }
+
+  template<typename DerivedClass>
+  peel_nothrow peel_arg_out (2) peel_nonnull_args (2)
+  void
+  parent_vfunc_get_out_value (GObject::Value *value_ptr)
+  {
+    ::TestTestyClass *_p_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    ::GValue * _peel_value_ptr = reinterpret_cast<::GValue *> (value_ptr);
+    _p_class->get_out_value (_peel_this, _peel_value_ptr);
+  }
+
   template<typename DerivedClass, typename CoolCallback>
   peel_nothrow
   int
@@ -221,6 +317,17 @@ protected:
     return _p_class->add_cool_callback (_peel_this, _peel_binding, s, _peel_callback, _peel_user_data);
   }
 
+  template<typename DerivedClass>
+  peel_nothrow
+  const float
+  (&parent_vfunc_return_fixed_size_array ())[4]
+  {
+    ::TestTestyClass *_p_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    const float * _peel_return = _p_class->return_fixed_size_array (_peel_this);
+    return reinterpret_cast<const float (&)[4]> (*_peel_return);
+  }
+
   class Class : public GObject::Object::Class
   {
   private:
@@ -231,7 +338,111 @@ protected:
     unsigned char _placeholder[sizeof (::TestTestyClass) - sizeof (GObject::Object::Class)];
   public:
   protected:
+    template<typename DerivedClass>
+    void
+    override_vfunc_get_int ()
+    {
+      ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
+      klass->get_int = +[] (::TestTesty *self) -> int
+      {
+        DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
+        return _peel_this->DerivedClass::vfunc_get_int ();
+      };
+    }
+
+    template<typename DerivedClass>
+    void
+    override_vfunc_pass_bool ()
+    {
+      ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
+      klass->pass_bool = +[] (::TestTesty *self, gboolean b) -> void
+      {
+        DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
+        bool _peel_b = !!b;
+        _peel_this->DerivedClass::vfunc_pass_bool (_peel_b);
+      };
+    }
+
+    template<typename DerivedClass>
+    void
+    override_vfunc_get_out_int ()
+    {
+      ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
+      klass->get_out_int = +[] (::TestTesty *self, int *int_ptr) -> void
+      {
+        DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
+        _peel_this->DerivedClass::vfunc_get_out_int (int_ptr);
+      };
+    }
+
+    template<typename DerivedClass>
+    void
+    override_vfunc_get_out_bool ()
+    {
+      ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
+      klass->get_out_bool = +[] (::TestTesty *self, gboolean *b) -> void
+      {
+        DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
+        bool _peel_b;
+        _peel_this->DerivedClass::vfunc_get_out_bool (&_peel_b);
+        *b = static_cast<gboolean> (_peel_b);
+      };
+    }
+
+    template<typename DerivedClass>
+    void
+    override_vfunc_get_out_object ()
+    {
+      ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
+      klass->get_out_object = +[] (::TestTesty *self, ::GObject **obj_ptr) -> void
+      {
+        DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
+        GObject::Object **_peel_obj_ptr = reinterpret_cast<GObject::Object **> (obj_ptr);
+        _peel_this->DerivedClass::vfunc_get_out_object (_peel_obj_ptr);
+      };
+    }
+
+    template<typename DerivedClass>
+    void
+    override_vfunc_get_out_owned_object ()
+    {
+      ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
+      klass->get_out_owned_object = +[] (::TestTesty *self, ::GObject **obj_ptr) -> void
+      {
+        DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
+        peel::RefPtr<GObject::Object> _peel_obj_ptr;
+        _peel_this->DerivedClass::vfunc_get_out_owned_object (&_peel_obj_ptr);
+        *obj_ptr = reinterpret_cast<::GObject *> (std::move (_peel_obj_ptr).release_ref ());
+      };
+    }
+
+    template<typename DerivedClass>
+    void
+    override_vfunc_get_out_value ()
+    {
+      ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
+      klass->get_out_value = +[] (::TestTesty *self, ::GValue *value_ptr) -> void
+      {
+        DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
+        GObject::Value *_peel_value_ptr = reinterpret_cast<GObject::Value *> (value_ptr);
+        _peel_this->DerivedClass::vfunc_get_out_value (_peel_value_ptr);
+      };
+    }
+
     /* Unsupported for now: add_cool_callback: casting callback from C to C++ */
+
+    template<typename DerivedClass>
+    void
+    override_vfunc_return_fixed_size_array ()
+    {
+      ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
+      klass->return_fixed_size_array = +[] (::TestTesty *self) -> const float *
+      {
+        DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
+        const float (&_peel_return)[4] = _peel_this->DerivedClass::vfunc_return_fixed_size_array ();
+        return reinterpret_cast<const float *> (_peel_return);
+      };
+    }
   };
 
   static_assert (sizeof (Class) == sizeof (::TestTestyClass),

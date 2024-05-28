@@ -49,12 +49,29 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
     l = []
     if templates:
         l.append(indent + 'template<{}>'.format(', '.join('typename ' + t for t in templates)))
-    l.extend([
-        indent + 'peel_nothrow' + ''.join(' ' + attr for attr in attributes),
-        indent + '{}{}'.format('static ' if is_static else '', rv.generate_cpp_type(name=None, context=context)),
-        indent + '{} ({})'.format(name, cpp_signature) + (' const' if is_const else ''),
-        indent + '{',
-    ])
+    l.append(indent + 'peel_nothrow' + ''.join(' ' + attr for attr in attributes))
+    fake_return_name = 'fake-return-name'
+    rv_cpp_signature = rv.generate_cpp_type(name=fake_return_name, context=context)
+    params_signature = '{} ({})'.format(name, cpp_signature) + (' const' if is_const else '')
+    if rv_cpp_signature.endswith(fake_return_name):
+        rv_cpp_type = rv_cpp_signature[:-len(fake_return_name)].strip()
+        l.extend([
+            indent + '{}{}'.format('static ' if is_static else '', rv_cpp_type),
+            indent + params_signature,
+        ])
+    else:
+        fake_return_name_pos = rv_cpp_signature.find(fake_return_name)
+        space_pos = rv_cpp_signature.rfind(' ', 0, fake_return_name_pos)
+        assert(space_pos != -1)
+        l.extend([
+            indent + '{}{}'.format('static ' if is_static else '', rv_cpp_signature[:space_pos]),
+            indent + '{}{}{}'.format(
+                rv_cpp_signature[space_pos+1:fake_return_name_pos],
+                params_signature,
+                rv_cpp_signature[fake_return_name_pos+len(fake_return_name):],
+            )
+        ])
+    l.append(indent + '{')
     if extra_decls:
         l.append(extra_decls)
     args = []
