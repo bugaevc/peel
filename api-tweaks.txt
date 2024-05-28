@@ -218,6 +218,8 @@ skip	GThreadedResolver
 ifdef	GSettingsBackend		G_SETTINGS_ENABLE_BACKEND
 
 in	g_socket_receive		size
+in	g_socket_receive_from		size
+in	g_socket_receive_with_blocking	size
 
 onstack	GInputVector
 onstack	GOutputVector
@@ -332,6 +334,9 @@ onstack	PangoLogAttr
 opaque	PangoLogAttr
 onstack	PangoGlyphInfo
 onstack	PangoRectangle
+
+in	pango_font_get_features		len
+in	PangoFont::vfunc_get_features	len
 
 # Graphene
 onstack	graphene_rect_t

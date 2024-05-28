@@ -107,6 +107,9 @@
           <parameter direction="out" name="int_ptr">
             <type name="gint" c:type="int*"/>
           </parameter>
+          <parameter direction="out" name="int_ptr2" caller-allocates="1">
+            <type name="gint" c:type="int*"/>
+          </parameter>
         </parameters>
       </method>
       <virtual-method name="get_out_int">
@@ -118,6 +121,9 @@
             <type name="Testy" c:type="TestTesty*"/>
           </instance-parameter>
           <parameter direction="out" name="int_ptr">
+            <type name="gint" c:type="int*"/>
+          </parameter>
+          <parameter direction="out" name="int_ptr2" caller-allocates="1">
             <type name="gint" c:type="int*"/>
           </parameter>
         </parameters>

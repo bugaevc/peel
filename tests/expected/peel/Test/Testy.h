@@ -95,12 +95,12 @@ public:
     test_testy_pass_gtype (_peel_this, gt);
   }
 
-  peel_nothrow peel_arg_out (2) peel_nonnull_args (2)
+  peel_nothrow peel_arg_out (2) peel_arg_out (3) peel_nonnull_args (2, 3)
   void
-  get_out_int (int *int_ptr)
+  get_out_int (int *int_ptr, int *int_ptr2)
   {
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
-    test_testy_get_out_int (_peel_this, int_ptr);
+    test_testy_get_out_int (_peel_this, int_ptr, int_ptr2);
   }
 
   peel_nothrow peel_arg_out (2) peel_nonnull_args (2)
@@ -241,13 +241,13 @@ protected:
   }
 
   template<typename DerivedClass>
-  peel_nothrow peel_arg_out (2) peel_nonnull_args (2)
+  peel_nothrow peel_arg_out (2) peel_arg_out (3) peel_nonnull_args (2, 3)
   void
-  parent_vfunc_get_out_int (int *int_ptr)
+  parent_vfunc_get_out_int (int *int_ptr, int *int_ptr2)
   {
     ::TestTestyClass *_p_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
-    _p_class->get_out_int (_peel_this, int_ptr);
+    _p_class->get_out_int (_peel_this, int_ptr, int_ptr2);
   }
 
   template<typename DerivedClass>
@@ -368,10 +368,10 @@ protected:
     override_vfunc_get_out_int ()
     {
       ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
-      klass->get_out_int = +[] (::TestTesty *self, int *int_ptr) -> void
+      klass->get_out_int = +[] (::TestTesty *self, int *int_ptr, int *int_ptr2) -> void
       {
         DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
-        _peel_this->DerivedClass::vfunc_get_out_int (int_ptr);
+        _peel_this->DerivedClass::vfunc_get_out_int (int_ptr, int_ptr2);
       };
     }
 

@@ -167,7 +167,7 @@ class Parameter(NodeHandler):
 
         if self.direction == 'in' or for_local_copy:
             out_asterisk = ''
-        elif self.caller_allocates:
+        elif self.caller_allocates and tp.is_passed_by_ref():
             if not tp.can_be_allocated_by_value():
                 raise UnsupportedForNowException('caller-allocates non-allocatable type (perhaps {} should be marked onstack?)'.format(tp))
             # Don't add an additional asterisk to the one that will be added
