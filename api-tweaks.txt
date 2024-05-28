@@ -196,6 +196,9 @@ ref	GParamSpec			g_param_spec_ref
 ref-sink GParamSpec			g_param_spec_ref_sink
 float	GParamSpec
 
+onstack	GSignalQuery
+onstack	GTypeQuery
+
 # Gio
 skip	g_buffered_input_stream_peek_buffer
 skip	g_networking_init
@@ -326,14 +329,24 @@ skip	pango_log2vis_get_embedding_levels
 onstack	PangoLogAttr
 opaque	PangoLogAttr
 onstack	PangoGlyphInfo
+onstack	PangoRectangle
 
 # Graphene
 onstack	graphene_rect_t
 onstack	graphene_point_t
+onstack	graphene_point3d_t
 onstack	graphene_matrix_t
 onstack	graphene_size_t
+onstack	graphene_vec2_t
 onstack	graphene_vec3_t
+onstack	graphene_vec4_t
 onstack	graphene_box_t
+onstack	graphene_plane_t
+onstack	graphene_sphere_t
+onstack	graphene_quaternion_t
+onstack	graphene_quad_t
+onstack	graphene_ray_t
+onstack	graphene_euler_t
 onstack	graphene_simd4f_t
 opaque	graphene_simd4f_t
 onstack	graphene_simd4x4f_t
@@ -389,8 +402,12 @@ nest	GskPathForeachFlags		Path::ForeachFlags
 nest	GskRenderNodeType		RenderNode::Type
 nest	GskTransformCategory		Transform::Category
 
+nest	GskPathPoint			Path::Point
+opaque	GskPathPoint
+
 onstack	GskColorStop
 onstack	GskRoundedRect
+onstack	GskPathPoint
 
 # Gtk
 skip	gtk_tree_model_rows_reordered

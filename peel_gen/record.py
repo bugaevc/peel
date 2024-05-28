@@ -28,6 +28,7 @@ class Record(DefinedType):
         self.is_pointer_type = False
         self.onstack = False
         self.is_initially_floating = False
+        self.all_fields_supported = True
         self.struct_kw = 'class /* record */'
         assert('glib:is-gtype-struct-for' not in attrs)
 
@@ -67,6 +68,11 @@ class Record(DefinedType):
             f = Field(attrs, self)
             self.fields.append(f)
             return f
+        elif name == 'union':
+            self.incomplete = False
+            self.all_fields_supported = False
+            if not self.opaque:
+                self.struct_kw = 'struct'
 
     def resolve_stuff(self):
         if self.has_resolved_stuff:
@@ -90,7 +96,7 @@ class Record(DefinedType):
                 self.is_initially_floating = True
 
         self.is_refcounted = bool(self.ref_func)
-        self.all_fields_supported = all(f.we_support_this for f in self.fields)
+        self.all_fields_supported = self.all_fields_supported and all(f.we_support_this for f in self.fields)
 
     def should_generate_fields(self):
         return self.all_fields_supported and not self.opaque and not self.incomplete
@@ -154,6 +160,7 @@ class Record(DefinedType):
 
     def generate(self):
         api_tweaks.skip_if_needed(self.c_type)
+        assert(not (self.onstack and self.incomplete))
 
         l = [
             '{} {}'.format(self.struct_kw, self.emit_def_name),

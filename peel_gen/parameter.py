@@ -169,7 +169,7 @@ class Parameter(NodeHandler):
             out_asterisk = ''
         elif self.caller_allocates:
             if not tp.can_be_allocated_by_value():
-                raise UnsupportedForNowException('caller-allocates non-allocatable type')
+                raise UnsupportedForNowException('caller-allocates non-allocatable type (perhaps {} should be marked onstack?)'.format(tp))
             # Don't add an additional asterisk to the one that will be added
             # by the usual "this type gets passed by ref" logic anyway.
             out_asterisk = ''
