@@ -257,6 +257,7 @@ struct SignalHelper1<Ret>
   static void
   marshal_va_cpp (Instance *instance, Callback &callback, ::GValue *return_value, va_list va_args, UnpackedArgs... args)
   {
+    (void) va_args;
     SignalHelper2<Ret, UnpackedArgs...>::template marshal_cpp<Instance, Callback> (instance, callback, return_value, args...);
   }
 };
