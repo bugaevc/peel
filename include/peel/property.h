@@ -306,7 +306,7 @@ private:
 public:
   template<typename T>
   Getter<Class, T>
-  prop (Property<T> p, ...)
+  prop (Property<T>, ...)
   {
     if (next_id++ == target_id)
       return Getter<Class, T> { instance, value, &found };
@@ -397,7 +397,7 @@ private:
 public:
   template<typename T>
   Setter<Class, T>
-  prop (Property<T> p, ...)
+  prop (Property<T>, ...)
   {
     if (next_id++ == target_id)
       return Setter<Class, T> { instance, value, &found };
@@ -519,7 +519,7 @@ struct PropertyHelper
 {
   peel_nothrow
   static void
-  init_props (::GObjectClass *klass)
+  init_props (::GObjectClass *)
   {
     /* The base implementation does nothing */
   }
