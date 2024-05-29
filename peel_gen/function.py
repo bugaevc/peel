@@ -40,6 +40,7 @@ class Function(FunctionLike):
             rv=self.rv,
             params=self.params,
             throws=self.throws,
-            indent=''
+            indent='',
+            attributes=['peel_no_warn_unused'],
         )
 

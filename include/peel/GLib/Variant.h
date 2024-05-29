@@ -16,7 +16,7 @@ class Variant
 {
 public:
   class Type;
-  class Builder;
+  struct Builder;
   typedef VariantIter Iter;
 };
 

@@ -65,7 +65,7 @@ namespace GObject
 class Object : public TypeInstance
 {
 private:
-  unsigned char _placeholder[sizeof (::GObject) - sizeof (TypeInstance)];
+  unsigned char _placeholder[sizeof (::GObject) - sizeof (TypeInstance)] peel_no_warn_unused;
 
   Object () = delete;
   Object (const Object &) = delete;
@@ -176,18 +176,11 @@ public:
   static peel::enable_if_derived<Object, Class, typename Traits<Class>::CreateType>
   create (Args &&...args)
   {
-    const char *names[sizeof... (Args) / 2];
-    ::GValue values[sizeof... (Args) / 2];
-    memset (values, 0, sizeof (values));
-
-    PropsCollector<Args...>::collect (names, values, std::forward<Args> (args)...);
+    static_assert (sizeof... (Args) % 2 == 0,
+                   "Must pass property / value pairs");
 
     ::GType type = static_cast<::GType> (Type::of<Class> ());
-    ::GObject *obj = g_object_new_with_properties (type, sizeof... (Args) / 2, names, values);
-
-    for (size_t i = 0; i * 2 < sizeof... (Args); i++)
-      g_value_unset (&values[i]);
-
+    ::GObject *obj = PropsCollector<Args...>::create (type, std::forward<Args> (args)...);
     return Traits<Class>::created (obj);
   }
 
@@ -346,7 +339,7 @@ public:
     Class (Class &&) = delete;
 
     // TODO: These should be public fields.
-    unsigned char _placeholder[sizeof (::GObjectClass) - sizeof (TypeClass)];
+    unsigned char _placeholder[sizeof (::GObjectClass) - sizeof (TypeClass)] peel_no_warn_unused;
 
   public:
     peel_nothrow
@@ -449,8 +442,12 @@ struct Value::Traits<T, peel::enable_if_derived<Object, T, void>>
     void *obj = g_value_get_object (value);
     if (std::is_same<T, Object>::value)
       return reinterpret_cast<T *> (obj);
+#if defined (G_DISABLE_CAST_CHECKS) || defined (__OPTIMIZE__)
+    return reinterpret_cast<T *> (obj);
+#else
     ::GType tp = static_cast<::GType> (Type::of<T> ());
     return G_TYPE_CHECK_INSTANCE_CAST (obj, tp, T);
+#endif
   }
 
   peel_nothrow
@@ -487,7 +484,16 @@ struct Object::PropsCollector<>
 {
   static void
   collect (const char *names[], ::GValue values[])
-  { }
+  {
+    (void) names;
+    (void) values;
+  }
+
+  static ::GObject *
+  create (::GType tp)
+  {
+    return g_object_new_with_properties (tp, 0, nullptr, nullptr);
+  }
 };
 
 template<typename T, typename U, typename... Args>
@@ -502,6 +508,25 @@ struct Object::PropsCollector<Property<T>, U, Args...>
     value->set<T> (std::forward<U> (prop_value));
 
     Object::PropsCollector<Args...>::collect (names + 1, values + 1, std::forward<Args> (args)...);
+  }
+
+  peel_nothrow
+  static ::GObject *
+  create (::GType type, Property<T> prop, U &&prop_value, Args... args)
+  {
+    constexpr int n = 1 + sizeof... (Args) / 2;
+    const char *names[n];
+    ::GValue values[n];
+    memset (values, 0, sizeof (values));
+
+    collect (names, values, prop, std::forward<U> (prop_value), std::forward<Args> (args)...);
+
+    ::GObject *obj = g_object_new_with_properties (type, n, names, values);
+
+    for (size_t i = 0; i < n; i++)
+      g_value_unset (&values[i]);
+
+    return obj;
   }
 };
 

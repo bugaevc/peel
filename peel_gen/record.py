@@ -172,7 +172,7 @@ class Record(DefinedType):
             l.append(s)
         if (self.opaque or not self.all_fields_supported) and not self.incomplete:
             l.extend([
-                '  ::{} inner;'.format(self.c_type),
+                '  ::{} inner peel_no_warn_unused;'.format(self.c_type),
                 ''
             ])
         s = api_tweaks.endif_for_non_opaque(self.c_type)

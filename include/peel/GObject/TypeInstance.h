@@ -14,7 +14,7 @@ class TypeClass;
 class TypeInstance
 {
 private:
-  ::GTypeInstance ti;
+  ::GTypeInstance ti peel_no_warn_unused;
 
   TypeInstance () = delete;
   TypeInstance (const TypeInstance &) = delete;

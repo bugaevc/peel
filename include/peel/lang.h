@@ -17,9 +17,11 @@
 #ifdef __GNUC__
 #define peel_assume(expr) do { if (!(expr)) __builtin_unreachable (); } while (0)
 #define peel_nothrow __attribute__ ((nothrow))
+#define peel_no_warn_unused __attribute__ ((unused))
 #else
 #define peel_assume(expr) do { } while (0)
 #define peel_nothrow
+#define peel_no_warn_unused
 #endif
 
 #ifdef __GNUC__

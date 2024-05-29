@@ -325,18 +325,29 @@ struct SignalHelper2<void, Args...>
   }
 };
 
+template<typename Callback>
+struct ClosureStoringCallback : public ::GClosure
+{
+  Callback storage;
+};
+
+template<typename Callback>
+using ClosureStoringOptionalCallback = typename std::conditional<
+  (sizeof (Callback) > sizeof (gpointer)),
+  ClosureStoringCallback<Callback>,
+  ::GClosure
+>::type;
+
 template<typename Instance, typename Callback, typename Ret, typename... Args>
-class SignalClosure : public ::GClosure
+class SignalClosure : public ClosureStoringOptionalCallback<Callback>
 {
 private:
-  Callback storage[(sizeof (Callback) > sizeof (gpointer)) ? 1 : 0];
-
   Callback *
   callback_ptr ()
   {
     if (sizeof (Callback) > sizeof (gpointer))
-      return &storage[0];
-    return reinterpret_cast<Callback *> (&data);
+      return &reinterpret_cast<ClosureStoringCallback<Callback> *> (this)->storage;
+    return reinterpret_cast<Callback *> (&reinterpret_cast<::GClosure *> (this)->data);
   }
 
   peel_nothrow
@@ -615,14 +626,11 @@ public:
   {
     ::GType instance_type = GObject::Type::of<Instance> ();
     ::GType return_type = GObject::Type::of<typename internals::SignalTraits<Ret>::PlainCppType> ();
-    ::GType param_types[] = { GObject::Type::of<typename internals::SignalTraits<Args>::PlainCppType> ()... };
-    id = g_signal_newv
-      (
-        name, instance_type, flags,
-        nullptr, nullptr, nullptr,
-        marshal, return_type,
-        sizeof... (Args), param_types
-    );
+    ::GType param_types[] = { GObject::Type::of<typename internals::SignalTraits<Args>::PlainCppType> ()..., G_TYPE_INVALID };
+    id = g_signal_newv (name, instance_type, flags,
+                        nullptr, nullptr, nullptr,
+                        marshal, return_type,
+                        sizeof... (Args), param_types);
     g_signal_set_va_marshaller (id, instance_type, marshal_va);
   }
 

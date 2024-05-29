@@ -14,7 +14,7 @@ class TypeInterface
   TypeInterface (const TypeInterface &) = delete;
   TypeInterface (TypeInterface &&) = delete;
 
-  ::GTypeInterface ti;
+  ::GTypeInterface ti peel_no_warn_unused;
 
 protected:
   ~TypeInterface() { }

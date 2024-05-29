@@ -1,9 +1,11 @@
 from peel_gen import api_tweaks
 
-def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=None, templates=None):
+def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=None, templates=None, attributes=None):
     """
     Common helper for function-likes that need to wrap a C callee into a C++ function.
     """
+    if attributes is None:
+        attributes = []
     typed_tweak_callee = None
     for tweak in api_tweaks.lookup(c_callee, 'typed'):
         typed_tweak_callee = tweak[1]
@@ -18,7 +20,7 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
         more_templates = params.generate_cpp_signature_templates(has_typed_tweak)
         if more_templates:
             templates.extend(more_templates)
-        attributes = params.generate_function_attributes(has_typed_tweak)
+        attributes.extend(params.generate_function_attributes(has_typed_tweak))
         skip_params = params.skip_params
         if templates:
             # TODO: handle both at the same time
@@ -29,7 +31,6 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
         cpp_signature = ''
         templates = None
         skip_params = []
-        attributes = []
 
     if throws:
         error_param = 'peel::UniquePtr<GLib::Error> *error'

@@ -18,7 +18,7 @@ private:
   TypeClass (const TypeClass &) = delete;
   TypeClass (TypeClass &&) = delete;
 
-  ::GTypeClass tc;
+  ::GTypeClass tc peel_no_warn_unused;
 
 protected:
   ~TypeClass() { }

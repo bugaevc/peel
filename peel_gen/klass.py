@@ -5,6 +5,7 @@ from peel_gen.vfunc import Vfunc
 from peel_gen.interface import Interface
 from peel_gen.signal import Signal
 from peel_gen.property import Property
+from peel_gen.field import Field
 from peel_gen.type import lookup_type, pick_base_type
 from peel_gen.exceptions import UnsupportedForNowException
 from peel_gen.specializations import generate_get_type_specialization, generate_ref_traits_specialization
@@ -30,6 +31,7 @@ class Class(DefinedType):
         self.hidden_members = []
         self.parent_gir_name = attrs.get('parent', None)
         self.sealed = True  # Will be set to false if we see any fields
+        self.fields = []
         self.type_struct_name = attrs.get('glib:type-struct', None)
         self.type_struct = None
 
@@ -115,6 +117,13 @@ class Class(DefinedType):
             return v
         elif name == 'field':
             self.sealed = False
+            f = Field(attrs, self)
+            self.fields.append(f)
+            return f
+        elif name == 'union':
+            self.sealed = False
+            self.fields.append('union')
+            return
         elif name == 'glib:signal':
             s = Signal(attrs, self)
             self.signals.append(s)
@@ -196,6 +205,13 @@ class Class(DefinedType):
         elif isinstance(parent_member, Method):
             return not any(c.name == parent_member.name for c in self.methods)
 
+    def should_emit_placeholder_member(self):
+        # GInitiallyUnowned is typedefed from struct _GObject, not
+        # struct _GInitiallyUnowned containing a GObject.
+        if self.c_type == 'GInitiallyUnowned':
+            return False
+        return len(self.fields) > 1
+
     def generate(self):
         api_tweaks.skip_if_needed(self.c_type)
 
@@ -222,17 +238,21 @@ class Class(DefinedType):
             l.insert(1, '/* extends {} */'.format(self.parent.emit_name_for_context(self)))
         if self.sealed:
             l.insert(1, '/* non-derivable */')
-        s = api_tweaks.ifdef_for_non_opaque(self.c_type)
-        if s:
-            l.append(s)
-        if not self.sealed or s:
-            # We cannot know the instance size this way for sealed classes
-            l.extend([
-                '  unsigned char _placeholder[sizeof (::{}) - sizeof ({})];'.format(self.c_type, cpp_base_type_emit_name),
-            ])
-        s = api_tweaks.endif_for_non_opaque(self.c_type)
-        if s:
-            l.append(s)
+        if self.should_emit_placeholder_member():
+            s = api_tweaks.ifdef_for_non_opaque(self.c_type)
+            if s:
+                l.append(s)
+            if not self.sealed or s:
+                # We cannot know the instance size this way for sealed classes
+                l.append(
+                    '  unsigned char _placeholder[sizeof (::{}) - sizeof ({})] peel_no_warn_unused;'.format(
+                        self.c_type,
+                        cpp_base_type_emit_name,
+                    ),
+                )
+            s = api_tweaks.endif_for_non_opaque(self.c_type)
+            if s:
+                l.append(s)
         for member in self.hidden_members:
             l.append('  using {}::{};'.format(cpp_base_type_emit_name, member))
         if self.parent is not None:
@@ -401,8 +421,12 @@ class Class(DefinedType):
                 '    void *obj = {} (value);'.format(self.get_value_func),
                 '    if (std::is_same<T, {}>::value)'.format(full_name),
                 '      return reinterpret_cast<{} *> (obj);'.format(full_name),
+                '#if defined (G_DISABLE_CAST_CHECKS) || defined (__OPTIMIZE__)',
+                '    return reinterpret_cast<T *> (obj);',
+                '#else',
                 '    ::GType tp = static_cast<::GType> (Type::of<T> ());',
                 '    return G_TYPE_CHECK_INSTANCE_CAST (obj, tp, T);',
+                '#endif',
                 '  }',
                 '',
                 '  static void',

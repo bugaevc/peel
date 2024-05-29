@@ -2,6 +2,7 @@ from peel_gen.defined_type import DefinedType
 from peel_gen.method import Method
 from peel_gen.klass import Class
 from peel_gen.interface import Interface
+from peel_gen.field import Field
 from peel_gen.type import lookup_type
 from peel_gen.exceptions import UnsupportedForNowException
 from peel_gen import api_tweaks
@@ -12,6 +13,7 @@ class TypeStruct(DefinedType):
         assert('glib:get-type' not in attrs)
         self.methods = []
         self.incomplete = True # Will be unset if we see any fields
+        self.fields = []
         self.type_struct_for = None
         if type_struct_for:
             self.type_struct_for_name = type_struct_for
@@ -33,6 +35,13 @@ class TypeStruct(DefinedType):
             return m
         elif name == 'field':
             self.incomplete = False
+            f = Field(attrs, self)
+            self.fields.append(f)
+            return f
+        elif name == 'union':
+            self.incomplete = False
+            self.fields.append('union')
+            return
 
     def resolve_stuff(self):
         if self.has_resolved_stuff:
@@ -95,6 +104,13 @@ class TypeStruct(DefinedType):
     def generate_forward_decl(self):
         return '  class {};'.format(self.own_name)
 
+    def should_emit_placeholder_member(self):
+        # GInitiallyUnowned is typedefed from struct _GObject, not
+        # struct _GInitiallyUnowned containing a GObject.
+        if self.c_type == 'GInitiallyUnownedClass':
+            return False
+        return len(self.fields) > 1
+
     def generate(self):
         api_tweaks.skip_if_needed(self.c_type)
 
@@ -116,16 +132,22 @@ class TypeStruct(DefinedType):
             '    {} () = delete;'.format(self.own_name),
             '    {} (const {} &) = delete;'.format(self.own_name, self.own_name),
             '    {} ({} &&) = delete;'.format(self.own_name, self.own_name),
-            ''
+            '',
         ]
-        s = api_tweaks.ifdef_for_non_opaque(self.c_type)
-        if s:
-            l.append(s)
-        if not self.incomplete or s:
-            l.append('    unsigned char _placeholder[sizeof (::{}) - sizeof ({})];'.format(self.c_type, parent_class_type_name))
-        s = api_tweaks.endif_for_non_opaque(self.c_type)
-        if s:
-            l.append(s)
+        if self.should_emit_placeholder_member():
+            s = api_tweaks.ifdef_for_non_opaque(self.c_type)
+            if s:
+                l.append(s)
+            if not self.incomplete or s:
+                l.append(
+                    '    unsigned char _placeholder[sizeof (::{}) - sizeof ({})] peel_no_warn_unused;'.format(
+                        self.c_type,
+                        parent_class_type_name,
+                    )
+                )
+            s = api_tweaks.endif_for_non_opaque(self.c_type)
+            if s:
+                l.append(s)
         l.append('  public:');
         for method in self.methods:
             try:

@@ -427,8 +427,8 @@ public:
   Installer (::GObjectClass *klass, const char *name, guint id, GObject::ParamSpec **pspec_ptr, Args... args)
     : klass (klass)
     , pspec_ptr (pspec_ptr)
-    , id (id)
     , traits (args...)
+    , id (id)
   {
     basics.name = name;
     basics.nick = nullptr;
