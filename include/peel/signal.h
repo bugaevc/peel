@@ -240,6 +240,7 @@ struct SignalHelper1<Ret>
   static void
   marshal_va (gpointer data1, gpointer data2, void *callback, ::GValue *return_value, va_list va_args, UnpackedArgs... args)
   {
+    (void) va_args;
     SignalHelper2<Ret, UnpackedArgs...>::marshal (data1, data2, callback, return_value, args...);
   }
 
@@ -355,6 +356,7 @@ private:
   static void
   notify_func (gpointer unused, GClosure *g_closure)
   {
+    (void) unused;
     SignalClosure *closure = reinterpret_cast<SignalClosure *> (g_closure);
     closure->callback_ptr ()->~Callback ();
   }
@@ -363,6 +365,12 @@ private:
   static void
   marshal (::GClosure *closure, ::GValue *return_value, guint n_param_values, const ::GValue *param_values, gpointer invocation_hint, gpointer marshal_data)
   {
+    g_return_if_fail (n_param_values == sizeof... (Args) + 1);
+    (void) n_param_values;
+    (void) param_values;
+    (void) invocation_hint;
+    (void) marshal_data;
+
     Instance *instance = reinterpret_cast<Instance *> (value_peek_pointer (param_values));
     Callback &callback = *reinterpret_cast<SignalClosure *> (closure)->callback_ptr ();
     SignalHelper1<Ret, Args...>::template marshal_cpp<Instance, Callback> (instance, callback, return_value, param_values + 1);
@@ -372,6 +380,11 @@ private:
   static void
   marshal_va (::GClosure *closure, ::GValue *return_value, gpointer c_instance, va_list args, gpointer marshal_data, int n_params, ::GType *param_types)
   {
+    g_return_if_fail (n_params == sizeof... (Args));
+    (void) n_params;
+    (void) param_types;
+    (void) marshal_data;
+
     Instance *instance = reinterpret_cast<Instance *> (c_instance);
     Callback &callback = *reinterpret_cast<SignalClosure *> (closure)->callback_ptr ();
 
@@ -573,6 +586,8 @@ private:
     gpointer data1, data2;
 
     g_return_if_fail (n_param_values == sizeof... (Args) + 1);
+    (void) n_param_values;
+    (void) invocation_hint;
 
     if (G_CCLOSURE_SWAP_DATA (closure))
       {
@@ -597,6 +612,8 @@ private:
     gpointer data1, data2;
 
     g_return_if_fail (n_params == sizeof... (Args));
+    (void) n_params;
+    (void) param_types;
 
     if (G_CCLOSURE_SWAP_DATA (closure))
       {

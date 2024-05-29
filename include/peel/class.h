@@ -64,6 +64,7 @@ struct ClassHelper
   static void
   class_init (gpointer g_class, gpointer class_data)
   {
+    (void) class_data;
     // static_assert (std::is_trivially_copyable<typename Subclass::Class>::value);
     typename Subclass::Class *klass = reinterpret_cast<typename Subclass::Class *> (g_class);
     ::GObjectClass *object_class = reinterpret_cast<::GObjectClass *> (g_class);

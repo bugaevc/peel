@@ -61,7 +61,12 @@ public:
   void *
   cast (Type tp)
   {
+#if defined (G_DISABLE_CAST_CHECKS) || defined (__OPTIMIZE__)
+    (void) tp;
+    return this;
+#else
     return G_TYPE_CHECK_INSTANCE_CAST (this, static_cast<::GType> (tp), void);
+#endif
   }
 
   template<typename T>

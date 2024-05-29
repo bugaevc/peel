@@ -128,6 +128,10 @@ Button::on_pressed (Gtk::GestureClick *,
                     int n_press,
                     double x, double y)
 {
+  (void) n_press;
+  (void) x;
+  (void) y;
+
   if (get_focus_on_click () && !has_focus ())
     grab_focus ();
 }
@@ -137,6 +141,8 @@ Button::on_released (Gtk::GestureClick *gesture_click,
                      int n_press,
                      double x, double y)
 {
+  (void) n_press;
+
   gesture_click->set_state (Gtk::EventSequenceState::CLAIMED);
   if (is_sensitive () && contains (x, y))
     sig_clicked.emit (this);
