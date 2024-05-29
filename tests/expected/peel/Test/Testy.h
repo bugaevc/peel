@@ -335,7 +335,6 @@ protected:
     Class (const Class &) = delete;
     Class (Class &&) = delete;
 
-    unsigned char _placeholder[sizeof (::TestTestyClass) - sizeof (GObject::Object::Class)];
   public:
   protected:
     template<typename DerivedClass>
