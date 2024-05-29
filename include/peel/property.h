@@ -15,6 +15,9 @@ class ParamSpec;
 enum class ParamFlags : std::underlying_type<::GParamFlags>::type;
 }
 
+template<typename T>
+struct Property;
+
 namespace internals
 {
 template<typename Class, typename = void>

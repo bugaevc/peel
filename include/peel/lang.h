@@ -70,4 +70,16 @@ private:
   UnsupportedForNowToken () = delete;
 };
 
+#if 0
+template<typename T, typename U>
+/* not constexpr */ size_t G_GNUC_CONST
+offset_of_member_ptr (U T::*mptr)
+{
+  // Try to invoke as little UB as possible, while getting
+  // the best generated code.
+  T *value = reinterpret_cast<T *> (sizeof (T));
+  return reinterpret_cast<uintptr_t> (&(value->*mptr)) - sizeof (T);
+}
+#endif
+
 }

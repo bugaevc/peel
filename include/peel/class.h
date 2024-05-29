@@ -86,7 +86,7 @@ struct ClassHelper
         sizeof (Subclass),
         InstanceInitHelper<Subclass>::get_instance_init (),
         // TODO: add a way to pass final/abstract here
-        GTypeFlags(0));
+        GTypeFlags (0));
     // TODO: add private, interfaces
   }
 };

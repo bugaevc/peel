@@ -340,6 +340,23 @@ using ClosureStoringOptionalCallback = typename std::conditional<
   ::GClosure
 >::type;
 
+static void
+closure_set_va_marshal (::GClosure *closure, ::GVaClosureMarshal marshal)
+{
+  // HACK: This is the private _GRealClosure / _g_closure_set_va_marshal API.
+  struct RealClosure
+  {
+    gpointer stuff[3];
+    ::GVaClosureMarshal va_marshal;
+    ::GClosure closure;
+  };
+
+  unsigned char *ptr = reinterpret_cast<unsigned char *> (closure);
+  ptr -= offsetof (RealClosure, closure);
+  RealClosure *real_closure = reinterpret_cast<RealClosure *> (ptr);
+  real_closure->va_marshal = marshal;
+}
+
 template<typename Instance, typename Callback, typename Ret, typename... Args>
 class SignalClosure : public ClosureStoringOptionalCallback<Callback>
 {
@@ -398,22 +415,6 @@ private:
       va_end (args_copy);
   }
 
-  // HACK: This is the private _GRealClosure / _g_closure_set_va_marshal API.
-  struct RealClosure
-  {
-    gpointer stuff[3];
-    GVaClosureMarshal va_marshal;
-    ::GClosure closure;
-  };
-
-  RealClosure *
-  as_real_closure ()
-  {
-    unsigned char *ptr = reinterpret_cast<unsigned char *> (this);
-    ptr -= offsetof (RealClosure, closure);
-    return reinterpret_cast<RealClosure *> (ptr);
-  }
-
 public:
   peel_nothrow
   static SignalClosure *
@@ -425,7 +426,7 @@ public:
 
     g_closure_set_marshal (g_closure, marshal);
     // _g_closure_set_va_marshal (g_closure, marshal_va);
-    closure->as_real_closure ()->va_marshal = marshal_va;
+    closure_set_va_marshal (g_closure, marshal_va);
 
     if (!std::is_trivially_destructible<Callback>::value)
       g_closure_add_finalize_notifier (g_closure, nullptr, notify_func);
