@@ -568,6 +568,12 @@ public:
     g_signal_handler_block (instance, id);
     return SignalBlockGuard { instance, id };
   }
+
+  constexpr
+  operator bool () const
+  {
+    return id > 0;
+  }
 };
 
 template<typename Instance, typename F>
