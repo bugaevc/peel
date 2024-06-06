@@ -267,7 +267,7 @@ class Record(DefinedType):
                 self.ref_func,
                 self.unref_func,
                 self.ref_sink_func,
-                template_derived=False
+                template_derived=False,
             )
         elif self.free_func:
             s += '\n\n' + generate_unique_traits_specialization(full_name, self.c_type, self.free_func)

@@ -195,6 +195,7 @@ skip	g_signal_handlers_unblock_matched
 ref	GParamSpec			g_param_spec_ref
 ref-sink GParamSpec			g_param_spec_ref_sink
 float	GParamSpec
+take-value GParamSpec			g_value_take_param
 
 onstack	GSignalQuery
 onstack	GTypeQuery
@@ -416,6 +417,8 @@ onstack	GskColorStop
 onstack	GskRoundedRect
 onstack	GskPathPoint
 
+take-value GskRenderNode		gsk_value_take_render_node
+
 # Gtk
 skip	gtk_tree_model_rows_reordered
 skip	gtk_tree_path_get_indices
@@ -425,6 +428,7 @@ skip	gtk_value_dup_expression
 skip	gtk_value_get_expression
 skip	gtk_value_set_expression
 skip	gtk_value_take_expression
+take-value GtkExpression		gtk_value_take_expression
 
 skip	GtkPageSetupUnixDialog
 skip	GtkPrintJob
@@ -626,3 +630,9 @@ hide	AdwApplicationWindow		prop_child
 
 # Gee
 opaque	GeeHazardPointer
+
+# Dex
+take-value DexObject			dex_value_take_object
+skip	dex_value_get_object
+skip	dex_value_set_object
+skip	dex_value_take_object

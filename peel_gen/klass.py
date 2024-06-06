@@ -18,6 +18,7 @@ class Class(DefinedType):
         self.get_type = attrs.get('glib:get-type', None)
         self.get_value_func = attrs.get('glib:get-value-func', None)
         self.set_value_func = attrs.get('glib:set-value-func', None)
+        self.take_value_func = None
         self.ref_func = attrs.get('glib:ref-func', None)
         self.unref_func = attrs.get('glib:unref-func', None)
         self.free_func = None  # Always None
@@ -68,6 +69,8 @@ class Class(DefinedType):
                 self.ref_func = tweak[1]
             elif tweak[0] == 'ref-sink':
                 self.ref_sink_func = tweak[1]
+            elif tweak[0] == 'take-value':
+                self.take_value_func = tweak[1]
             elif tweak[0] == 'hide':
                 self.hidden_members.append(tweak[1])
 
@@ -408,12 +411,16 @@ class Class(DefinedType):
                 '};'
             ])
         if self.get_value_func is not None or self.set_value_func is not None:
-            s += '\n'.join([
+            l = [
                 '',
                 'template<typename T>',
                 'struct GObject::Value::Traits<T, peel::enable_if_derived<{}, T, void>>'.format(full_name),
                 '{',
                 '  typedef T *UnownedType;',
+            ]
+            if self.take_value_func is not None:
+                l.append('  typedef RefPtr<T> OwnedType;')
+            l.extend([
                 '',
                 '  static T *',
                 '  get (const ::GValue *value)',
@@ -435,8 +442,19 @@ class Class(DefinedType):
                 '    ::{} *_peel_object = reinterpret_cast<::{} *> (object);'.format(self.c_type, self.c_type),
                 '    {} (value, _peel_object);'.format(self.set_value_func),
                 '  }',
-                '};'
             ])
+            if self.take_value_func is not None:
+                l.extend([
+                    '',
+                    '  static void',
+                    '  take (::GValue *value, RefPtr<T> &&object)',
+                    '  {',
+                    '    ::{} *_peel_object = reinterpret_cast<::{} *> (std::move (object).release_ref ());'.format(self.c_type, self.c_type),
+                    '    {} (value, _peel_object);'.format(self.take_value_func),
+                    '  }',
+                ])
+            l.append('};')
+            s += '\n'.join(l)
         if self.ref_func or self.unref_func:
             s += '\n\n' + generate_ref_traits_specialization(
                 full_name,
@@ -444,7 +462,7 @@ class Class(DefinedType):
                 self.ref_func,
                 self.unref_func,
                 self.ref_sink_func,
-                template_derived=True
+                template_derived=True,
             )
         si = api_tweaks.ifdef_if_needed(self.c_type)
         if not si:
