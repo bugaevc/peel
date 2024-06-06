@@ -227,5 +227,4 @@ main ()
   GLib::MainContext *main_context = GLib::MainContext::default_ ();
   while (!should_stop)
     main_context->iteration (true);
-  window->close ();
 }
