@@ -23,6 +23,8 @@ struct InstanceInitHelper
   static void
   call_instance_init (::GTypeInstance *instance, gpointer g_class)
   {
+    (void) instance;
+    (void) g_class;
   }
 };
 
