@@ -183,6 +183,7 @@ class Record(DefinedType):
                 '  {} () = delete;'.format(self.own_name),
                 '  {} (const {} &) = delete;'.format(self.own_name, self.own_name),
                 '  {} ({} &&) = delete;'.format(self.own_name, self.own_name),
+                '  ~{} ();'.format(self.own_name),
             ])
         l.extend([
             '',
