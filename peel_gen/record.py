@@ -251,6 +251,20 @@ class Record(DefinedType):
                 'reinterpret_cast<{} *> (g_value_get_pointer (value))'.format(full_name),
                 'g_value_set_pointer (value, reinterpret_cast<void *> (r))',
             )
+            s += '\n\n' + '\n'.join([
+                'template<>',
+                'struct peel::internals::PspecTraits<{}>'.format(full_name),
+                '{',
+                '  constexpr PspecTraits ()',
+                '  { }',
+                '',
+                '  ::GParamSpec *',
+                '  create_pspec (PspecBasics basics)',
+                '  {',
+                '    return g_param_spec_pointer (basics.name, basics.nick, basics.blurb, basics.flags);',
+                '  }',
+                '};',
+            ])
         elif self.get_type:
             # XXX: We assume that structures that have get_type are boxed
             s += '\n' + generate_value_traits_specialization(
@@ -260,6 +274,20 @@ class Record(DefinedType):
                 'reinterpret_cast<{} *> (g_value_get_boxed (value))'.format(full_name),
                 'g_value_set_boxed (value, reinterpret_cast<const void *> (r))',
             )
+            s += '\n\n' + '\n'.join([
+                'template<>',
+                'struct peel::internals::PspecTraits<{}>'.format(full_name),
+                '{',
+                '  constexpr PspecTraits ()',
+                '  { }',
+                '',
+                '  ::GParamSpec *',
+                '  create_pspec (PspecBasics basics)',
+                '  {',
+                '    return g_param_spec_boxed (basics.name, basics.nick, basics.blurb, GObject::Type::of<{}> (), basics.flags);'.format(full_name),
+                '  }',
+                '};',
+            ])
         if self.ref_func or self.unref_func:
             assert(not self.free_func)
             s += '\n\n' + generate_ref_traits_specialization(

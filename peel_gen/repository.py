@@ -56,6 +56,7 @@ class Repository(NodeHandler):
             '#include <peel/ArrayRef.h>',
             '#include <peel/signal.h>',
             '#include <peel/callback.h>',
+            '#include <peel/property.h>',
             '#include <peel/lang.h>',
             '#include <cstdint>',
             '#include <utility>',
