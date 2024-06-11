@@ -1,5 +1,6 @@
 from peel_gen import api_tweaks
 from peel_gen.utils import extract_constness_from_c_type
+from peel_gen.exceptions import UnsupportedForNowException
 
 def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=None, templates=None, attributes=None):
     """
@@ -47,7 +48,8 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
             if not p.is_instance:
                 continue
             constness = extract_constness_from_c_type(p.c_type)
-            assert(len(constness) == 1)
+            if len(constness) != 1:
+                raise UnsupportedForNowException('weird number of indirections in instance parameter')
             is_const = constness[0]
             break
     else:
