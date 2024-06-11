@@ -1,4 +1,5 @@
 from peel_gen import api_tweaks
+from peel_gen.utils import extract_constness_from_c_type
 
 def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=None, templates=None, attributes=None):
     """
@@ -41,7 +42,14 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
 
     if params is not None:
         is_static = all(not p.is_instance for p in params.params)
-        is_const = any(p.is_instance and p.c_type.startswith('const ') and p.c_type.endswith('*') for p in params.params)
+        is_const = False
+        for p in params.params:
+            if not p.is_instance:
+                continue
+            constness = extract_constness_from_c_type(p.c_type)
+            assert(len(constness) == 1)
+            is_const = constness[0]
+            break
     else:
         is_static = True
         is_const = False

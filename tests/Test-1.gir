@@ -452,6 +452,36 @@
           </parameter>
         </parameters>
       </method>
+      <method name="const_self" c:identifier="test_rec_const_self">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self">
+            <type name="Rec" c:type="const TestRec*"/>
+          </instance-parameter>
+        </parameters>
+      </method>
+      <method name="self_gconstpointer" c:identifier="test_rec_self_gconstpointer">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self">
+            <type name="Rec" c:type="gconstpointer"/>
+          </instance-parameter>
+        </parameters>
+      </method>
+      <method name="self_gpointer" c:identifier="test_rec_self_gpointer">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self">
+            <type name="Rec" c:type="gpointer"/>
+          </instance-parameter>
+        </parameters>
+      </method>
     </record>
   </namespace>
 </repository>

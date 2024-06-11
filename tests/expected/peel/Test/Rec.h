@@ -44,6 +44,30 @@ public:
     ::TestRec * _peel_this = reinterpret_cast<::TestRec *> (this);
     test_rec_pass_inout_int (_peel_this, i);
   }
+
+  peel_nothrow
+  void
+  const_self () const
+  {
+    const ::TestRec * _peel_this = reinterpret_cast<const ::TestRec *> (this);
+    test_rec_const_self (_peel_this);
+  }
+
+  peel_nothrow
+  void
+  self_gconstpointer () const
+  {
+    ::gconstpointer _peel_this = reinterpret_cast<::gconstpointer> (this);
+    test_rec_self_gconstpointer (_peel_this);
+  }
+
+  peel_nothrow
+  void
+  self_gpointer ()
+  {
+    ::gpointer _peel_this = reinterpret_cast<::gpointer> (this);
+    test_rec_self_gpointer (_peel_this);
+  }
 }; /* record Rec */
 
 } /* namespace Test */
