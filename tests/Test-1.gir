@@ -438,5 +438,20 @@
         <type name="GObject.ObjectClass" c:type="GObjectClass"/>
       </field>
     </record>
+    <record name="Rec" c:type="RestRec">
+      <method name="pass_inout_int" c:identifier="test_rec_pass_inout_int">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self">
+            <type name="Rec" c:type="TestRec*"/>
+          </instance-parameter>
+          <parameter name="i" direction="inout">
+            <type name="gint" c:type="int*"/>
+          </parameter>
+        </parameters>
+      </method>
+    </record>
   </namespace>
 </repository>
