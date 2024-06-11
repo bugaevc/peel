@@ -47,7 +47,7 @@ class FunctionLike(NodeHandler):
             for p in self.params.params:
                 p.resolve_stuff()
         for tweak in api_tweaks.lookup(self.tweak_ident):
-            if tweak[0] in ('float', 'unowned', 'owned', 'in', 'out'):
+            if tweak[0] in ('float', 'unowned', 'owned', 'in', 'out', 'inout'):
                 p = self.find_param_for_tweak(tweak[1])
                 if tweak[0] == 'float':
                     assert(not p.is_instance)
@@ -66,6 +66,8 @@ class FunctionLike(NodeHandler):
                     p.direction = 'in'
                 elif tweak[0] == 'out':
                     p.direction = 'out'
+                elif tweak[0] == 'inout':
+                    p.direction = 'inout'
 
         assert(self.rv.type is not None)
         tp = chase_type_aliases(self.rv.type)

@@ -132,6 +132,8 @@ opaque	GSource
 # Should have explicit bindings
 skip	GVariant
 
+inout	g_time_zone_adjust_time		time_
+
 # GObject
 # These all have (or should have) explicit bindings.
 skip	GType
