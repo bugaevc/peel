@@ -147,6 +147,19 @@ struct PspecTraits<const char *>
 };
 
 template<>
+struct PspecTraits<void *>
+{
+  constexpr PspecTraits ()
+  { }
+
+  ::GParamSpec *
+  create_pspec (PspecBasics basics)
+  {
+    return g_param_spec_pointer (basics.name, basics.nick, basics.blurb, basics.flags);
+  }
+};
+
+template<>
 struct PspecTraits<GObject::Type>
 {
   GObject::Type is_a_type;
