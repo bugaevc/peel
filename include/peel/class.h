@@ -100,7 +100,7 @@ template<typename T>
 GObject::Type
 GObject::Type::of ()
 {
-  return T::get_type ();
+  return T::_peel_get_type ();
 }
 
 } /* namespace p */
@@ -116,7 +116,7 @@ GObject::Type::of ()
 public:                                                                        \
   peel_nothrow G_GNUC_CONST                                                    \
   static ::peel::GObject::Type                                                 \
-  get_type ();                                                                 \
+  _peel_get_type ();                                                           \
                                                                                \
 protected:                                                                     \
   class Class;                                                                 \
@@ -159,7 +159,7 @@ private:                                                                       \
 #define PEEL_CLASS_IMPL(Subclass, type_name, ParentClass)                      \
 peel_nothrow G_GNUC_CONST                                                      \
 ::peel::GObject::Type                                                          \
-Subclass::get_type ()                                                          \
+Subclass::_peel_get_type ()                                                    \
 {                                                                              \
   static ::GType _peel_tp;                                                     \
                                                                                \
