@@ -51,7 +51,7 @@ public:
   create_with_label (const char *label)
   {
     FloatPtr<Gtk::Label> child = Gtk::Label::create (label);
-    return Object::create<Button> (prop_child (), child);
+    return Object::create<Button> (prop_child (), std::move (child));
   }
 
   Gtk::Widget *

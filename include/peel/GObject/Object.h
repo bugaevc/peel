@@ -463,6 +463,14 @@ struct Value::Traits<T, peel::enable_if_derived<Object, T, void>>
   {
     g_value_take_object (value, std::move (object).release_ref ());
   }
+
+  peel_nothrow
+  static void
+  set_sink (::GValue *value, FloatPtr<T> &&object)
+  {
+    T *obj = std::move (object).release_floating_ptr ();
+    g_value_take_object (value, g_object_ref_sink (obj));
+  }
 };
 
 class InitiallyUnowned;

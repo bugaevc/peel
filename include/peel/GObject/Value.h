@@ -7,6 +7,10 @@
 
 namespace peel
 {
+
+template<typename T>
+class FloatPtr;
+
 namespace GObject
 {
 
@@ -121,15 +125,23 @@ public:
   template<typename T>
   peel_nothrow
   void
-  set (typename Traits<T>::OwnedType value)
+  set (typename Traits<T>::OwnedType &&value)
   {
     Traits<T>::take (&this->value, std::move (value));
+  }
+
+  template<typename T, typename U>
+  peel_nothrow
+  peel::void_t<decltype (&Traits<T>::set_sink)>
+  set (FloatPtr<U> &&value)
+  {
+    Traits<T>::set_sink (&this->value, std::move (value));
   }
 
   template<typename T>
   peel_nothrow
   void
-  take (typename Traits<T>::OwnedType value)
+  take (typename Traits<T>::OwnedType &&value)
   {
     Traits<T>::take (&this->value, std::move (value));
   }
@@ -147,7 +159,7 @@ public:
   template<typename T>
   peel_nothrow
   static Value
-  make (typename Traits<T>::OwnedType value)
+  make (typename Traits<T>::OwnedType &&value)
   {
     Value v { Type::of<T> () };
     Traits<T>::take (&v.value, std::move(value));
