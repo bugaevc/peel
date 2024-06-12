@@ -34,6 +34,30 @@ public:
     return Type ();
   }
 
+  constexpr static Type
+  interface ()
+  {
+    return G_TYPE_INTERFACE;
+  }
+
+  constexpr static Type
+  boxed ()
+  {
+    return G_TYPE_BOXED;
+  }
+
+  constexpr static Type
+  enum_ ()
+  {
+    return G_TYPE_ENUM;
+  }
+
+  constexpr static Type
+  flags ()
+  {
+    return G_TYPE_FLAGS;
+  }
+
   template<typename T>
   static Type
   of ();
@@ -84,13 +108,25 @@ public:
     return g_type_depth (tp);
   }
 
-  // next_base
+  peel_nothrow
+  Type
+  next_base (Type base_type) const
+  {
+    return g_type_next_base (tp, base_type);
+  }
 
   peel_nothrow
   bool
   is_a (Type other) const
   {
     return !!g_type_is_a (tp, other.tp);
+  }
+
+  template<typename T>
+  bool
+  is_a () const
+  {
+    return is_a (of<T> ());
   }
 
   peel_nothrow
@@ -218,8 +254,6 @@ Type::of<void> ()
   return G_TYPE_NONE;
 }
 
-/* TODO: G_TYPE_INTERFACE */
-
 template<>
 constexpr inline Type
 Type::of<signed char> ()
@@ -271,8 +305,6 @@ Type::of<unsigned long> ()
 
 /* TODO: int64, uint64 might be same as long, what do we do? */
 
-/* TODO: enum, flags */
-
 template<>
 constexpr inline Type
 Type::of<float> ()
@@ -307,8 +339,6 @@ Type::of<Type> ()
 {
   return G_TYPE_GTYPE;
 }
-
-/* TODO: boxed */
 
 } /* namespace GObject */
 
