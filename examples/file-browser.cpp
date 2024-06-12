@@ -117,14 +117,14 @@ main ()
   column_view->add_css_class ("data-table");
 
   RefPtr<Gtk::SignalListItemFactory> main_column_factory = Gtk::SignalListItemFactory::create ();
-  main_column_factory->connect_setup(
+  main_column_factory->connect_setup (
     [] (Gtk::SignalListItemFactory *, Object *obj)
     {
       Gtk::ListItem *item = obj->cast<Gtk::ListItem> ();
       item->set_focusable (false);
       item->set_child (MainColumnCell::create ());
     });
-  main_column_factory->connect_bind(
+  main_column_factory->connect_bind (
     [] (Gtk::SignalListItemFactory *, Object *obj)
     {
       Gtk::ListItem *item = obj->cast<Gtk::ListItem> ();
