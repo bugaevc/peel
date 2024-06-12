@@ -16,11 +16,6 @@ class Gradient : public Gtk::Widget
   PEEL_SIMPLE_CLASS (Gradient, Gtk::Widget)
   friend class Gtk::Widget;
 
-  void
-  init (Class *)
-  {
-  }
-
   template<typename F>
   static void
   define_properties (F &f)
