@@ -335,6 +335,15 @@ public:
   {
     return prop (p);
   }
+
+  template<typename T>
+  Getter<Class, T>
+  override_prop (Property<T>)
+  {
+    if (next_id++ == target_id)
+      return Getter<Class, T> { instance, value, &found };
+    return Getter<Class, T> { nullptr, nullptr, nullptr };
+  }
 };
 
 template<typename Class, typename T>
@@ -426,6 +435,15 @@ public:
   {
     return prop (p);
   }
+
+  template<typename T>
+  Setter<Class, T>
+  override_prop (Property<T>)
+  {
+    if (next_id++ == target_id)
+      return Setter<Class, T> { instance, value, &found };
+    return Setter<Class, T> { nullptr, nullptr, nullptr };
+  }
 };
 
 template<typename T>
@@ -496,6 +514,58 @@ public:
   }
 };
 
+struct OverrideInstaller
+{
+private:
+  ::GObjectClass *klass;
+  const char *name;
+  guint id;
+
+public:
+  template<typename... Args>
+  OverrideInstaller (::GObjectClass *klass, const char *name, guint id)
+    : klass (klass)
+    , name (name)
+    , id (id)
+  { }
+
+  peel_nothrow
+  ~OverrideInstaller ()
+  {
+    g_object_class_override_property (klass, id, name);
+  }
+
+  OverrideInstaller &
+  get (...)
+  {
+    return *this;
+  }
+
+  OverrideInstaller &
+  set (...)
+  {
+    return *this;
+  }
+
+  OverrideInstaller &
+  nick (...)
+  {
+    return *this;
+  }
+
+  OverrideInstaller &
+  blurb (...)
+  {
+    return *this;
+  }
+
+  OverrideInstaller &
+  flags (...)
+  {
+    return *this;
+  }
+};
+
 template<typename Class>
 struct InstallVisitor
 {
@@ -524,6 +594,13 @@ public:
   {
     ::GType tp = GObject::Type::of<T> ();
     return Installer<GObject::Object> { klass, p.get_name (), next_id++, p.pspec_ptr, tp };
+  }
+
+  template<typename T>
+  OverrideInstaller
+  override_prop (Property<T> p)
+  {
+    return OverrideInstaller { klass, p.get_name (), next_id++ };
   }
 };
 
