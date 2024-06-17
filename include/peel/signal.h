@@ -516,14 +516,16 @@ public:
   void
   disconnect ()
   {
-    g_signal_handler_disconnect (instance, id);
-    id = 0;
+    if (id > 0)
+      {
+        g_signal_handler_disconnect (instance, id);
+        id = 0;
+      }
   }
 
   ~SignalConnection ()
   {
-    if (id > 0)
-      disconnect ();
+    disconnect ();
   }
 
   SignalConnection (gpointer instance, gulong id)
@@ -553,8 +555,7 @@ public:
   {
     if (this == &other)
       return *this;
-    if (id > 0)
-      disconnect ();
+    disconnect ();
     instance = other.instance;
     id = other.id;
     other.id = 0;
