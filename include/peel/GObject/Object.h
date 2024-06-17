@@ -46,7 +46,7 @@ private:
   GObject::ParamSpec **pspec_ptr;
 
 public:
-  constexpr Property(const char *name, GObject::ParamSpec **pspec_ptr = nullptr)
+  constexpr Property (const char *name, GObject::ParamSpec **pspec_ptr = nullptr)
     : name (name)
     , pspec_ptr (pspec_ptr)
   { }
@@ -101,8 +101,8 @@ protected:
   void
   notify (const char *property_name)
   {
-    ::GObject *_peel_this = reinterpret_cast<::GObject *> (this);
-    g_object_notify (_peel_this, property_name);
+    ::GObject *object = reinterpret_cast<::GObject *> (this);
+    g_object_notify (object, property_name);
   }
 
   template<typename T>

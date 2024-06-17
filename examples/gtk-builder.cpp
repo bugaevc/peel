@@ -32,7 +32,8 @@ static const char template_string[] = R"(
 </interface>
 )";
 
-namespace Demo {
+namespace Demo
+{
 
 class Window : public Gtk::Window
 {
