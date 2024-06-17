@@ -182,7 +182,7 @@ class BuilderScope : public Gtk::Builder::CScope
 public:
   peel_nothrow G_GNUC_CONST
   static Type
-  get_type ()
+  _peel_get_type ()
   {
     static ::GType tp;
     if (_peel_once_init_enter (&tp))
