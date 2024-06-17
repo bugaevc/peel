@@ -111,8 +111,13 @@ protected:
   notify (Property<T> prop)
   {
     ::GObject *object = reinterpret_cast<::GObject *> (this);
-    ::GParamSpec *pspec = reinterpret_cast<::GParamSpec *> (*prop.pspec_ptr);
-    g_object_notify_by_pspec (object, pspec);
+    if (prop.pspec_ptr)
+      {
+        ::GParamSpec *pspec = reinterpret_cast<::GParamSpec *> (*prop.pspec_ptr);
+        g_object_notify_by_pspec (object, pspec);
+      }
+    else
+      g_object_notify (object, prop.name);
   }
 
   peel_nothrow
