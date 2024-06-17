@@ -197,3 +197,21 @@ Subclass::_peel_get_type ()                                                    \
   return _peel_tp;                                                             \
 }                                                                              \
 /* end of PEEL_CLASS_IMPL */
+
+#define PEEL_IMPLEMENT_INTERFACE(tp, Interface)                                \
+do                                                                             \
+  {                                                                            \
+    void (*iface_init_function) (Interface::Iface *) = &init_interface;        \
+    const ::GInterfaceInfo iface_info                                          \
+    {                                                                          \
+      reinterpret_cast<::GInterfaceInitFunc> (iface_init_function),            \
+      nullptr,                                                                 \
+      nullptr                                                                  \
+    };                                                                         \
+    g_type_add_interface_static (                                              \
+      static_cast<::GType> (tp),                                               \
+      ::peel::GObject::Type::of<Interface> (),                                 \
+      &iface_info);                                                            \
+  }                                                                            \
+while (0)                                                                      \
+/* end of PEEL_IMPLEMENT_INTERFACE */
