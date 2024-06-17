@@ -47,6 +47,26 @@ struct InstanceInitHelper<Subclass, typename std::enable_if<has_own_member<Subcl
   }
 };
 
+template<typename Subclass, typename = void>
+struct TypeInitHelper
+{
+  static void
+  call_type_init (peel::GObject::Type tp)
+  {
+    (void) tp;
+  }
+};
+
+template<typename Subclass>
+struct TypeInitHelper<Subclass, void_t<decltype (&Subclass::init_type)>>
+{
+  static void
+  call_type_init (peel::GObject::Type tp)
+  {
+    Subclass::init_type (tp);
+  }
+};
+
 template<typename Subclass>
 struct ClassHelper
 {
@@ -80,7 +100,7 @@ struct ClassHelper
   static ::GType
   register_type_static (::GType parent_type, const char *type_name)
   {
-    return g_type_register_static_simple (
+    ::GType tp = g_type_register_static_simple (
         parent_type,
         g_intern_static_string (type_name),
         sizeof (typename Subclass::Class),
@@ -89,7 +109,9 @@ struct ClassHelper
         InstanceInitHelper<Subclass>::get_instance_init (),
         // TODO: add a way to pass final/abstract here
         GTypeFlags (0));
-    // TODO: add private, interfaces
+    // TODO: add private
+    TypeInitHelper<Subclass>::call_type_init (tp);
+    return tp;
   }
 };
 
@@ -111,6 +133,8 @@ GObject::Type::of ()
   friend struct ::peel::internals::ClassHelper<Subclass>;                      \
   template<typename, typename> /* workaround a Clang bug */                    \
   friend struct ::peel::internals::InstanceInitHelper;                         \
+  template<typename, typename> /* workaround a Clang bug */                    \
+  friend struct ::peel::internals::TypeInitHelper;                             \
   friend struct ::peel::internals::PropertyHelper<Subclass>;                   \
                                                                                \
 public:                                                                        \
