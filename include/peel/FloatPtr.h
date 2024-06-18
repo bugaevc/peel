@@ -113,12 +113,14 @@ public:
 
   operator T * () && = delete;
 
-  constexpr
-  T *
-  operator -> () const
+  constexpr T *
+  operator -> () const &
   {
     return ptr;
   }
+
+  T *
+  operator -> () && = delete;
 
   peel_nodiscard ("the floating reference will leak if unused")
   T *

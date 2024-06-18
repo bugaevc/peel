@@ -193,10 +193,13 @@ public:
   }
 
   constexpr T *
-  operator -> () const
+  operator -> () const &
   {
     return ptr;
   }
+
+  T *
+  operator -> () && = delete;
 
   explicit constexpr
   operator bool () const

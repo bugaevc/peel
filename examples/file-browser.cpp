@@ -84,7 +84,7 @@ void
 MainColumnCell::set_tree_list_row (Gtk::TreeListRow *row)
 {
   tree_expander->set_list_row (row);
-  Gio::FileInfo *file_info = row->get_item ()->cast<Gio::FileInfo> ();
+  RefPtr<Gio::FileInfo> file_info = row->get_item ().cast<Gio::FileInfo> ();
 
   label->set_label (file_info->get_display_name ());
   icon->set_from_gicon (file_info->get_icon ());
@@ -152,7 +152,7 @@ main ()
       Gtk::ListItem *item = obj->cast<Gtk::ListItem> ();
       Gtk::Inscription *inscription = item->get_child ()->cast<Gtk::Inscription> ();
       Gtk::TreeListRow *tree_list_row = item->get_item ()->cast<Gtk::TreeListRow> ();
-      Gio::FileInfo *file_info = tree_list_row->get_item ()->cast<Gio::FileInfo> ();
+      RefPtr<Gio::FileInfo> file_info = tree_list_row->get_item ().cast<Gio::FileInfo> ();
       char *size = g_format_size (file_info->get_size ());
       inscription->set_text (size);
       g_free (size);
@@ -176,7 +176,7 @@ main ()
       Gtk::ListItem *item = obj->cast<Gtk::ListItem> ();
       Gtk::Inscription *inscription = item->get_child ()->cast<Gtk::Inscription> ();
       Gtk::TreeListRow *tree_list_row = item->get_item ()->cast<Gtk::TreeListRow> ();
-      Gio::FileInfo *file_info = tree_list_row->get_item ()->cast<Gio::FileInfo> ();
+      RefPtr<Gio::FileInfo> file_info = tree_list_row->get_item ().cast<Gio::FileInfo> ();
       RefPtr<GLib::DateTime> mtime = file_info->get_modification_date_time ();
       char *text = mtime->format ("%c");
       inscription->set_text (text);
@@ -198,7 +198,7 @@ main ()
       // Extract the Gio::File.
       Gio::ListModel *model = column_view->get_model ();
       RefPtr<Gtk::TreeListRow> tree_list_row = model->get_object (position).cast<Gtk::TreeListRow> ();
-      Gio::FileInfo *file_info = tree_list_row->get_item ()->cast<Gio::FileInfo> ();
+      RefPtr<Gio::FileInfo> file_info = tree_list_row->get_item ().cast<Gio::FileInfo> ();
       Gio::File *file = file_info->get_attribute_object ("standard::file")->cast<Gio::File> ();
       // Call Gio::AppInfo::launch_default_for_uri (), passing the file URI.
       char *uri = file->get_uri ();
