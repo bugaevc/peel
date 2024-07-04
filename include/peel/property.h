@@ -350,7 +350,7 @@ template<typename Class, typename T>
 struct Setter : public GSBase<Setter<Class, T>>
 {
   template<typename C>
-  friend class SetVisitor;
+  friend struct SetVisitor;
 
 private:
   Class *instance;

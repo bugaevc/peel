@@ -48,6 +48,10 @@
 #define peel_nonnull_args(...)
 #endif
 
+#ifndef _Bool
+#define _Bool bool
+#endif
+
 namespace peel
 {
 

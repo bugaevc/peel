@@ -43,6 +43,18 @@ public:
   {
     return p;
   }
+
+  constexpr T &
+  operator [] (unsigned index)
+  {
+    return p[index];
+  }
+
+  constexpr const T &
+  operator [] (unsigned index) const
+  {
+    return p[index];
+  }
 };
 
 }

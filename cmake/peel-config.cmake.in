@@ -1,0 +1,41 @@
+cmake_minimum_required(VERSION 3.16)
+
+find_package (Python3 REQUIRED)
+
+set (peel_LIBRARIES)
+set (peel_INCLUDE_DIRS "@includedir@")
+set (PEEL_GEN_MODULE "@peel_gen_path@")
+mark_as_advanced (peel_LIBRARIES peel_INCLUDE_DIRS PEEL_GEN_MODULE)
+
+add_library (peel::peel INTERFACE IMPORTED)
+set_property (TARGET peel::peel APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${peel_INCLUDE_DIRS}")
+
+include (FindPackageHandleStandardArgs)
+find_package_handle_standard_args (peel DEFAULT_MSG)
+
+function (peel_generate GIR_NAME GIR_VERSION)
+  # Parse our arguments.
+  set (options RECURSIVE OPTIONAL GLOBAL)
+  set (oneValueArgs GIR_FILE)
+  set (multiValueArgs)
+  cmake_parse_arguments (PEEL_GENERATE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+  set (gen_dir "${CMAKE_CURRENT_BINARY_DIR}/peel-generated")
+  file (MAKE_DIRECTORY "${gen_dir}")
+  add_custom_command (OUTPUT "${gen_dir}/peel"
+    COMMAND "${Python3_EXECUTABLE}"
+    ARGS "${PEEL_GEN_MODULE}" "--recursive" "${GIR_NAME}" "${GIR_VERSION}"
+    WORKING_DIRECTORY "${gen_dir}"
+    VERBATIM DEPENDS_EXPLICIT_ONLY)
+
+  add_custom_target (peel_generate_${GIR_NAME} DEPENDS "${gen_dir}/peel")
+
+  add_library (peel::${GIR_NAME} INTERFACE IMPORTED)
+  target_link_libraries (peel::${GIR_NAME} INTERFACE peel::peel)
+  add_dependencies (peel::${GIR_NAME} peel_generate_${GIR_NAME})
+
+  set_property (TARGET peel::${GIR_NAME} APPEND PROPERTY IMPORTED_LOCATION "${gen_dir}/peel")
+  set_property (TARGET peel::${GIR_NAME} APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${gen_dir}")
+  set_property (TARGET peel::${GIR_NAME} APPEND PROPERTY ADDITIONAL_CLEAN_FILES "${gen_dir}")
+  # set_property (DIRECTORY "${gen_dir}" GENERATED)
+endfunction (peel_generate)

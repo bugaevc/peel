@@ -1,0 +1,27 @@
+inc = include_directories('.')
+
+static_headers = files(
+  'peel/lang.h',
+  'peel/class.h',
+  'peel/property.h',
+  'peel/signal.h',
+  'peel/callback.h',
+  'peel/widget-template.h',
+
+  'peel/UniquePtr.h',
+  'peel/ArrayRef.h',
+  'peel/RefPtr.h',
+  'peel/FloatPtr.h',
+
+  'peel/GObject/Type.h',
+  'peel/GObject/TypeInstance.h',
+  'peel/GObject/TypeClass.h',
+  'peel/GObject/TypeInterface.h',
+  'peel/GObject/Value.h',
+  'peel/GObject/Object.h',
+  'peel/GLib/Variant.h',
+)
+
+if not meson.is_subproject()
+  install_headers(static_headers, preserve_path: true)
+endif

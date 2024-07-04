@@ -528,6 +528,11 @@ public:
     disconnect ();
   }
 
+  SignalConnection ()
+    : instance (nullptr)
+    , id (0)
+  { }
+
   SignalConnection (gpointer instance, gulong id)
     : instance (instance)
     , id (id)
@@ -570,7 +575,7 @@ public:
     return SignalBlockGuard { instance, id };
   }
 
-  constexpr
+  explicit constexpr
   operator bool () const
   {
     return id > 0;

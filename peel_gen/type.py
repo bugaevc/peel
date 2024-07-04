@@ -53,7 +53,7 @@ type_map = {
     'glong': PlainType('glong', 'long'),
     'gulong': PlainType('gulong', 'unsigned long'),
     'gsize': PlainType('gsize', 'size_t'),
-    'gssize': PlainType('gssize', 'ssize_t'),  # FIXME not ssize_t on Windows?
+    'gssize': PlainType('gssize', 'gssize'),
     'gfloat': PlainType('gfloat', 'float'),
     'gdouble': PlainType('gdouble', 'double'),
     'gboolean': PlainType('gboolean', 'bool', corresponds_exactly=False),

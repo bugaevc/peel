@@ -1,9 +1,19 @@
+#! /usr/bin/env python3
+
+import sys
 from argparse import ArgumentParser
 from pathlib import Path
 
-# Gotta love Python's module system.
-import sys
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# These will be set by Meson in the installed file.
+peel_gen_module_path = '@module_path@'
+builtin_api_tweaks_path = '@api_tweaks_path@'
+
+if peel_gen_module_path == '@' + 'module_path' + '@':
+    # Running uninstalled from the source tree.
+    peel_gen_module_path = str(Path(__file__).parent)
+    builtin_api_tweaks_path = Path(peel_gen_module_path) / 'api-tweaks.txt'
+
+sys.path.insert(0, peel_gen_module_path)
 
 if __name__ == '__main__' and __package__ is None:
     __package__ = 'peel_gen'
@@ -161,7 +171,7 @@ def emit_repo(repo):
         emit_umbrella_header(repo, file_path, emitted_files)
 
 def main():
-    arg_parser = ArgumentParser(prog='gen.py')
+    arg_parser = ArgumentParser(prog='peel-gen')
     # TODO: Make it possible to specify multiple repos
     arg_parser.add_argument('name', metavar='repo-name')
     # TODO: Don't require version
@@ -174,6 +184,7 @@ def main():
     args = arg_parser.parse_args()
     peel_gen.namespace.raw_namespace_names = args.raw
 
+    api_tweaks.load_from_file(builtin_api_tweaks_path)
     for path in args.api_tweaks:
         api_tweaks.load_from_file(path)
 
