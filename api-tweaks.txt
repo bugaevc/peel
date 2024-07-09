@@ -230,6 +230,10 @@ onstack	GActionEntry
 
 nest	GApplicationFlags		Application::Flags
 nest	GTlsPasswordFlags		TlsPassword::Flags
+
+no-autobase GInitable
+no-autobase GAsyncInitable
+prefer-autobase GActionGroup		ActionMap
 # FIXME: returning C arrays
 skip	GTlsPassword::vfunc_get_value
 
@@ -588,6 +592,8 @@ nest	GtkCellAreaContext		CellArea::Context
 no-autobase GtkBuildable
 no-autobase GtkAccessible
 prefer-autobase GtkSectionModel		SelectionModel
+
+prefer-autobase GtkTreeDragSource	TreeModel
 
 # Adw
 float	adw_window_set_content		content
