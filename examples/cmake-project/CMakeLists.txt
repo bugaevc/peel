@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.16)
-project (cmake-exmaple CXX)
+project (cmake-example CXX)
 
 add_compile_options ("-Wall" "-Wextra")
 # Enable colored compiler diagnostics, even when using Ninja.
