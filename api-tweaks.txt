@@ -252,6 +252,46 @@ onstack	GActionEntry
 
 nest	GApplicationFlags		Application::Flags
 nest	GTlsPasswordFlags		TlsPassword::Flags
+nest	GTlsCertificateFlags		TlsCertificate::Flags
+nest	GTlsCertificateRequestFlags	TlsCertificate::RequestFlags
+nest	GTlsDatabaseVerifyFlags		TlsDatabase::VerifyFlags
+nest	GTlsDatabaseLookupFlags		TlsDatabase::LookupFlags
+nest	GResourceLookupFlags		Resource::LookupFlags
+nest	GResourceFlags			Resource::Flags
+nest	GResourceError			Resource::Error
+nest	GFileAttributeType		File::AttributeType
+nest	GFileAttributeInfoFlags		File::AttributeInfoFlags
+nest	GFileCopyFlags			File::CopyFlags
+nest	GFileCreateFlags		File::CreateFlags
+nest	GFileMeasureFlags		File::MeasureFlags
+nest	GFileMonitorFlags		File::MonitorFlags
+nest	GFileQueryInfoFlags		File::QueryInfoFlags
+nest	GTestDBusFlags			TestDBus::Flags
+nest	GConverterFlags			Converter::Flags
+nest	GConverterResult		Converter::Result
+nest	GDBusConnectionFlags		DBusConnection::Flags
+nest	GDBusProxyFlags			DBusProxy::Flags
+nest	GDBusServerFlags		DBusServer::Flags
+nest	GDBusMessageFlags		DBusMessage::Flags
+nest	GDBusPropertyInfoFlags		DBusPropertyInfo::Flags
+nest	GDBusInterfaceSkeletonFlags	DBusInterfaceSkeleton::Flags
+nest	GDBusInterfaceInfo		DBusInterface::Info
+nest	GDBusInterfaceVTable		DBusInterface::VTable
+nest	GDBusObjectManagerClientFlags	DBusObjectManagerClient::Flags
+nest	GDriveStartFlags		Drive::StartFlags
+nest	GDriveStartStopType		Drive::StartStopType
+nest	GMountMountFlags		Mount::MountFlags
+nest	GMountUnmountFlags		Mount::UnmountFlags
+nest	GSubprocessFlags		Subprocess::Flags
+nest	GSettingsBindFlags		Settings::BindFlags
+nest	GAppInfoCreateFlags		AppInfo::CreateFlags
+nest	GIOModuleScope			IOModule::Scope
+#nest	GIOModuleScopeFlags		IOModule::Scope::Flags
+nest	GIOModuleScopeFlags		IOModule::ScopeFlags
+nest	GIOStreamSpliceFlags		IOStream::SpliceFlags
+nest	GOutputStreamSpliceFlags	OutputStream::SpliceFlags
+nest	GResolverNameLookupFlags	Resolver::NameLookupFlags
+
 
 no-autobase GInitable
 no-autobase GAsyncInitable
@@ -275,6 +315,7 @@ skip	GFileDescriptorBased		Gio
 skip	GUnixInputStream		Gio
 skip	GUnixMountMonitor		Gio
 skip	GUnixMountPoint			Gio
+skip	GUnixMountEntry			Gio
 skip	GUnixOutputStream		Gio
 skip	g_unix_is_mount_path_system_internal Gio
 skip	g_unix_is_system_device_path	Gio
