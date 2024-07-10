@@ -34,13 +34,13 @@ class Enumeration(DefinedType):
         return set()
 
     def generate_forward_decl(self, for_nested=False):
-        api_tweaks.skip_if_needed(self.c_type)
+        api_tweaks.skip_if_needed(self.c_type, self.ns)
         if self.nested_in and not for_nested:
             return None
         return 'enum class {} : std::underlying_type<::{}>::type;'.format(self.own_name, self.c_type)
 
     def generate(self):
-        api_tweaks.skip_if_needed(self.c_type)
+        api_tweaks.skip_if_needed(self.c_type, self.ns)
         l = [
             'enum class {} : std::underlying_type<::{}>::type'.format(self.emit_def_name, self.c_type),
             '{'
@@ -51,7 +51,7 @@ class Enumeration(DefinedType):
         return '\n'.join(l)
 
     def generate_specializations(self):
-        api_tweaks.skip_if_needed(self.c_type)
+        api_tweaks.skip_if_needed(self.c_type, self.ns)
         type_name = self.emit_name_for_context(None)
         s = generate_value_traits_specialization(
             type_name,

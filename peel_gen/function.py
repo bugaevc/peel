@@ -31,9 +31,12 @@ class Function(FunctionLike):
     def generate(self):
         if self.moved_to is not None:
             return '/* {} moved to {} */'.format(self.name, self.moved_to)
-        api_tweaks.skip_if_needed(self.tweak_ident)
-
-        return c_function_wrapper.generate(
+        api_tweaks.skip_if_needed(self.tweak_ident, self.ns)
+        l = []
+        s = api_tweaks.ifdef_if_needed(self.c_ident)
+        if s:
+            l.append(s)
+        l.append(c_function_wrapper.generate(
             name=escape_cpp_name(self.name),
             c_callee=self.c_ident,
             context=self.ns,
@@ -42,5 +45,8 @@ class Function(FunctionLike):
             throws=self.throws,
             indent='',
             attributes=['peel_no_warn_unused'],
-        )
-
+        ))
+        s = api_tweaks.endif_if_needed(self.c_ident)
+        if s:
+            l.append(s)
+        return '\n'.join(l)

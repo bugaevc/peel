@@ -23,8 +23,19 @@ def load_from_file(path):
                 tweaks[tweak_ident] = []
             tweaks[tweak_ident].append((parts[0], *parts[2:]))
 
-def skip_if_needed(tweak_ident):
+def should_skip(tweak_ident, ns, keep_manual=False):
     for tweak in lookup(tweak_ident, 'skip'):
+        # If an explicit namespace is given,
+        # only skip it in that namesapce.
+        if ns is not None and len(tweak) > 1 and tweak[1] != ns.name:
+            continue
+        if keep_manual and len(tweak) > 2 and tweak[2] == 'manual':
+            continue
+        return True
+    return False
+
+def skip_if_needed(tweak_ident, ns):
+    if should_skip(tweak_ident, ns):
         raise UnsupportedForNowException('explicitly skipped')
 
 def ifdef_if_needed(tweak_ident):

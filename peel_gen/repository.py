@@ -5,18 +5,20 @@ from pathlib import Path
 
 from peel_gen.node_handler import NodeHandler
 from peel_gen.namespace import Namespace
+from peel_gen import api_tweaks
 
 # (Name, version) (e.g. ('Gtk', '4.0')) to Repository
 repository_map = dict()
 
 class Repository(NodeHandler):
-    def __init__(self, attrs):
+    def __init__(self, name, attrs):
+        self.name = name
         self.c_includes = []
-        self.package_name = None
+        self.package_names = []
         self.namespaces = []
 
     def __repr__(self):
-        return 'Repository({})'.format(self.package_name)
+        return 'Repository({})'.format(self.name)
 
     def start_child_element(self, name, attrs):
         if name == 'include':
@@ -26,10 +28,18 @@ class Repository(NodeHandler):
                 find_and_parse_gir_repo(gir_name, gir_version)
             return
         elif name == 'c:include':
-            self.c_includes.append(attrs['name'])
+            name = attrs['name']
+            for tweak in api_tweaks.lookup(name, 'repo-skip'):
+                if tweak[1] == self.name:
+                    return
+            self.c_includes.append(name)
             return
         elif name == 'package':
-            self.package_name = attrs['name']
+            name = attrs['name']
+            for tweak in api_tweaks.lookup(name, 'repo-skip'):
+                if tweak[1] == self.name:
+                    return
+            self.package_names.append(name)
             return
         elif name == 'namespace':
             ns = Namespace(attrs)
@@ -38,12 +48,14 @@ class Repository(NodeHandler):
             return ns
 
     def generate_basic_header(self):
-        return '\n'.join([
+        l = [
             '#pragma once',
             '',
             '/* Auto-generated, do not modify */',
-            '/* Package {} */'.format(self.package_name) if self.package_name else None,
-        ])
+        ]
+        for package_name in self.package_names:
+            l.append('/* Package {} */'.format(package_name))
+        return '\n'.join(l)
 
     def generate_header(self, extra_includes):
         l = [self.generate_basic_header()]
@@ -79,34 +91,6 @@ class Repository(NodeHandler):
             '\n'
             'G_GNUC_END_IGNORE_DEPRECATIONS\n'
         )
-
-    def generate(self):
-        l = [
-            '#pragma once',
-            '',
-            '/* Auto-generated, do not modify */',
-            '/* Package {} */'.format(self.package_name) if self.package_name else None,
-            '',
-            '#include <cstdint>',
-            '#include <utility>',
-        ]
-        for include in self.c_includes:
-            l.append('#include <{}>'.format(include))
-        l.extend([
-            '',
-            'G_GNUC_BEGIN_IGNORE_DEPRECATIONS',
-            '',
-            'namespace p',
-            '{',
-        ])
-        for ns in self.namespaces:
-            l.append(ns.generate())
-        l.extend([
-            '} /* namespace p */',
-            '',
-            'G_GNUC_END_IGNORE_DEPRECATIONS',
-        ])
-        return '\n'.join(filter(lambda line: line is not None, l))
 
 def work_out_gir_paths():
     # See gi-docgen:gidocgen/utils.py:default_search_paths()

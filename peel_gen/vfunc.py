@@ -13,7 +13,7 @@ class Vfunc(FunctionLike):
         return 'Vfunc({!r}.{})'.format(self.cpp_class, self.name)
 
     def generate(self):
-        api_tweaks.skip_if_needed(self.tweak_ident)
+        api_tweaks.skip_if_needed(self.tweak_ident, self.ns)
         extra_decls = '    ::{} *_p_class = reinterpret_cast<::{} *> (Class::peek<DerivedClass> ()->peek_parent ());'.format(
             self.cpp_class.type_struct.c_type,
             self.cpp_class.type_struct.c_type,
@@ -34,7 +34,7 @@ class Vfunc(FunctionLike):
         from peel_gen.parameter import Parameter
         from peel_gen.klass import Class
 
-        api_tweaks.skip_if_needed(self.tweak_ident)
+        api_tweaks.skip_if_needed(self.tweak_ident, self.ns)
         if self.params is None:
             params = None
         else:

@@ -130,27 +130,49 @@ onstack	GDate
 opaque	GSource
 
 # Should have explicit bindings
-skip	GVariant
+skip	GVariant			GLib		manual
 
 inout	g_time_zone_adjust_time		time_
 
+# See comment on GioUnix below
+skip	GUnixFDSourceFunc		GLib
+skip	GUnixPipe			GLib
+skip	GUnixPipeEnd			GLib
+skip	g_closefrom			GLib
+skip	g_unix_error_quark		GLib
+skip	g_unix_fd_add			GLib
+skip	g_unix_fd_add_full		GLib
+skip	g_unix_fd_source_new		GLib
+skip	g_fdwalk_set_cloexec		GLib
+skip	g_unix_get_passwd_entry		GLib
+skip	g_unix_open_pipe		GLib
+skip	g_unix_set_fd_nonblocking	GLib
+skip	g_unix_signal_add		GLib
+skip	g_unix_signal_add_full		GLib
+skip	g_unix_signal_source_new	GLib
+
+ifdef	g_source_add_unix_fd		G_OS_UNIX
+ifdef	g_source_modify_unix_fd		G_OS_UNIX
+ifdef	g_source_remove_unix_fd		G_OS_UNIX
+ifdef	g_source_query_unix_fd		G_OS_UNIX
+
 # GObject
 # These all have (or should have) explicit bindings.
-skip	GType
-skip	GObject
+skip	GType				GObject		manual
+skip	GObject				GObject		manual
 ref	GObject				g_object_ref
 unref	GObject				g_object_unref
 ref-sink GObject			g_object_ref_sink
-skip	GTypeInstance
-skip	GTypeClass
-skip	GTypeInterface
+skip	GTypeInstance			GObject		manual
+skip	GTypeClass			GObject		manual
+skip	GTypeInterface			GObject		manual
 type-struct-for GTypeClass		GObject.TypeInstance
 # The following line is a lie, but close enough.
 type-struct	GTypeInstance		GObject.TypeClass
 nest	GObjectConstructParam		Object::ConstructParam
-skip	GObjectConstructParam
+skip	GObjectConstructParam		GObject		manual
 nest-alias GBindingFlags		Binding::Flags
-skip	GValue
+skip	GValue				GObject		manual
 onstack	GValue
 float	GInitiallyUnowned
 skip	g_gtype_get_type
@@ -234,6 +256,88 @@ nest	GTlsPasswordFlags		TlsPassword::Flags
 no-autobase GInitable
 no-autobase GAsyncInitable
 prefer-autobase GActionGroup		ActionMap
+
+# For compatibility reasons, these APIs are present in Gio-2.0.gir,
+# as well as in newer GioUnix-2.0.gir. We don't want to put them into
+# peel::Gio bindings, so skip them when generating that.
+repo-skip gio-unix-2.0			Gio
+repo-skip gio/gdesktopappinfo.h		Gio
+repo-skip gio/gfiledescriptorbased.h	Gio
+repo-skip gio/gunixfdmessage.h		Gio
+repo-skip gio/gunixinputstream.h	Gio
+repo-skip gio/gunixmounts.h		Gio
+repo-skip gio/gunixoutputstream.h	Gio
+skip	GDesktopAppInfo			Gio
+skip	GDesktopAppInfoLookup		Gio
+skip	GDesktopAppLaunchCallback	Gio
+skip	GUnixFDMessage			Gio
+skip	GFileDescriptorBased		Gio
+skip	GUnixInputStream		Gio
+skip	GUnixMountMonitor		Gio
+skip	GUnixMountPoint			Gio
+skip	GUnixOutputStream		Gio
+skip	g_unix_is_mount_path_system_internal Gio
+skip	g_unix_is_system_device_path	Gio
+skip	g_unix_is_system_fs_type	Gio
+skip	g_unix_mount_at			Gio
+skip	g_unix_mount_compare		Gio
+skip	g_unix_mount_copy		Gio
+skip	g_unix_mount_for		Gio
+skip	g_unix_mount_free		Gio
+skip	g_unix_mount_get_device_path	Gio
+skip	g_unix_mount_get_fs_type	Gio
+skip	g_unix_mount_get_mount_path	Gio
+skip	g_unix_mount_get_options	Gio
+skip	g_unix_mount_get_root_path	Gio
+skip	g_unix_mount_guess_can_eject	Gio
+skip	g_unix_mount_guess_icon		Gio
+skip	g_unix_mount_guess_name		Gio
+skip	g_unix_mount_guess_should_display Gio
+skip	g_unix_mount_guess_symbolic_icon Gio
+skip	g_unix_mount_is_readonly	Gio
+skip	g_unix_mount_is_system_internal	Gio
+skip	g_unix_mount_point_at		Gio
+skip	g_unix_mount_point_compare	Gio
+skip	g_unix_mount_point_copy		Gio
+skip	g_unix_mount_point_free		Gio
+skip	g_unix_mount_point_get_device_path Gio
+skip	g_unix_mount_point_get_fs_type	Gio
+skip	g_unix_mount_point_get_mount_path Gio
+skip	g_unix_mount_point_get_options	Gio
+skip	g_unix_mount_point_guess_can_eject Gio
+skip	g_unix_mount_point_guess_icon	Gio
+skip	g_unix_mount_point_guess_name	Gio
+skip	g_unix_mount_point_guess_symbolic_icon Gio
+skip	g_unix_mount_point_is_loopback	Gio
+skip	g_unix_mount_point_is_readonly	Gio
+skip	g_unix_mount_point_is_user_mountable Gio
+skip	g_unix_mount_points_changed_since Gio
+skip	g_unix_mount_points_get		Gio
+skip	g_unix_mounts_changed_since	Gio
+skip	g_unix_mounts_get		Gio
+
+ifdef	g_dbus_message_get_unix_fd_list	G_OS_UNIX
+ifdef	g_dbus_message_set_unix_fd_list	G_OS_UNIX
+ifdef	g_credentials_get_unix_pid	G_OS_UNIX
+ifdef	g_credentials_get_unix_user	G_OS_UNIX
+ifdef	g_credentials_set_unix_user	G_OS_UNIX
+ifdef	g_subprocess_launcher_take_fd	G_OS_UNIX
+ifdef	g_subprocess_launcher_close	G_OS_UNIX
+ifdef	g_subprocess_launcher_set_stdin_file_path	G_OS_UNIX
+ifdef	g_subprocess_launcher_take_stdin_fd		G_OS_UNIX
+ifdef	g_subprocess_launcher_set_stdout_file_path	G_OS_UNIX
+ifdef	g_subprocess_launcher_take_stdout_fd		G_OS_UNIX
+ifdef	g_subprocess_launcher_set_stderr_file_path	G_OS_UNIX
+ifdef	g_subprocess_launcher_take_stderr_fd		G_OS_UNIX
+ifdef	g_subprocess_launcher_set_child_setup		G_OS_UNIX
+ifdef	g_dbus_connection_call_with_unix_fd_list	G_OS_UNIX
+ifdef	g_dbus_connection_call_with_unix_fd_list_finish	G_OS_UNIX
+ifdef	g_dbus_connection_call_with_unix_fd_list_sync	G_OS_UNIX
+ifdef	g_dbus_method_invocation_return_value_with_unix_fd_list G_OS_UNIX
+ifdef	g_dbus_proxy_call_with_unix_fd_list		G_OS_UNIX
+ifdef	g_dbus_proxy_call_with_unix_fd_list_finish	G_OS_UNIX
+ifdef	g_dbus_proxy_call_with_unix_fd_list_sync	G_OS_UNIX
+
 # FIXME: returning C arrays
 skip	GTlsPassword::vfunc_get_value
 

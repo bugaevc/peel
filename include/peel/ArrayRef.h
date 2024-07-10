@@ -44,7 +44,7 @@ public:
     return p;
   }
 
-  constexpr T &
+  T &
   operator [] (unsigned index)
   {
     return p[index];

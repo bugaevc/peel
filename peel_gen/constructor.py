@@ -15,7 +15,7 @@ class Constructor(FunctionLike):
             self.containing_type.ns.name,
             self.containing_type.gir_name,
             self.name,
-            self.c_ident
+            self.c_ident,
         )
 
     def resolve_stuff(self):
@@ -69,7 +69,7 @@ class Constructor(FunctionLike):
         return escape_cpp_name(name)
 
     def generate(self):
-        api_tweaks.skip_if_needed(self.tweak_ident)
+        api_tweaks.skip_if_needed(self.tweak_ident, self.ns)
 
         return c_function_wrapper.generate(
             name=self.emit_name(),
@@ -78,5 +78,5 @@ class Constructor(FunctionLike):
             rv=self.rv,
             params=self.params,
             throws=self.throws,
-            indent='  '
+            indent='  ',
         )

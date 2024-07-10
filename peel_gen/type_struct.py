@@ -112,7 +112,7 @@ class TypeStruct(DefinedType):
         return len(self.fields) > 1
 
     def generate(self):
-        api_tweaks.skip_if_needed(self.c_type)
+        api_tweaks.skip_if_needed(self.c_type, self.ns)
 
         if isinstance(self.type_struct_for, Class):
             parent_instance_type = self.type_struct_for.parent

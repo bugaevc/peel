@@ -153,13 +153,13 @@ class Record(DefinedType):
         return s
 
     def generate_forward_decl(self, for_nested=False):
-        api_tweaks.skip_if_needed(self.c_type)
+        api_tweaks.skip_if_needed(self.c_type, self.ns)
         if self.nested_in and not for_nested:
             return None
         return '{} {};'.format(self.struct_kw, self.own_name)
 
     def generate(self):
-        api_tweaks.skip_if_needed(self.c_type)
+        api_tweaks.skip_if_needed(self.c_type, self.ns)
         assert(not (self.onstack and self.incomplete))
 
         l = [
@@ -234,7 +234,7 @@ class Record(DefinedType):
 
     def generate_specializations(self):
         self.resolve_stuff()
-        api_tweaks.skip_if_needed(self.c_type)
+        api_tweaks.skip_if_needed(self.c_type, self.ns)
         full_name = self.emit_name_for_context(None)
         if self.get_type == 'intern':
             get_type = generate_get_type_specialization(full_name, intern_get_type_map[self.gir_name])

@@ -12,7 +12,7 @@ class SaxHandler(xml.sax.handler.ContentHandler):
     def startElement(self, name, attrs):
         if not self.stack:
             assert(name == 'repository')
-            r = Repository(attrs)
+            r = Repository(self.repo_name, attrs)
             repository_map[(self.repo_name, self.repo_version)] = r
             self.stack.append(r)
             return

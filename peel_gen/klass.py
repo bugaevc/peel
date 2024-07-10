@@ -216,7 +216,7 @@ class Class(DefinedType):
         return len(self.fields) > 1
 
     def generate(self):
-        api_tweaks.skip_if_needed(self.c_type)
+        api_tweaks.skip_if_needed(self.c_type, self.ns)
 
         l = []
 
@@ -385,7 +385,7 @@ class Class(DefinedType):
         return '\n'.join(l)
 
     def generate_specializations(self):
-        api_tweaks.skip_if_needed(self.c_type)
+        api_tweaks.skip_if_needed(self.c_type, self.ns)
         full_name = self.emit_name_for_context(None)
         s = ''
         if self.get_type == 'intern':

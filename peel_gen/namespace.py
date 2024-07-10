@@ -85,5 +85,9 @@ class Namespace(NodeHandler):
                 member.resolve_stuff()
 
     def should_emit_file(self, member):
-        return isinstance(member, (Class, Interface, Record, Enumeration, Bitfield))
+        if not isinstance(member, (Class, Interface, Record, Enumeration, Bitfield)):
+            return False
+        if api_tweaks.should_skip(member.c_type, ns=self, keep_manual=True):
+            return False
+        return True
 

@@ -14,8 +14,12 @@ class Method(FunctionLike):
         return 'Method({}.{}, c_ident={})'.format(self.containing_type, self.name, self.c_ident)
 
     def generate(self, indent):
-        api_tweaks.skip_if_needed(self.c_ident)
-        return c_function_wrapper.generate(
+        api_tweaks.skip_if_needed(self.c_ident, self.ns)
+        l = []
+        s = api_tweaks.ifdef_if_needed(self.c_ident)
+        if s:
+            l.append(s)
+        l.append(c_function_wrapper.generate(
             name=escape_cpp_name(self.name),
             c_callee=self.c_ident,
             context=self.containing_type,
@@ -23,5 +27,9 @@ class Method(FunctionLike):
             params=self.params,
             throws=self.throws,
             indent=indent,
-        )
+        ))
+        s = api_tweaks.endif_if_needed(self.c_ident)
+        if s:
+            l.append(s)
+        return '\n'.join(l)
 
