@@ -362,6 +362,7 @@ ifdef	g_dbus_message_set_unix_fd_list	G_OS_UNIX
 ifdef	g_credentials_get_unix_pid	G_OS_UNIX
 ifdef	g_credentials_get_unix_user	G_OS_UNIX
 ifdef	g_credentials_set_unix_user	G_OS_UNIX
+ifdef	g_subprocess_send_signal	G_OS_UNIX
 ifdef	g_subprocess_launcher_take_fd	G_OS_UNIX
 ifdef	g_subprocess_launcher_close	G_OS_UNIX
 ifdef	g_subprocess_launcher_set_stdin_file_path	G_OS_UNIX
