@@ -35,7 +35,7 @@ public:
   }
 
   constexpr static Type
-  interface ()
+  interface_ ()
   {
     return G_TYPE_INTERFACE;
   }

@@ -57,6 +57,7 @@ def escape_cpp_name(name):
         'TRY_AGAIN',
         'ALTERNATE',
         'WINDING',
+        'interface',
     ):
         return name + '_'
     assert(name)
