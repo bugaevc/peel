@@ -39,6 +39,7 @@ def escape_cpp_name(name):
         'BIG_ENDIAN',
         'LITTLE_ENDIAN',
         'UNICODE',
+        'CALLBACK',
     ):
         return name + '_'
     assert(name)
