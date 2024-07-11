@@ -367,8 +367,11 @@ public:
     /* Don't call this if using the define_properties () mechanism */
     peel_nothrow
     void
-    install_property (unsigned id, FloatPtr<ParamSpec> pspec)
+    install_property (unsigned id, FloatPtr<ParamSpec> &&pspec)
     {
+      // The argument must be of type FloatPtr && (as opposed to a by-value
+      // FloatPtr) to prevent trying to instantiate RefTraits<ParamSpec>
+      // for the forward-declared ParamSpec type.
       ::GObjectClass *klass = reinterpret_cast<::GObjectClass *> (this);
       ::GParamSpec *p = reinterpret_cast<::GParamSpec *> (std::move (pspec).release_floating_ptr ());
       g_object_class_install_property (klass, id, p);
