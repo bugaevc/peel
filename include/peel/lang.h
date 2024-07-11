@@ -48,6 +48,16 @@
 #define peel_nonnull_args(...)
 #endif
 
+#if defined (__GNUC__)
+#define _peel_diagnostic_push_ignored_offsetof                                 \
+  _Pragma ("GCC diagnostic push");                                             \
+  _Pragma ("GCC diagnostic ignored \"-Winvalid-offsetof\"")
+#define _peel_diagnostic_pop _Pragma ("GCC diagnostic pop")
+#else
+#define _peel_diagnostic_push_ignored_offsetof
+#define _peel_diagnostic_pop
+#endif
+
 #ifndef _Bool
 #define _Bool bool
 #endif

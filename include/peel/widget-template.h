@@ -219,4 +219,13 @@ public:
 
 } /* namespace peel */
 
-#define PEEL_WIDGET_TEMPLATE_BIND_CHILD(WidgetClass, name) this->::peel::Gtk::Widget::Class::bind_template_child_full (#name, false, G_STRUCT_OFFSET (WidgetClass, name))
+#define PEEL_WIDGET_TEMPLATE_BIND_CHILD(WidgetClass, name)                     \
+do                                                                             \
+  {                                                                            \
+    _peel_diagnostic_push_ignored_offsetof                                     \
+    this->::peel::Gtk::Widget::Class::bind_template_child_full (               \
+      #name, false, G_STRUCT_OFFSET (WidgetClass, name));                      \
+    _peel_diagnostic_pop                                                       \
+  }                                                                            \
+while (0)                                                                      \
+/* end of PEEL_WIDGET_TEMPLATE_BIND_CHILD */
