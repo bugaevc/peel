@@ -53,16 +53,37 @@ class Enumeration(DefinedType):
     def generate_specializations(self):
         api_tweaks.skip_if_needed(self.c_type, self.ns)
         type_name = self.emit_name_for_context(None)
-        s = generate_value_traits_specialization(
+        l = [generate_value_traits_specialization(
             type_name,
             type_name,
             'm',
             'static_cast<{}> (g_value_get_enum (value))'.format(type_name),
-            'g_value_set_enum (value, static_cast<{}> (m))'.format(self.c_type),
-        )
+            'g_value_set_enum (value, static_cast<::{}> (m))'.format(self.c_type),
+        )]
         if self.get_type:
-            s += '\n' + generate_get_type_specialization(type_name, self.get_type + ' ()')
-        return s
+            l.append(generate_get_type_specialization(type_name, self.get_type + ' ()'))
+            l.extend([
+                'template<>',
+                'struct peel::internals::PspecTraits<{}>'.format(type_name),
+                '{',
+                '  {} default_value;'.format(type_name),
+                '',
+                '  constexpr PspecTraits ({} default_value)'.format(type_name),
+                '    : default_value (default_value)',
+                '  { }',
+                '',
+                '  ::GParamSpec *',
+                '  create_pspec (PspecBasics basics)',
+                '  {',
+                '    return g_param_spec_enum (basics.name, basics.nick, basics.blurb,',
+                '                              {} (),'.format(self.get_type),
+                '                              static_cast<::{}> (default_value),'.format(self.c_type),
+                '                              basics.flags);',
+                '  }',
+                '};',
+            ])
+
+        return '\n'.join(l)
 
 class EnumMember(NodeHandler):
     def __init__(self, attrs):
