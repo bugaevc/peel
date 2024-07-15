@@ -4,6 +4,7 @@ pkg = import('pkgconfig')
 py = import('python').find_installation('python3')
 
 subdir('include')
+subdir('peel_gen')
 subdir('tests')
 subdir('cmake')
 
@@ -23,7 +24,7 @@ peel_gen = configure_file(
 if meson.is_subproject()
   meson.override_find_program('peel-gen', peel_gen)
 else
-  install_subdir('peel_gen', install_dir: py.get_install_dir())
+  py.install_sources(peel_gen_files, subdir: 'peel_gen')
   install_data('api-tweaks.txt')
 endif
 

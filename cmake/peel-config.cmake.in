@@ -22,11 +22,16 @@ function (peel_generate GIR_NAME GIR_VERSION)
 
   set (gen_dir "${CMAKE_CURRENT_BINARY_DIR}/peel-generated")
   file (MAKE_DIRECTORY "${gen_dir}")
+  if (${CMAKE_VERSION} VERSION_LESS "3.27")
+    set (depends_explicit_only)
+  else ()
+    set (depends_explicit_only DEPENDS_EXPLICIT_ONLY)
+  endif ()
   add_custom_command (OUTPUT "${gen_dir}/peel"
     COMMAND "${Python3_EXECUTABLE}"
     ARGS "${PEEL_GEN_MODULE}" "--recursive" "${GIR_NAME}" "${GIR_VERSION}"
     WORKING_DIRECTORY "${gen_dir}"
-    VERBATIM DEPENDS_EXPLICIT_ONLY)
+    VERBATIM ${depends_explicit_only})
 
   add_custom_target (peel_generate_${GIR_NAME} DEPENDS "${gen_dir}/peel")
 
@@ -37,5 +42,4 @@ function (peel_generate GIR_NAME GIR_VERSION)
   set_property (TARGET peel::${GIR_NAME} APPEND PROPERTY IMPORTED_LOCATION "${gen_dir}/peel")
   set_property (TARGET peel::${GIR_NAME} APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${gen_dir}")
   set_property (TARGET peel::${GIR_NAME} APPEND PROPERTY ADDITIONAL_CLEAN_FILES "${gen_dir}")
-  # set_property (DIRECTORY "${gen_dir}" GENERATED)
 endfunction (peel_generate)
