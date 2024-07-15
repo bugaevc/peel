@@ -125,7 +125,7 @@ GObject::Type::of ()
   return T::_peel_get_type ();
 }
 
-} /* namespace p */
+} /* namespace peel */
 
 #define PEEL_CLASS(Subclass)                                                   \
   friend class ::peel::GObject::Object;                                        \
