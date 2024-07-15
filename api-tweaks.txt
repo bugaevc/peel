@@ -767,6 +767,11 @@ nest	AdwAnimationTarget		Animation::Target
 nest	AdwViewSwitcherPolicy		ViewSwitcher::Policy
 nest	AdwToastPriority		Toast::Priority
 nest	AdwDialogPresentationMode	Dialog::PresentationMode
+nest	AdwFlapFoldPolicy		Flap::FoldPolicy
+nest	AdwFlapTransitionType		Flap::TransitionType
+nest	AdwSqueezerTransitionType	Squeezer::TransitionType
+nest	AdwLeafletTransitionType	Leaflet::TransitionType
+nest	AdwTabViewShortcuts		TabView::Shortcuts
 
 skip	adw_breakpoint_add_settersv
 skip	AdwSwipeable::vfunc_get_snap_points
