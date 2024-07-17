@@ -25,11 +25,11 @@
 #endif
 
 #ifdef __GNUC__
-#define peel_always_inline __attribute__ ((always_inline))
+#define peel_always_inline __attribute__ ((always_inline)) inline
 #elif defined (_MSC_VER)
 #define peel_always_inline __forceinline
 #else
-#define peel_always_inline
+#define peel_always_inline inline
 #endif
 
 #if defined (__GNUC__) && __GNUC__ >= 10

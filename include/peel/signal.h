@@ -340,7 +340,7 @@ using ClosureStoringOptionalCallback = typename std::conditional<
   ::GClosure
 >::type;
 
-static void
+static inline void
 closure_set_va_marshal (::GClosure *closure, ::GVaClosureMarshal marshal)
 {
   // HACK: This is the private _GRealClosure / _g_closure_set_va_marshal API.

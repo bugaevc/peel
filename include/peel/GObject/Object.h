@@ -556,7 +556,7 @@ using GObject::Object;
 /* Note: this function is very intentionally marked inline,
    but not static inline. */
 peel_always_inline peel_nothrow
-inline void
+void
 peel_sink_unref_gobject_if_floating (void *object)
 {
   static guint (*floating_flag_handler)(::GObject *, gint);
