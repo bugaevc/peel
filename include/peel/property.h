@@ -20,7 +20,7 @@ struct Property;
 
 namespace internals
 {
-template<typename Class, typename = void>
+template<typename Class, typename ParentClass, typename = void>
 struct PropertyHelper;
 
 template<typename T>
@@ -303,7 +303,8 @@ public:
 template<typename Class>
 struct GetVisitor
 {
-  friend struct PropertyHelper<Class>;
+  template<typename, typename, typename>
+  friend struct PropertyHelper;
 private:
   Class *instance;
   guint target_id;
@@ -402,7 +403,8 @@ public:
 template<typename Class>
 struct SetVisitor
 {
-  friend struct PropertyHelper<Class>;
+  template<typename, typename, typename>
+  friend struct PropertyHelper;
 
 private:
   Class *instance;
@@ -569,7 +571,8 @@ public:
 template<typename Class>
 struct InstallVisitor
 {
-  friend struct PropertyHelper<Class>;
+  template<typename, typename, typename>
+  friend struct PropertyHelper;
 
 private:
   ::GObjectClass *klass;
@@ -604,10 +607,77 @@ public:
   }
 };
 
-template<typename Class>
-using if_has_define_properties = decltype (Class::define_properties (std::declval<int &> ()));
+struct DummyVisitorRet
+{
+  DummyVisitorRet &
+  get (...)
+  {
+    return *this;
+  }
 
-template<typename Class, typename>
+  DummyVisitorRet &
+  set (...)
+  {
+    return *this;
+  }
+
+  DummyVisitorRet &
+  nick (...)
+  {
+    return *this;
+  }
+
+  DummyVisitorRet &
+  blurb (...)
+  {
+    return *this;
+  }
+
+  DummyVisitorRet &
+  flags (...)
+  {
+    return *this;
+  }
+};
+
+struct DummyVisitor
+{
+  DummyVisitorRet
+  prop (...)
+  {
+    return DummyVisitorRet { };
+  }
+
+  DummyVisitorRet
+  override_prop (...)
+  {
+    return DummyVisitorRet { };
+  }
+};
+
+template<typename Class>
+constexpr void
+(*get_define_properties (...)) (DummyVisitor &)
+{
+  return nullptr;
+}
+
+template<typename Class>
+constexpr void
+(*get_define_properties (decltype (&Class::template define_properties<DummyVisitor>))) (DummyVisitor &)
+{
+  return &Class::template define_properties<DummyVisitor>;
+}
+
+template<typename Subclass, typename ParentClass>
+constexpr bool
+has_own_define_properties ()
+{
+  return (get_define_properties<Subclass> (nullptr) != nullptr) &&
+         (get_define_properties<Subclass> (nullptr) != get_define_properties<ParentClass> (nullptr));
+}
+
+template<typename Class, typename ParentClass, typename>
 struct PropertyHelper
 {
   peel_nothrow
@@ -618,8 +688,8 @@ struct PropertyHelper
   }
 };
 
-template<typename Class>
-struct PropertyHelper<Class, if_has_define_properties<Class>>
+template<typename Class, typename ParentClass>
+struct PropertyHelper<Class, ParentClass, typename std::enable_if<has_own_define_properties<Class, ParentClass> ()>::type>
 {
   peel_nothrow
   static void

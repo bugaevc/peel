@@ -82,6 +82,7 @@ struct ClassHelper
     self->_peel_chain_finalize (obj);
   }
 
+  template<typename ParentClass>
   peel_nothrow
   static void
   class_init (gpointer g_class, gpointer class_data)
@@ -92,19 +93,20 @@ struct ClassHelper
     ::GObjectClass *object_class = reinterpret_cast<::GObjectClass *> (g_class);
     if (!std::is_trivially_destructible<Subclass>::value)
       object_class->finalize = finalize_vfunc;
-    PropertyHelper<Subclass>::init_props (object_class);
+    PropertyHelper<Subclass, ParentClass>::init_props (object_class);
     klass->Subclass::Class::init ();
   }
 
+  template<typename ParentClass>
   G_NO_INLINE peel_nothrow
   static ::GType
-  register_type_static (::GType parent_type, const char *type_name)
+  register_type_static (const char *type_name)
   {
     ::GType tp = g_type_register_static_simple (
-        parent_type,
+        Type::of<ParentClass> (),
         g_intern_static_string (type_name),
         sizeof (typename Subclass::Class),
-        class_init,
+        &class_init<ParentClass>,
         sizeof (Subclass),
         InstanceInitHelper<Subclass>::get_instance_init (),
         // TODO: add a way to pass final/abstract here
@@ -131,11 +133,18 @@ GObject::Type::of ()
   friend class ::peel::GObject::Object;                                        \
   friend class ::peel::GObject::TypeClass;                                     \
   friend struct ::peel::internals::ClassHelper<Subclass>;                      \
-  template<typename, typename> /* workaround a Clang bug */                    \
-  friend struct ::peel::internals::InstanceInitHelper;                         \
-  template<typename, typename> /* workaround a Clang bug */                    \
-  friend struct ::peel::internals::TypeInitHelper;                             \
-  friend struct ::peel::internals::PropertyHelper<Subclass>;                   \
+  friend struct ::peel::internals::InstanceInitHelper<Subclass>;               \
+  friend struct ::peel::internals::TypeInitHelper<Subclass>;                   \
+                                                                               \
+  template<typename Class>                                                     \
+  friend constexpr void                                                        \
+  (*::peel::internals::get_define_properties                                   \
+  (decltype (&Class::template define_properties                                \
+  <::peel::internals::DummyVisitor>)))                                         \
+  (::peel::internals::DummyVisitor &);                                         \
+                                                                               \
+  template<typename, typename, typename>                                       \
+  friend struct ::peel::internals::PropertyHelper;                             \
                                                                                \
 public:                                                                        \
   peel_nothrow G_GNUC_CONST                                                    \
@@ -190,7 +199,7 @@ Subclass::_peel_get_type ()                                                    \
   if (_peel_once_init_enter (&_peel_tp))                                       \
     {                                                                          \
       ::GType _peel_actual_tp = ::peel::internals::ClassHelper<Subclass>::     \
-        register_type_static (::peel::Type::of<ParentClass> (), (type_name));  \
+        template register_type_static<ParentClass> (type_name);                \
       _peel_once_init_leave (&_peel_tp, _peel_actual_tp);                      \
     }                                                                          \
                                                                                \
