@@ -39,7 +39,5 @@ function (peel_generate GIR_NAME GIR_VERSION)
   target_link_libraries (peel::${GIR_NAME} INTERFACE peel::peel)
   add_dependencies (peel::${GIR_NAME} peel_generate_${GIR_NAME})
 
-  set_property (TARGET peel::${GIR_NAME} APPEND PROPERTY IMPORTED_LOCATION "${gen_dir}/peel")
   set_property (TARGET peel::${GIR_NAME} APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${gen_dir}")
-  set_property (TARGET peel::${GIR_NAME} APPEND PROPERTY ADDITIONAL_CLEAN_FILES "${gen_dir}")
 endfunction (peel_generate)
