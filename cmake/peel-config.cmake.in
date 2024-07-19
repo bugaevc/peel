@@ -20,6 +20,23 @@ function (peel_generate GIR_NAME GIR_VERSION)
   set (multiValueArgs)
   cmake_parse_arguments (PEEL_GENERATE "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
+  set (gi_gir_path "$ENV{GI_GIR_PATH}")
+  foreach (prefix_path IN LISTS CMAKE_PREFIX_PATH)
+    file (TO_NATIVE_PATH "${prefix_path}" native_prefix_path)
+    if ("${gi_gir_path}" STREQUAL "")
+      set (sep)
+    elseif (UNIX)
+      set (sep ":")
+    else ()
+      set (sep ";")
+    endif ()
+    if (UNIX)
+      set (gi_gir_path "${gi_gir_path}${sep}${native_prefix_path}/share/gir-1.0")
+    else ()
+      set (gi_gir_path "${gi_gir_path}${sep}${native_prefix_path}\\share\\gir-1.0")
+    endif ()
+  endforeach ()
+
   set (gen_dir "${CMAKE_CURRENT_BINARY_DIR}/peel-generated")
   file (MAKE_DIRECTORY "${gen_dir}")
   if (${CMAKE_VERSION} VERSION_LESS "3.27")
@@ -28,8 +45,11 @@ function (peel_generate GIR_NAME GIR_VERSION)
     set (depends_explicit_only DEPENDS_EXPLICIT_ONLY)
   endif ()
   add_custom_command (OUTPUT "${gen_dir}/peel"
-    COMMAND "${Python3_EXECUTABLE}"
-    ARGS "${PEEL_GEN_MODULE}" "--recursive" "${GIR_NAME}" "${GIR_VERSION}"
+    COMMAND "${CMAKE_COMMAND}"
+    ARGS
+      "-E" "env" "GI_GIR_PATH=${gi_gir_path}"
+      "${Python3_EXECUTABLE}" "${PEEL_GEN_MODULE}"
+      "--recursive" "${GIR_NAME}" "${GIR_VERSION}"
     WORKING_DIRECTORY "${gen_dir}"
     VERBATIM ${depends_explicit_only})
 
