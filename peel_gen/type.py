@@ -66,10 +66,16 @@ type_map = {
     'gunichar': PlainType('gunichar', 'gunichar'),
     'gunichar32': PlainType('gunichar32', 'gunichar32'),
     'long double': PlainType('long double', 'long double'),
-    'time_t': PlainType('time_t', 'time_t'),
     'utf8': StrType(),
     'filename': StrType(),
     'va_list': VaListType(),
+
+    'time_t': PlainType('time_t', 'time_t'),
+    'off_t': PlainType('off_t', 'off_t'),
+    'pid_t': PlainType('pid_t', 'pid_t'),
+    'uid_t': PlainType('uid_t', 'uid_t'),
+    'dev_t': PlainType('dev_t', 'dev_t'),
+    'socklen_t': PlainType('socklen_t', 'socklen_t'),
 
     # This is really supposed to be GObject.Type, but some GIR files
     # contain this as its own plain type.
