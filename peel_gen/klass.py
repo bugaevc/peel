@@ -356,7 +356,10 @@ class Class(DefinedType):
                     l.append('  /* Unsupported for now: {}: {} */'.format(vfunc.name, e.reason))
                 l.append('')
         if self.type_struct is not None:
-            l.append(self.type_struct.generate())
+            try:
+                l.append(self.type_struct.generate())
+            except UnsupportedForNowException as e:
+                l.append('  /* Type struct unsupported for now: {} */'.format(e.reason))
         s = api_tweaks.endif_for_non_opaque(self.c_type)
         if s:
             l.append(s)

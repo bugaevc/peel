@@ -117,6 +117,9 @@ class TypeStruct(DefinedType):
         if isinstance(self.type_struct_for, Class):
             parent_instance_type = self.type_struct_for.parent
             if parent_instance_type is not None:
+                if parent_instance_type.type_struct is None:
+                    # Broken GIR.
+                    raise UnsupportedForNowException('No type struct for parent type')
                 parent_class_type_name = parent_instance_type.type_struct.emit_name_for_context(self)
             else:
                 parent_class_type_name = 'GObject::TypeClass'
