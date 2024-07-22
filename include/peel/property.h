@@ -20,7 +20,7 @@ struct Property;
 
 namespace internals
 {
-template<typename Class, typename ParentClass, typename = void>
+template<typename Class, typename = void>
 struct PropertyHelper;
 
 template<typename T>
@@ -303,7 +303,7 @@ public:
 template<typename Class>
 struct GetVisitor
 {
-  template<typename, typename, typename>
+  template<typename, typename>
   friend struct PropertyHelper;
 private:
   Class *instance;
@@ -403,7 +403,7 @@ public:
 template<typename Class>
 struct SetVisitor
 {
-  template<typename, typename, typename>
+  template<typename, typename>
   friend struct PropertyHelper;
 
 private:
@@ -571,7 +571,7 @@ public:
 template<typename Class>
 struct InstallVisitor
 {
-  template<typename, typename, typename>
+  template<typename, typename>
   friend struct PropertyHelper;
 
 private:
@@ -655,31 +655,31 @@ struct DummyVisitor
   }
 };
 
-template<typename Class>
-constexpr void
-(*get_define_properties (...)) (DummyVisitor &)
+constexpr static bool
+has_define_properties (...)
 {
-  return nullptr;
+  return false;
 }
 
 template<typename Class>
-constexpr void
-(*get_define_properties (decltype (&Class::template define_properties<DummyVisitor>))) (DummyVisitor &)
+constexpr static bool
+has_define_properties (decltype (&Class::template define_properties<DummyVisitor>))
 {
-  return &Class::template define_properties<DummyVisitor>;
+  return true;
 }
 
-template<typename Subclass, typename ParentClass>
-constexpr bool
-has_own_define_properties ()
-{
-  return (get_define_properties<Subclass> (nullptr) != nullptr) &&
-         (get_define_properties<Subclass> (nullptr) != get_define_properties<ParentClass> (nullptr));
-}
-
-template<typename Class, typename ParentClass, typename>
+template<typename Class, typename /* = void */>
 struct PropertyHelper
 {
+  template<typename Visitor>
+  peel_always_inline
+  constexpr static void
+  (*get_define_properties ()) (Visitor &)
+  {
+    return nullptr;
+  }
+
+  template<typename ParentClass>
   peel_nothrow
   static void
   init_props (::GObjectClass *)
@@ -688,9 +688,33 @@ struct PropertyHelper
   }
 };
 
-template<typename Class, typename ParentClass>
-struct PropertyHelper<Class, ParentClass, typename std::enable_if<has_own_define_properties<Class, ParentClass> ()>::type>
+template<typename Class>
+struct PropertyHelper<Class, typename std::enable_if<has_define_properties<Class> (nullptr)>::type>
 {
+  template<typename Visitor>
+  peel_always_inline
+  constexpr static void
+  (*get_define_properties ()) (Visitor &)
+  {
+    return &Class::template define_properties<Visitor>;
+  }
+
+  template<typename ParentClass, typename Visitor>
+  peel_always_inline
+  static bool
+  has_own_define_properties ()
+  {
+#if !defined (__GNUC__) || __GNUC__ >= 12
+    // GCC < 12 doesn't properly evaluate pointer equality in
+    // constant contexts. So, we have to do the check at runtime.
+    // See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94716 and
+    // GCC commit 91031bffa42fdea3c985727d042cd1882a64be9c.
+    constexpr
+#endif
+    bool has_own = get_define_properties<Visitor> () != PropertyHelper<ParentClass>::template get_define_properties<Visitor> ();
+    return has_own;
+  }
+
   peel_nothrow
   static void
   get_property (::GObject *object, guint prop_id, ::GValue *value, ::GParamSpec *pspec)
@@ -719,10 +743,14 @@ struct PropertyHelper<Class, ParentClass, typename std::enable_if<has_own_define
       }
   }
 
+  template<typename ParentClass>
   peel_nothrow
   static void
   init_props (::GObjectClass *klass)
   {
+    if (!has_own_define_properties<ParentClass, InstallVisitor<Class>> ())
+      return;
+
     klass->get_property = get_property;
     klass->set_property = set_property;
 

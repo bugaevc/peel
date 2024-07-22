@@ -93,7 +93,7 @@ struct ClassHelper
     ::GObjectClass *object_class = reinterpret_cast<::GObjectClass *> (g_class);
     if (!std::is_trivially_destructible<Subclass>::value)
       object_class->finalize = finalize_vfunc;
-    PropertyHelper<Subclass, ParentClass>::init_props (object_class);
+    PropertyHelper<Subclass>::template init_props<ParentClass> (object_class);
     klass->Subclass::Class::init ();
   }
 
@@ -137,13 +137,12 @@ GObject::Type::of ()
   friend struct ::peel::internals::TypeInitHelper<Subclass>;                   \
                                                                                \
   template<typename Class>                                                     \
-  friend constexpr void                                                        \
-  (*::peel::internals::get_define_properties                                   \
+  friend constexpr bool                                                        \
+  ::peel::internals::has_define_properties                                     \
   (decltype (&Class::template define_properties                                \
-  <::peel::internals::DummyVisitor>)))                                         \
-  (::peel::internals::DummyVisitor &);                                         \
+  <::peel::internals::DummyVisitor>));                                         \
                                                                                \
-  template<typename, typename, typename>                                       \
+  template<typename, typename>                                                 \
   friend struct ::peel::internals::PropertyHelper;                             \
                                                                                \
 public:                                                                        \
