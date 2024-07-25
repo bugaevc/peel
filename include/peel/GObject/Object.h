@@ -336,6 +336,54 @@ public:
 
   // TODO: the generic add_weak_ref () API
 
+  peel_nothrow
+  void *
+  get_data (const char *key)
+  {
+    ::GObject *obj = reinterpret_cast<::GObject *> (this);
+    return g_object_get_data (obj, key);
+  }
+
+  peel_nothrow
+  void *
+  get_data (::GQuark quark)
+  {
+    ::GObject *obj = reinterpret_cast<::GObject *> (this);
+    return g_object_get_qdata (obj, quark);
+  }
+
+  peel_nothrow
+  void
+  set_data (const char *key, void *data, ::GDestroyNotify destroy_notify = nullptr)
+  {
+    ::GObject *obj = reinterpret_cast<::GObject *> (this);
+    g_object_set_data_full (obj, key, data, destroy_notify);
+  }
+
+  peel_nothrow
+  void
+  set_data (::GQuark quark, void *data, ::GDestroyNotify destroy_notify = nullptr)
+  {
+    ::GObject *obj = reinterpret_cast<::GObject *> (this);
+    g_object_set_qdata_full (obj, quark, data, destroy_notify);
+  }
+
+  peel_nothrow
+  void *
+  steal_data (const char *key)
+  {
+    ::GObject *obj = reinterpret_cast<::GObject *> (this);
+    return g_object_steal_data (obj, key);
+  }
+
+  peel_nothrow
+  void *
+  steal_data (::GQuark quark)
+  {
+    ::GObject *obj = reinterpret_cast<::GObject *> (this);
+    return g_object_steal_qdata (obj, quark);
+  }
+
   class Class : public TypeClass
   {
   private:
@@ -343,7 +391,7 @@ public:
     Class (const Class &) = delete;
     Class (Class &&) = delete;
 
-    // TODO: These should be public fields.
+    // TODO: Should be public fields?
     unsigned char _placeholder[sizeof (::GObjectClass) - sizeof (TypeClass)] peel_no_warn_unused;
 
   public:
