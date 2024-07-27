@@ -12,6 +12,7 @@ static_headers = files(
   'peel/ArrayRef.h',
   'peel/RefPtr.h',
   'peel/FloatPtr.h',
+  'peel/WeakPtr.h',
 
   'peel/GObject/Type.h',
   'peel/GObject/TypeInstance.h',
