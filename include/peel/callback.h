@@ -189,5 +189,5 @@ public:
   }
 };
 
-}
-}
+} /* namespace internals */
+} /* namespace peel */

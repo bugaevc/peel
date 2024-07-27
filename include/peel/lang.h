@@ -96,4 +96,4 @@ offset_of_member_ptr (U T::*mptr)
 }
 #endif
 
-}
+} /* namespace peel */
