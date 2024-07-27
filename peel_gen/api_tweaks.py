@@ -34,8 +34,8 @@ def should_skip(tweak_ident, ns, keep_manual=False):
         return True
     return False
 
-def skip_if_needed(tweak_ident, ns):
-    if should_skip(tweak_ident, ns):
+def skip_if_needed(tweak_ident, ns, keep_manual=False):
+    if should_skip(tweak_ident, ns, keep_manual):
         raise UnsupportedForNowException('explicitly skipped')
 
 def ifdef_if_needed(tweak_ident):

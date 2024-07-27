@@ -28,6 +28,7 @@ namespace GObject
 class Binding;
 enum class BindingFlags : std::underlying_type<::GBindingFlags>::type;
 class Object;
+struct Value;
 } /* namespace GObject */
 
 namespace Test

@@ -153,7 +153,6 @@ class Record(DefinedType):
         return s
 
     def generate_forward_decl(self, for_nested=False):
-        api_tweaks.skip_if_needed(self.c_type, self.ns)
         if self.nested_in and not for_nested:
             return None
         return '{} {};'.format(self.struct_kw, self.own_name)
