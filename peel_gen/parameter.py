@@ -322,6 +322,7 @@ class Parameter(NodeHandler):
                 params,
                 throws=False,
                 indent='      ',
+                trailing_specs='mutable',
             )
             closure_param_name = self.closure_param.generate_casted_name()
             callback_helper_type = 'peel::internals::CallbackHelper<{}>'.format(', '.join(p.generate_c_type() for p in [tp.rv] + params.params))

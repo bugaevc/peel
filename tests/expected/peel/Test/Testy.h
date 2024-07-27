@@ -181,7 +181,7 @@ public:
     ::GBinding * _peel_binding = reinterpret_cast<::GBinding *> (std::move (binding).release_ref ());
     ::TestCoolCallback _peel_callback = peel::internals::CallbackHelper<::TestTesty *, gboolean *>::wrap_async_callback (
       [callback]
-      (gboolean *b) -> ::TestTesty *
+      (gboolean *b) mutable -> ::TestTesty *
       {
         bool _peel_b;
         peel::RefPtr<Testy> _peel_return = callback (&_peel_b);
@@ -309,7 +309,7 @@ protected:
     ::GBinding * _peel_binding = reinterpret_cast<::GBinding *> (std::move (binding).release_ref ());
     ::TestCoolCallback _peel_callback = peel::internals::CallbackHelper<::TestTesty *, gboolean *>::wrap_async_callback (
       [callback]
-      (gboolean *b) -> ::TestTesty *
+      (gboolean *b) mutable -> ::TestTesty *
       {
         bool _peel_b;
         peel::RefPtr<Testy> _peel_return = callback (&_peel_b);

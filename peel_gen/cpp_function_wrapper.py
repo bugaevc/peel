@@ -1,6 +1,6 @@
 from peel_gen.exceptions import UnsupportedForNowException
 
-def generate(cpp_callee, context, rv, params, throws, indent):
+def generate(cpp_callee, context, rv, params, throws, indent, trailing_specs=None):
     if params is not None:
         c_signature = params.generate_c_signature()
     else:
@@ -14,7 +14,7 @@ def generate(cpp_callee, context, rv, params, throws, indent):
             c_signature = error_param
 
     l = [
-        '({}) -> {}'.format(c_signature, rv.generate_c_type()),
+        '({}){} -> {}'.format(c_signature, ' ' + trailing_specs if trailing_specs else '', rv.generate_c_type()),
         indent + '{'
     ]
     args = []
