@@ -692,9 +692,11 @@ public:
   template<typename Handler>
   peel_nothrow
   SignalConnection::Token
-  connect (Instance *instance, ::GQuark detail, Handler handler, bool after = false)
+  connect (Instance *instance, ::GQuark detail, Handler &&handler, bool after = false)
   {
-    typedef internals::SignalClosure<Instance, Handler, Ret, Args...> ClosureType;
+    typedef typename std::remove_reference<Handler>::type HandlerRR;
+    typedef typename std::conditional<std::is_function<HandlerRR>::value, HandlerRR *, HandlerRR>::type HandlerType;
+    typedef internals::SignalClosure<Instance, HandlerType, Ret, Args...> ClosureType;
     ClosureType *closure = ClosureType::make (static_cast<Handler &&> (handler));
     // Sinks the closure reference.
     gulong conn_id = g_signal_connect_closure_by_id (reinterpret_cast<::GObject *> (instance), id, detail, closure, after);
@@ -729,9 +731,11 @@ public:
   template<typename Handler>
   static peel_nothrow
   SignalConnection::Token
-  _peel_connect_by_name (Instance *instance, const char *detailed_name, Handler handler, bool after = false)
+  _peel_connect_by_name (Instance *instance, const char *detailed_name, Handler &&handler, bool after = false)
   {
-    typedef internals::SignalClosure<Instance, Handler, Ret, Args...> ClosureType;
+    typedef typename std::remove_reference<Handler>::type HandlerRR;
+    typedef typename std::conditional<std::is_function<HandlerRR>::value, HandlerRR *, HandlerRR>::type HandlerType;
+    typedef internals::SignalClosure<Instance, HandlerType, Ret, Args...> ClosureType;
     ClosureType *closure = ClosureType::make (static_cast<Handler &&> (handler));
     // Sinks the closure reference.
     gulong conn_id = g_signal_connect_closure (reinterpret_cast<::GObject *> (instance), detailed_name, closure, after);
@@ -771,7 +775,7 @@ public:
   peel_nothrow                                                                 \
   ::peel::SignalConnection::Token                                              \
   connect_ ## signal_name                                                      \
-  (_SignalHandler signal_handler, ::GQuark detail = 0, bool after = false)     \
+  (_SignalHandler &&signal_handler, ::GQuark detail = 0, bool after = false)   \
   {                                                                            \
     return (signal_obj).connect (this, detail,                                 \
       static_cast<_SignalHandler &&> (signal_handler), after);                 \

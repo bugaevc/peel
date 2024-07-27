@@ -268,20 +268,20 @@ public:
   template<typename T, typename Handler>
   peel_nothrow
   SignalConnection::Token
-  connect_notify (Property<T> prop, Handler handler, bool after = false)
+  connect_notify (Property<T> prop, Handler &&handler, bool after = false)
   {
     Signal<Object, void (ParamSpec *)> notify_signal = Signal<Object, void (ParamSpec *)>::lookup ("notify");
     ::GQuark quark = g_quark_from_string (prop.name);
-    return notify_signal.template connect<Handler> (this, quark, std::move (handler), after);
+    return notify_signal.template connect<Handler> (this, quark, static_cast<Handler &&> (handler), after);
   }
 
   template<typename T, typename Handler>
   peel_nothrow
   SignalConnection::Token
-  connect_notify (Handler handler, bool after = false)
+  connect_notify (Handler &&handler, bool after = false)
   {
     Signal<Object, void (ParamSpec *)> notify_signal = Signal<Object, void (ParamSpec *)>::lookup ("notify");
-    return notify_signal.template connect<Handler> (this, std::move (handler), after);
+    return notify_signal.template connect<Handler> (this, static_cast<Handler &&> (handler), after);
   }
 
   template<typename T, typename HandlerObject>

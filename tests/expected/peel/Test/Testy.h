@@ -174,7 +174,7 @@ public:
   template<typename CoolCallback>
   peel_nothrow
   int
-  add_cool_callback (peel::RefPtr<GObject::Binding> binding, /* owned */ char *s, CoolCallback callback)
+  add_cool_callback (peel::RefPtr<GObject::Binding> binding, /* owned */ char *s, CoolCallback &&callback)
   {
     gpointer _peel_user_data;
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
@@ -301,7 +301,7 @@ protected:
   template<typename DerivedClass, typename CoolCallback>
   peel_nothrow
   int
-  parent_vfunc_add_cool_callback (peel::RefPtr<GObject::Binding> binding, /* owned */ char *s, CoolCallback callback)
+  parent_vfunc_add_cool_callback (peel::RefPtr<GObject::Binding> binding, /* owned */ char *s, CoolCallback &&callback)
   {
     ::TestTestyClass *_p_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     gpointer _peel_user_data;

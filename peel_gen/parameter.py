@@ -187,9 +187,9 @@ class Parameter(NodeHandler):
                 else:
                     return '::' + tp.c_type + ' ' + name
             if name is None:
-                return tp.name
+                return '{} &&'.format(tp.name)
             else:
-                return tp.name + ' ' + name
+                return '{} &&{}'.format(tp.name, name)
         # Other params marked with scope/closure/destroy should not reach here.
         assert(self.scope is None and self.closure is None and self.destroy is None)
 
