@@ -78,7 +78,7 @@ class Parameter(NodeHandler):
         while isinstance(tp, Array):
             tp = chase_type_aliases(tp.item_type)
         if isinstance(tp, Callback):
-            return set()
+            return tp.generate_extra_include_members()
         elif not isinstance(tp, DefinedType):
             return set()
         elif tp.ns.emit_raw:
@@ -96,7 +96,7 @@ class Parameter(NodeHandler):
         while isinstance(tp, Array):
             tp = chase_type_aliases(tp.item_type)
         if isinstance(tp, Callback):
-            return set()
+            return tp.generate_extra_forward_members()
         elif not isinstance(tp, DefinedType):
             return set()
         elif tp.ns.emit_raw:
@@ -110,7 +110,7 @@ class Parameter(NodeHandler):
         while isinstance(tp, Array):
             tp = chase_type_aliases(tp.item_type)
         if isinstance(tp, Callback):
-            return set()
+            return tp.generate_extra_include_at_end_members()
         elif not isinstance(tp, DefinedType):
             return set()
         elif tp.ns.emit_raw:
