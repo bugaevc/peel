@@ -185,7 +185,7 @@ public:
       (gboolean *b) mutable -> ::TestTesty *
       {
         bool _peel_b;
-        peel::RefPtr<Testy> _peel_return = callback (&_peel_b);
+        peel::RefPtr<Testy> _peel_return = static_cast<CoolCallback &&> (callback) (&_peel_b);
         *b = static_cast<gboolean> (_peel_b);
         return reinterpret_cast<::TestTesty *> (std::move (_peel_return).release_ref ());
       }, &_peel_user_data);
@@ -316,7 +316,7 @@ protected:
       (gboolean *b) mutable -> ::TestTesty *
       {
         bool _peel_b;
-        peel::RefPtr<Testy> _peel_return = callback (&_peel_b);
+        peel::RefPtr<Testy> _peel_return = static_cast<CoolCallback &&> (callback) (&_peel_b);
         *b = static_cast<gboolean> (_peel_b);
         return reinterpret_cast<::TestTesty *> (std::move (_peel_return).release_ref ());
       }, &_peel_user_data);
