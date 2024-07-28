@@ -129,6 +129,10 @@ onstack	GTimeVal
 onstack	GDate
 opaque	GSource
 
+onstack	GHashTableIter
+opaque	GHashTableIter
+nest	GHashTableIter			HashTable::Iter
+
 # Should have explicit bindings
 skip	GVariant			GLib		manual
 
