@@ -56,11 +56,21 @@ class Parameter(NodeHandler):
             self.type = lookup_type(self.type_name, self.ns)
             assert(self.type is not None)
         self.type.resolve_stuff()
-        if self.type_name == 'gpointer' and self.c_type != 'gpointer':
+        # Beautify the type when a misc type pointer is smuggled
+        # through GIR as a gpointer. See g_date_to_struct_tm ()
+        # for an example. Note we already detect the constness
+        # that gconstpointer implies, and add our own 'const'.
+        if self.type_name == 'gpointer':
             assert(isinstance(self.type, PlainType))
-            self.type = self.type.clone()
-            self.type.stdname = self.c_type
-            self.type.corresponds_exactly = True
+            if self.direction == 'in' and self.c_type not in ('gpointer', 'gconstpointer'):
+                self.type = self.type.clone()
+                self.type.stdname = self.c_type
+                self.type.corresponds_exactly = True
+            elif self.direction != 'in' and self.c_type not in ('gpointer*', 'gconstpointer*'):
+                self.type = self.type.clone()
+                assert(self.c_type.endswith('*'))
+                self.type.stdname = self.c_type[:-1].strip()
+                self.type.corresponds_exactly = True
 
     def generate_extra_include_members(self):
         self.resolve_stuff()
