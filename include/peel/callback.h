@@ -15,7 +15,7 @@ public:
 
   template<typename F>
   static CallbackType
-  wrap_notified_callback (F f, gpointer *out_data, GDestroyNotify *out_notify)
+  wrap_notified_callback (F &&f, gpointer *out_data, GDestroyNotify *out_notify)
   {
     if (sizeof (F) <= sizeof (gpointer))
       {
@@ -62,7 +62,7 @@ public:
 
   template<typename F>
   static CallbackType
-  wrap_async_callback (F f, gpointer *out_data)
+  wrap_async_callback (F &&f, gpointer *out_data)
   {
     if (sizeof (F) <= sizeof (gpointer))
       {
@@ -79,7 +79,7 @@ public:
         {
           U u;
           u.data = data;
-          Ret ret = u.f (args...);
+          Ret ret = static_cast<F &&> (u.f) (args...);
           u.f.~F ();
           return ret;
         };
@@ -91,7 +91,7 @@ public:
         return +[] (Args... args, gpointer data) -> Ret
         {
           F &f = *reinterpret_cast<F *> (data);
-          Ret ret = f (args...);
+          Ret ret = static_cast<F &&> (f) (args...);
           delete &f;
           return ret;
         };
@@ -107,7 +107,7 @@ public:
 
   template<typename F>
   static CallbackType
-  wrap_notified_callback (F f, gpointer *out_data, GDestroyNotify *out_notify)
+  wrap_notified_callback (F &&f, gpointer *out_data, GDestroyNotify *out_notify)
   {
     if (sizeof (F) <= sizeof (gpointer))
       {
@@ -154,7 +154,7 @@ public:
 
   template<typename F>
   static CallbackType
-  wrap_async_callback (F f, gpointer *out_data)
+  wrap_async_callback (F &&f, gpointer *out_data)
   {
     if (sizeof (F) <= sizeof (gpointer))
       {
@@ -171,7 +171,7 @@ public:
         {
           U u;
           u.data = data;
-          u.f (args...);
+          static_cast<F &&> (u.f) (args...);
           u.f.~F ();
         };
       }
@@ -182,7 +182,7 @@ public:
         return +[] (Args... args, gpointer data) -> void
         {
           F &f = *reinterpret_cast<F *> (data);
-          f (args...);
+          static_cast<F &&> (f) (args...);
           delete &f;
         };
       }

@@ -315,8 +315,15 @@ class Parameter(NodeHandler):
             assert(params.params[-1].type_name == 'gpointer')
             params.params.pop()
             params.resolve_stuff(has_typed_tweak=False)
+            if self.scope != 'async':
+                cpp_callee_expr = cpp_name
+            else:
+                cpp_callee_expr = 'static_cast<{}> ({})'.format(
+                    self.generate_cpp_type(name=None, context=context),
+                    cpp_name,
+                )
             lambda_expr = cpp_function_wrapper.generate(
-                cpp_name,
+                cpp_callee_expr,
                 context,
                 tp.rv,
                 params,
