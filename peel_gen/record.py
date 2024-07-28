@@ -245,7 +245,7 @@ class Record(DefinedType):
         if self.is_pointer_type:
             s += '\n' + generate_value_traits_specialization(
                 full_name,
-                full_name + '*',
+                full_name + ' *',
                 'r',
                 'reinterpret_cast<{} *> (g_value_get_pointer (value))'.format(full_name),
                 'g_value_set_pointer (value, reinterpret_cast<void *> (r))',
@@ -268,7 +268,7 @@ class Record(DefinedType):
             # XXX: We assume that structures that have get_type are boxed
             s += '\n' + generate_value_traits_specialization(
                 full_name,
-                full_name + '*',
+                full_name + ' *',
                 'r',
                 'reinterpret_cast<{} *> (g_value_get_boxed (value))'.format(full_name),
                 'g_value_set_boxed (value, reinterpret_cast<const void *> (r))',

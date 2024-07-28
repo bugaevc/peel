@@ -1,4 +1,5 @@
 from peel_gen.function_like import FunctionLike
+from peel_gen.alias import chase_type_aliases
 from peel_gen import c_function_wrapper
 from peel_gen import cpp_function_wrapper
 from peel_gen import api_tweaks
@@ -57,6 +58,10 @@ class Vfunc(FunctionLike):
                     }, ns=self.cpp_class.ns)
                     new_p.type = fake_class
                     params.params[i] = new_p
+
+            rv_tp = chase_type_aliases(self.rv.type)
+            if hasattr(rv_tp, 'length_param'):
+                params.skip_params.append(rv_tp.length_param)
 
             params.resolve_stuff(has_typed_tweak=False)
 

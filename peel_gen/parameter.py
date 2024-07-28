@@ -117,6 +117,8 @@ class Parameter(NodeHandler):
         if self.direction == 'in':
             return False
         tp = chase_type_aliases(self.type)
+        if isinstance(tp, Array):
+            return not self.caller_allocates
         if tp.is_passed_by_ref():
             return self.ownership not in (None, 'none')
         if isinstance(tp, PlainType) and tp.corresponds_exactly:
@@ -342,23 +344,26 @@ class Parameter(NodeHandler):
                 return callback_helper_type + '::wrap_async_callback (\n      [{}]\n      {}, &{})'.format(cpp_name, lambda_expr, closure_param_name)
 
         if isinstance(tp, Array):
-            if self.direction != 'in':
-                raise UnsupportedForNowException('non-in array')
             itp = chase_type_aliases(tp.item_type)
             if isinstance(itp, PlainType) and itp.stdname == 'bool':
                 raise UnsupportedForNowException('array of bool')
             if tp.fixed_size is not None:
                 return 'reinterpret_cast<{}> ({})'.format(c_type, cpp_name)
             elif tp.length is not None:
-                length_param_name = tp.length_param.generate_casted_name()
+                if self.ownership != 'none' and self.ownership is not None:
+                    raise UnsupportedForNowException('Owned array')
+                if tp.length_param.direction == 'in':
+                    length_param_place = tp.length_param.generate_casted_name()
+                else:
+                    length_param_place = '*' + tp.length_param.name
                 if c_type == 'char **' and self.ownership in (None, 'none'):
                     return '({} = {}.count (), const_cast<char **> ({}.ptr ()))'.format(
-                        length_param_name,
+                        length_param_place,
                         cpp_name,
                         cpp_name,
                     )
                 return '({} = {}.count (), reinterpret_cast<{}> ({}.ptr ()))'.format(
-                    length_param_name,
+                    length_param_place,
                     cpp_name,
                     c_type,
                     cpp_name,
@@ -419,14 +424,14 @@ class Parameter(NodeHandler):
         tp = chase_type_aliases(self.type)
 
         if isinstance(tp, Array):
-            if self.direction != 'in':
-                raise UnsupportedForNowException('non-in return array')
             itp = chase_type_aliases(tp.item_type)
             if isinstance(itp, PlainType) and itp.stdname == 'bool':
                 raise UnsupportedForNowException('array of bool')
             if tp.fixed_size is not None:
                 return 'reinterpret_cast<{}> (*{})'.format(plain_cpp_type, c_name)
             elif tp.length is not None:
+                if self.ownership != 'none' and self.ownership is not None:
+                    raise UnsupportedForNowException('Owned array')
                 if tp.length_param.direction == 'in':
                     length_param_name = tp.length_param.name
                 else:
@@ -438,7 +443,7 @@ class Parameter(NodeHandler):
                 return 'peel::ArrayRef<{}> ({}, {})'.format(
                     plain_cpp_type,
                     ptr_expr,
-                    length_param_name
+                    length_param_name,
                 )
             else:
                 raise UnsupportedForNowException('Complex array')

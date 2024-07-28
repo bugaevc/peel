@@ -10,6 +10,12 @@ class ArrayRef
   unsigned c;
 
 public:
+  // The default constructor is used by generated local copies.
+  constexpr ArrayRef ()
+    : p (nullptr)
+    , c (0)
+  { }
+
   constexpr ArrayRef (decltype (nullptr))
     : p (nullptr)
     , c (0)

@@ -23,7 +23,6 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
         if more_templates:
             templates.extend(more_templates)
         attributes.extend(params.generate_function_attributes(has_typed_tweak))
-        skip_params = params.skip_params
         if templates:
             # TODO: handle both at the same time
             assert(typed_tweak_callee is None)
@@ -32,7 +31,6 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
     else:
         cpp_signature = ''
         templates = None
-        skip_params = []
 
     attributes.extend(rv.generate_rv_function_attributes())
     post_call_assumes = rv.generate_post_call_assumes()
@@ -91,14 +89,13 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
     args = []
     have_local_copies = False
     if params is not None:
-        # First, declare the skip params
+        # First, declare the skip params.
         for p in params.params:
-            if p in skip_params:
+            if p in params.skip_params:
                 needs_local_copy = p.direction != 'in'
                 l.append(indent + '  {} {};'.format(p.generate_c_type(for_local_copy=needs_local_copy), p.generate_casted_name()))
-                continue
         for p in params.params:
-            if p in skip_params:
+            if p in params.skip_params:
                 casted_name = p.generate_casted_name()
                 if p.direction == 'in':
                     args.append(casted_name)
@@ -155,7 +152,7 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
 
     if params is not None:
         for p in params.params:
-            if p in skip_params:
+            if p in params.skip_params:
                 continue
             if not p.needs_local_copy():
                 continue

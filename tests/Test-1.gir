@@ -342,7 +342,6 @@
           </parameter>
         </parameters>
       </method>
-<!--
       <virtual-method name="return_byte_array">
         <return-value transfer-ownership="none">
           <array length="0" c:type="gconstpointer">
@@ -363,7 +362,6 @@
           </parameter>
         </parameters>
       </virtual-method>
--->
       <method name="return_fixed_size_array" c:identifier="test_testy_return_fixed_size_array">
         <return-value transfer-ownership="none">
           <array zero-terminated="0" c:type="const float*" fixed-size="4">
@@ -408,7 +406,6 @@
           </parameter>
         </parameters>
       </method>
-<!--
       <virtual-method name="return_flags_array">
         <return-value transfer-ownership="none">
           <array length="0" c:type="const GBindingFlags*">
@@ -429,7 +426,88 @@
           </parameter>
         </parameters>
       </virtual-method>
--->
+      <method name="read_in" c:identifier="test_testy_read_in">
+        <return-value>
+          <type name="gsize" c:type="gsize"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter direction="out"
+                     name="buffer"
+                     caller-allocates="1"
+                     transfer-ownership="none">
+            <array length="1" zero-terminated="0" c:type="void*">
+              <type name="guint8"/>
+            </array>
+          </parameter>
+          <parameter name="buffer_size">
+            <type name="gsize" c:type="gsize"/>
+          </parameter>
+        </parameters>
+      </method>
+      <virtual-method name="read_in">
+        <return-value>
+          <type name="gsize" c:type="gsize"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter direction="out"
+                     name="buffer"
+                     caller-allocates="1"
+                     transfer-ownership="none">
+            <array length="1" zero-terminated="0" c:type="void*">
+              <type name="guint8"/>
+            </array>
+          </parameter>
+          <parameter name="buffer_size">
+            <type name="gsize" c:type="gsize"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <method name="read_out" c:identifier="test_testy_read_out">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter direction="out"
+                     name="buffer"
+                     transfer-ownership="none">
+            <array length="1" zero-terminated="0" c:type="void**">
+              <type name="guint8"/>
+            </array>
+          </parameter>
+          <parameter name="buffer_size" direction="out">
+            <type name="gsize" c:type="gsize*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <virtual-method name="read_out">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter direction="out"
+                     name="buffer"
+                     transfer-ownership="none">
+            <array length="1" zero-terminated="0" c:type="void**">
+              <type name="guint8"/>
+            </array>
+          </parameter>
+          <parameter name="buffer_size" direction="out">
+            <type name="gsize" c:type="gsize*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
     </class>
     <record name="TestyClass"
             c:type="TestTestyClass"
