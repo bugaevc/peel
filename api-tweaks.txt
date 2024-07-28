@@ -483,10 +483,28 @@ onstack	hb_variation_t
 # Pango
 skip	pango_get_mirror_char
 skip	pango_log2vis_get_embedding_levels
+onstack	PangoAttribute
+onstack	PangoColor
 onstack	PangoLogAttr
 opaque	PangoLogAttr
+onstack	PangoGlyphVisAttr
+opaque	PangoGlyphVisAttr
 onstack	PangoGlyphInfo
+onstack	PangoGlyphGeometry
 onstack	PangoRectangle
+onstack	PangoItem
+onstack	PangoAnalysis
+
+onstack	PangoAttrColor
+onstack	PangoAttrInt
+onstack	PangoAttrShape
+onstack	PangoAttrFloat
+onstack	PangoAttrFontDesc
+onstack	PangoAttrFontFeatures
+onstack	PangoAttrLanguage
+onstack	PangoAttrSize
+opaque	PangoAttrSize
+onstack	PangoAttrString
 
 in	pango_font_get_features		len
 in	PangoFont::vfunc_get_features	len

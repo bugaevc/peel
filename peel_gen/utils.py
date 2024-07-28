@@ -30,6 +30,7 @@ def escape_cpp_name(name):
         'double',
         'int',
         'continue',
+        'break',
         'catch',
         'try',
         'FALSE',

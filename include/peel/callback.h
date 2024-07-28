@@ -23,22 +23,20 @@ public:
           {
             F f;
             gpointer data;
-            U () { }
+            U (gpointer data) : data (data) { }
             ~U () { }
-          } u;
+          } u { nullptr };
         new (&u.f) F (static_cast<F &&> (f));
         *out_data = u.data;
         if (out_notify)
           *out_notify = +[] (gpointer data)
           {
-            U u;
-            u.data = data;
+            U u { data };
             u.f.~F ();
           };
         return +[] (Args... args, gpointer data) -> Ret
         {
-          U u;
-          u.data = data;
+          U u { data };
           return u.f (args...);
         };
       }
@@ -70,15 +68,14 @@ public:
           {
             F f;
             gpointer data;
-            U () { }
+            U (gpointer data) : data (data) { }
             ~U () { }
-          } u;
+          } u { nullptr };
         new (&u.f) F (static_cast<F &&> (f));
         *out_data = u.data;
         return +[] (Args... args, gpointer data) -> Ret
         {
-          U u;
-          u.data = data;
+          U u { data };
           Ret ret = static_cast<F &&> (u.f) (args...);
           u.f.~F ();
           return ret;
@@ -115,22 +112,20 @@ public:
           {
             F f;
             gpointer data;
-            U () { }
+            U (gpointer data) : data (data) { }
             ~U () { }
-          } u;
+          } u { nullptr };
         new (&u.f) F (static_cast<F &&> (f));
         *out_data = u.data;
         if (out_notify)
           *out_notify = +[] (gpointer data)
           {
-            U u;
-            u.data = data;
+            U u { data };
             u.f.~F ();
           };
         return +[] (Args... args, gpointer data) -> void
         {
-          U u;
-          u.data = data;
+          U u { data };
           u.f (args...);
         };
       }
@@ -162,15 +157,14 @@ public:
           {
             F f;
             gpointer data;
-            U () { }
+            U (gpointer data) : data (data) { }
             ~U () { }
-          } u;
+          } u { nullptr };
         new (&u.f) F (static_cast<F &&> (f));
         *out_data = u.data;
         return +[] (Args... args, gpointer data) -> void
         {
-          U u;
-          u.data = data;
+          U u { data };
           static_cast<F &&> (u.f) (args...);
           u.f.~F ();
         };
