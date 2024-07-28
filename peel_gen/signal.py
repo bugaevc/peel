@@ -26,7 +26,7 @@ class Signal(FunctionLike):
             '  template<typename Handler>',
             '  peel_nothrow',
             '  peel::SignalConnection::Token',
-            '  connect_{} (Handler handler, bool after = false)'.format(connect_signal_name),
+            '  connect_{} (Handler &&handler, bool after = false)'.format(connect_signal_name),
             '  {',
             '    return {}::_peel_connect_by_name (this, "{}", static_cast<Handler &&> (handler), after);'.format(
                 signal_type,
