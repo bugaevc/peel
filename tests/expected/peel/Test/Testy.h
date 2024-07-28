@@ -230,9 +230,9 @@ protected:
   int
   parent_vfunc_get_int ()
   {
-    ::TestTestyClass *_p_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
-    return _p_class->get_int (_peel_this);
+    return _peel_class->get_int (_peel_this);
   }
 
   template<typename DerivedClass>
@@ -240,10 +240,10 @@ protected:
   void
   parent_vfunc_pass_bool (bool b)
   {
-    ::TestTestyClass *_p_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     gboolean _peel_b = static_cast<gboolean> (b);
-    _p_class->pass_bool (_peel_this, _peel_b);
+    _peel_class->pass_bool (_peel_this, _peel_b);
   }
 
   template<typename DerivedClass>
@@ -251,9 +251,9 @@ protected:
   void
   parent_vfunc_get_out_int (int *int_ptr, int *int_ptr2)
   {
-    ::TestTestyClass *_p_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
-    _p_class->get_out_int (_peel_this, int_ptr, int_ptr2);
+    _peel_class->get_out_int (_peel_this, int_ptr, int_ptr2);
   }
 
   template<typename DerivedClass>
@@ -261,10 +261,10 @@ protected:
   void
   parent_vfunc_get_out_bool (bool *b)
   {
-    ::TestTestyClass *_p_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     gboolean _peel_b;
-    _p_class->get_out_bool (_peel_this, &_peel_b);
+    _peel_class->get_out_bool (_peel_this, &_peel_b);
     *b = !!_peel_b;
   }
 
@@ -273,10 +273,10 @@ protected:
   void
   parent_vfunc_get_out_object (GObject::Object **obj_ptr)
   {
-    ::TestTestyClass *_p_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     ::GObject ** _peel_obj_ptr = reinterpret_cast<::GObject **> (obj_ptr);
-    _p_class->get_out_object (_peel_this, _peel_obj_ptr);
+    _peel_class->get_out_object (_peel_this, _peel_obj_ptr);
   }
 
   template<typename DerivedClass>
@@ -284,10 +284,10 @@ protected:
   void
   parent_vfunc_get_out_owned_object (peel::RefPtr<GObject::Object> *obj_ptr)
   {
-    ::TestTestyClass *_p_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     ::GObject * _peel_obj_ptr;
-    _p_class->get_out_owned_object (_peel_this, &_peel_obj_ptr);
+    _peel_class->get_out_owned_object (_peel_this, &_peel_obj_ptr);
     *obj_ptr = peel::RefPtr<GObject::Object>::adopt_ref (reinterpret_cast<GObject::Object *> (_peel_obj_ptr));
   }
 
@@ -296,10 +296,10 @@ protected:
   void
   parent_vfunc_get_out_value (GObject::Value *value_ptr)
   {
-    ::TestTestyClass *_p_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     ::GValue * _peel_value_ptr = reinterpret_cast<::GValue *> (value_ptr);
-    _p_class->get_out_value (_peel_this, _peel_value_ptr);
+    _peel_class->get_out_value (_peel_this, _peel_value_ptr);
   }
 
   template<typename DerivedClass, typename CoolCallback>
@@ -307,7 +307,7 @@ protected:
   int
   parent_vfunc_add_cool_callback (peel::RefPtr<GObject::Binding> binding, /* owned */ char *s, CoolCallback &&callback)
   {
-    ::TestTestyClass *_p_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     gpointer _peel_user_data;
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     ::GBinding * _peel_binding = reinterpret_cast<::GBinding *> (std::move (binding).release_ref ());
@@ -320,7 +320,7 @@ protected:
         *b = static_cast<gboolean> (_peel_b);
         return reinterpret_cast<::TestTesty *> (std::move (_peel_return).release_ref ());
       }, &_peel_user_data);
-    return _p_class->add_cool_callback (_peel_this, _peel_binding, s, _peel_callback, _peel_user_data);
+    return _peel_class->add_cool_callback (_peel_this, _peel_binding, s, _peel_callback, _peel_user_data);
   }
 
   template<typename DerivedClass>
@@ -328,9 +328,9 @@ protected:
   const float
   (&parent_vfunc_return_fixed_size_array ())[4]
   {
-    ::TestTestyClass *_p_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
-    const float * _peel_return = _p_class->return_fixed_size_array (_peel_this);
+    const float * _peel_return = _peel_class->return_fixed_size_array (_peel_this);
     peel_assume (_peel_return);
     return reinterpret_cast<const float (&)[4]> (*_peel_return);
   }

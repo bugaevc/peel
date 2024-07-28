@@ -14,13 +14,13 @@ class Vfunc(FunctionLike):
 
     def generate(self):
         api_tweaks.skip_if_needed(self.tweak_ident, self.ns)
-        extra_decls = '    ::{} *_p_class = reinterpret_cast<::{} *> (Class::peek<DerivedClass> ()->peek_parent ());'.format(
+        extra_decls = '    ::{} *_peel_class = reinterpret_cast<::{} *> (Class::peek<DerivedClass> ()->peek_parent ());'.format(
             self.cpp_class.type_struct.c_type,
             self.cpp_class.type_struct.c_type,
         )
         return c_function_wrapper.generate(
             name='parent_vfunc_' + self.name,
-            c_callee='_p_class->{}'.format(self.name),
+            c_callee='_peel_class->{}'.format(self.name),
             context=self.cpp_class,
             rv=self.rv,
             params=self.params,
