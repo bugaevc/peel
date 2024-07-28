@@ -493,3 +493,26 @@ class Parameter(NodeHandler):
         else:
             return 'reinterpret_cast<{}> ({})'.format(add_asterisk(plain_cpp_type), c_name)
 
+    def generate_rv_function_attributes(self):
+        assert(self.is_rv)
+        # TODO: duplicated logic with Parameters.should_add_nonnull()
+        tp = chase_type_aliases(self.type)
+        if isinstance(tp, (Callback, Array)):
+            return []
+        if self.ownership is not None and self.ownership != 'none':
+            return []
+        if not tp.is_passed_by_ref():
+            return []
+        if self.nullable:
+            return []
+        return ['peel_returns_nonnull']
+
+    def generate_post_call_assumes(self):
+        assert(self.is_rv)
+        # TODO: same for out/inout params
+        tp = chase_type_aliases(self.type)
+        if not tp.is_passed_by_ref():
+            return None
+        if self.nullable:
+            return None
+        return ['peel_assume ({});'.format(self.generate_casted_name())]

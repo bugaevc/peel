@@ -34,6 +34,9 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
         templates = None
         skip_params = []
 
+    attributes.extend(rv.generate_rv_function_attributes())
+    post_call_assumes = rv.generate_post_call_assumes()
+
     if throws:
         error_param = 'peel::UniquePtr<GLib::Error> *error'
         if not cpp_signature:
@@ -138,7 +141,7 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
     if rv.c_type != 'void':
         casted_name = rv.generate_casted_name()
         cast_from_c = rv.generate_cast_from_c(c_name=casted_name, context=context)
-        if cast_from_c is None and not have_local_copies:
+        if cast_from_c is None and not have_local_copies and not post_call_assumes:
             rv_expr = call
         else:
             l.append(indent + '  {} {} = {};'.format(rv.generate_c_type(for_local_copy=False), casted_name, call))
@@ -163,6 +166,10 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
     if throws:
         l.append(indent + '  if (error)')
         l.append(indent + '    *error = peel::UniquePtr<GLib::Error>::adopt_ref (reinterpret_cast<GLib::Error *> (_peel_error));')
+
+    if post_call_assumes:
+        for pc_assume in post_call_assumes:
+            l.append(indent + '  ' + pc_assume)
 
     if rv_expr is not None:
         l.append(indent + '  return {};'.format(rv_expr))

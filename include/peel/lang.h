@@ -44,8 +44,10 @@
 
 #if defined (__GNUC__)
 #define peel_nonnull_args(...) __attribute__ ((nonnull (__VA_ARGS__)))
+#define peel_returns_nonnull __attribute__ ((returns_nonnull))
 #else
 #define peel_nonnull_args(...)
+#define peel_returns_nonnull
 #endif
 
 #if defined (__GNUC__)

@@ -69,6 +69,7 @@ public:
   create ()
   {
     ::TestTesty * _peel_return = test_testy_new ();
+    peel_assume (_peel_return);
     return peel::RefPtr<Testy>::adopt_ref (reinterpret_cast<Testy *> (_peel_return));
   }
 
@@ -198,6 +199,7 @@ public:
     gsize _peel_size;
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     gconstpointer _peel_return = test_testy_return_byte_array (_peel_this, &_peel_size);
+    peel_assume (_peel_return);
     return peel::ArrayRef<const uint8_t> (reinterpret_cast<const uint8_t *> (_peel_return), _peel_size);
   }
 
@@ -207,6 +209,7 @@ public:
   {
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     const float * _peel_return = test_testy_return_fixed_size_array (_peel_this);
+    peel_assume (_peel_return);
     return reinterpret_cast<const float (&)[4]> (*_peel_return);
   }
 
@@ -217,6 +220,7 @@ public:
     gsize _peel_size;
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     const ::GBindingFlags * _peel_return = test_testy_return_flags_array (_peel_this, &_peel_size);
+    peel_assume (_peel_return);
     return peel::ArrayRef<const GObject::Binding::Flags> (reinterpret_cast<const GObject::Binding::Flags *> (_peel_return), _peel_size);
   }
 
@@ -327,6 +331,7 @@ protected:
     ::TestTestyClass *_p_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     const float * _peel_return = _p_class->return_fixed_size_array (_peel_this);
+    peel_assume (_peel_return);
     return reinterpret_cast<const float (&)[4]> (*_peel_return);
   }
 
