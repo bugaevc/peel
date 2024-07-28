@@ -198,8 +198,11 @@ class Parameter(NodeHandler):
                     return '::' + tp.c_type
                 else:
                     return '::' + tp.c_type + ' ' + name
+            if strip_refs:
+                assert(name is None)
+                return tp.name
             if name is None:
-                return '{} &&'.format(tp.name)
+                return tp.name + ' &&'
             else:
                 return '{} &&{}'.format(tp.name, name)
         # Other params marked with scope/closure/destroy should not reach here.

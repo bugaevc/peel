@@ -107,8 +107,6 @@ class Parameters(NodeHandler):
             # We pass context=self.ns to get unqualified callback type name,
             # to be used as template name.
             s = p.generate_cpp_type(name=None, context=self.ns, strip_refs=1000)
-            assert(s.endswith(' &&'))
-            s = s[:-3]
             assert('::' not in s)
             assert('*' not in s)
             assert(' ' not in s)
