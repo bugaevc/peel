@@ -325,36 +325,66 @@ class Parameter(NodeHandler):
             if tp.c_type == 'GCallback':
                 raise UnsupportedForNowException('GCallback')
             assert(tp.params is not None)
-            params = tp.params.clone()
-            assert(len(params.params) >= 1)
-            assert(params.params[-1].type_name == 'gpointer')
-            params.params.pop()
-            params.resolve_stuff(has_typed_tweak=False)
+            assert(len(tp.params.params) >= 1)
+            user_data_param = tp.params.params[-1]
+            assert(user_data_param.type_name == 'gpointer')
+            tp.params.resolve_stuff(has_typed_tweak=False)
+            # FIXME: This is a gross place to do this.
+            if user_data_param not in tp.params.skip_params:
+                 tp.params.skip_params.append(user_data_param)
+            plain_closure_type = self.generate_cpp_type(
+                name=None,
+                context=context,
+                strip_refs=1,
+            )
+            extra_decls = '        {} &{} = reinterpret_cast<{} &> (*reinterpret_cast<unsigned char *> ({}));'.format(
+                plain_closure_type,
+                cpp_name,
+                plain_closure_type,
+                user_data_param.name,
+            )
             if self.scope != 'async':
                 cpp_callee_expr = cpp_name
             else:
-                cpp_callee_expr = 'static_cast<{}> ({})'.format(
-                    self.generate_cpp_type(name=None, context=context),
+                cpp_callee_expr = 'static_cast<{} &&> ({})'.format(
+                    plain_closure_type,
                     cpp_name,
                 )
             lambda_expr = cpp_function_wrapper.generate(
                 cpp_callee_expr,
                 context,
                 tp.rv,
-                params,
+                tp.params,
                 throws=False,
                 indent='      ',
-                trailing_specs='mutable',
+                extra_decls=extra_decls,
             )
             closure_param_name = self.closure_param.generate_casted_name()
-            callback_helper_type = 'peel::internals::CallbackHelper<{}>'.format(', '.join(p.generate_c_type() for p in [tp.rv] + params.params))
+            callback_helper_type = 'peel::internals::CallbackHelper<{}>'.format(', '.join(
+                p.generate_c_type() for p in [tp.rv] + tp.params.params if p is not user_data_param
+            ))
             if self.scope == 'notified':
-                destroy_param_name = self.destroy_param.generate_casted_name()
-                return callback_helper_type + '::wrap_notified_callback (\n      [{}]\n      {}, &{}, &{})'.format(cpp_name, lambda_expr, closure_param_name, destroy_param_name)
+                wrap_method_name = 'wrap_notified_callback'
+                misc_args = ', &{}'.format(self.destroy_param.generate_casted_name())
             elif self.scope == 'forever':
-                return callback_helper_type + '::wrap_notified_callback (\n      [{}]\n      {}, &{}, nullptr)'.format(cpp_name, lambda_expr, closure_param_name)
+                wrap_method_name = 'wrap_notified_callback'
+                misc_args = ', nullptr'
             elif self.scope == 'async':
-                return callback_helper_type + '::wrap_async_callback (\n      [{}]\n      {}, &{})'.format(cpp_name, lambda_expr, closure_param_name)
+                wrap_method_name = 'wrap_async_callback'
+                misc_args = ''
+            elif self.scope in ('call', None):
+                return '({} = reinterpret_cast<gpointer> (&{}), +[] {})'.format(
+                    self.closure_param.generate_casted_name(),
+                    cpp_name,
+                    lambda_expr,
+                )
+            if wrap_method_name:
+                return '\n'.join([
+                    '{}::{} ('.format(callback_helper_type, wrap_method_name),
+                    '      static_cast<{} &&> ({}),'.format(plain_closure_type, cpp_name),
+                    '      [] {},'.format(lambda_expr),
+                    '      &{}{})'.format(closure_param_name, misc_args),
+                ])
 
         if isinstance(tp, Array):
             itp = chase_type_aliases(tp.item_type)

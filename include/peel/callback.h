@@ -1,5 +1,6 @@
 #pragma once
 
+#include <peel/lang.h>
 #include <glib.h>
 
 namespace peel
@@ -13,15 +14,16 @@ class CallbackHelper
 public:
   typedef Ret (*CallbackType) (Args..., gpointer);
 
-  template<typename F>
+  template<typename F, typename F2>
   static CallbackType
-  wrap_notified_callback (F &&f, gpointer *out_data, GDestroyNotify *out_notify)
+  wrap_notified_callback (F &&f, F2 &&f2, gpointer *out_data, GDestroyNotify *out_notify)
   {
     if (sizeof (F) <= sizeof (gpointer))
       {
         union U
           {
             F f;
+            F2 *f2;
             gpointer data;
             U (gpointer data) : data (data) { }
             ~U () { }
@@ -37,7 +39,13 @@ public:
         return +[] (Args... args, gpointer data) -> Ret
         {
           U u { data };
-          return u.f (args...);
+#ifdef peel_cpp_20
+          F2 f2;
+#else
+          // Make up a fake instance of F2.
+          F2 &f2 = *u.f2;
+#endif
+          return f2 (args..., &u.data);
         };
       }
     else
@@ -52,21 +60,27 @@ public:
           };
         return +[] (Args... args, gpointer data) -> Ret
         {
-          F &f = *reinterpret_cast<F *> (data);
-          return f (args...);
+#ifdef peel_cpp_20
+          F2 f2;
+#else
+          // Make up a fake instance of F2.
+          F2 &f2 = *reinterpret_cast<F2 *> (data);
+#endif
+          return f2 (args..., data);
         };
       }
   }
 
-  template<typename F>
+  template<typename F, typename F2>
   static CallbackType
-  wrap_async_callback (F &&f, gpointer *out_data)
+  wrap_async_callback (F &&f, F2 &&f2, gpointer *out_data)
   {
     if (sizeof (F) <= sizeof (gpointer))
       {
         union U
           {
             F f;
+            F2 *f2;
             gpointer data;
             U (gpointer data) : data (data) { }
             ~U () { }
@@ -76,7 +90,13 @@ public:
         return +[] (Args... args, gpointer data) -> Ret
         {
           U u { data };
-          Ret ret = static_cast<F &&> (u.f) (args...);
+#ifdef peel_cpp_20
+          F2 f2;
+#else
+          // Make up a fake instance of F2.
+          F2 &f2 = *u.f2;
+#endif
+          Ret ret = f2 (args..., &u.data);
           u.f.~F ();
           return ret;
         };
@@ -87,9 +107,14 @@ public:
         *out_data = heap_f;
         return +[] (Args... args, gpointer data) -> Ret
         {
-          F &f = *reinterpret_cast<F *> (data);
-          Ret ret = static_cast<F &&> (f) (args...);
-          delete &f;
+#ifdef peel_cpp_20
+          F2 f2;
+#else
+          // Make up a fake instance of F2.
+          F2 &f2 = *reinterpret_cast<F2 *> (data);
+#endif
+          Ret ret = f2 (args..., data);
+          delete reinterpret_cast<F *> (data);
           return ret;
         };
       }
@@ -102,15 +127,16 @@ class CallbackHelper<void, Args...>
 public:
   typedef void (*CallbackType) (Args..., gpointer);
 
-  template<typename F>
+  template<typename F, typename F2>
   static CallbackType
-  wrap_notified_callback (F &&f, gpointer *out_data, GDestroyNotify *out_notify)
+  wrap_notified_callback (F &&f, F2 &&f2, gpointer *out_data, GDestroyNotify *out_notify)
   {
     if (sizeof (F) <= sizeof (gpointer))
       {
         union U
           {
             F f;
+            F2 *f2;
             gpointer data;
             U (gpointer data) : data (data) { }
             ~U () { }
@@ -126,7 +152,13 @@ public:
         return +[] (Args... args, gpointer data) -> void
         {
           U u { data };
-          u.f (args...);
+#ifdef peel_cpp_20
+          F2 f2;
+#else
+          // Make up a fake instance of F2.
+          F2 &f2 = *u.f2;
+#endif
+          f2 (args..., &u.data);
         };
       }
     else
@@ -141,21 +173,27 @@ public:
           };
         return +[] (Args... args, gpointer data) -> void
         {
-          F &f = *reinterpret_cast<F *> (data);
-          f (args...);
+#ifdef peel_cpp_20
+          F2 f2;
+#else
+          // Make up a fake instance of F2.
+          F2 &f2 = *reinterpret_cast<F2 *> (data);
+#endif
+          f2 (args..., data);
         };
       }
   }
 
-  template<typename F>
+  template<typename F, typename F2>
   static CallbackType
-  wrap_async_callback (F &&f, gpointer *out_data)
+  wrap_async_callback (F &&f, F2 &&f2, gpointer *out_data)
   {
     if (sizeof (F) <= sizeof (gpointer))
       {
         union U
           {
             F f;
+            F2 *f2;
             gpointer data;
             U (gpointer data) : data (data) { }
             ~U () { }
@@ -165,7 +203,13 @@ public:
         return +[] (Args... args, gpointer data) -> void
         {
           U u { data };
-          static_cast<F &&> (u.f) (args...);
+#ifdef peel_cpp_20
+          F2 f2;
+#else
+          // Make up a fake instance of F2.
+          F2 &f2 = *u.f2;
+#endif
+          f2 (args..., &u.data);
           u.f.~F ();
         };
       }
@@ -175,9 +219,14 @@ public:
         *out_data = heap_f;
         return +[] (Args... args, gpointer data) -> void
         {
-          F &f = *reinterpret_cast<F *> (data);
-          static_cast<F &&> (f) (args...);
-          delete &f;
+#ifdef peel_cpp_20
+          F2 f2;
+#else
+          // Make up a fake instance of F2.
+          F2 &f2 = *reinterpret_cast<F2 *> (data);
+#endif
+          f2 (args..., data);
+          delete reinterpret_cast<F *> (data);
         };
       }
   }

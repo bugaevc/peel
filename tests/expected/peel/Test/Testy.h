@@ -181,14 +181,16 @@ public:
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     ::GBinding * _peel_binding = reinterpret_cast<::GBinding *> (std::move (binding).release_ref ());
     ::TestCoolCallback _peel_callback = peel::internals::CallbackHelper<::TestTesty *, gboolean *>::wrap_async_callback (
-      [callback]
-      (gboolean *b) mutable -> ::TestTesty *
+      static_cast<CoolCallback &&> (callback),
+      [] (gboolean *b, gpointer user_data) -> ::TestTesty *
       {
+        CoolCallback &callback = reinterpret_cast<CoolCallback &> (*reinterpret_cast<unsigned char *> (user_data));
         bool _peel_b;
         peel::RefPtr<Testy> _peel_return = static_cast<CoolCallback &&> (callback) (&_peel_b);
         *b = static_cast<gboolean> (_peel_b);
         return reinterpret_cast<::TestTesty *> (std::move (_peel_return).release_ref ());
-      }, &_peel_user_data);
+      },
+      &_peel_user_data);
     return test_testy_add_cool_callback (_peel_this, _peel_binding, s, _peel_callback, _peel_user_data);
   }
 
@@ -333,14 +335,16 @@ protected:
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     ::GBinding * _peel_binding = reinterpret_cast<::GBinding *> (std::move (binding).release_ref ());
     ::TestCoolCallback _peel_callback = peel::internals::CallbackHelper<::TestTesty *, gboolean *>::wrap_async_callback (
-      [callback]
-      (gboolean *b) mutable -> ::TestTesty *
+      static_cast<CoolCallback &&> (callback),
+      [] (gboolean *b, gpointer user_data) -> ::TestTesty *
       {
+        CoolCallback &callback = reinterpret_cast<CoolCallback &> (*reinterpret_cast<unsigned char *> (user_data));
         bool _peel_b;
         peel::RefPtr<Testy> _peel_return = static_cast<CoolCallback &&> (callback) (&_peel_b);
         *b = static_cast<gboolean> (_peel_b);
         return reinterpret_cast<::TestTesty *> (std::move (_peel_return).release_ref ());
-      }, &_peel_user_data);
+      },
+      &_peel_user_data);
     return _peel_class->add_cool_callback (_peel_this, _peel_binding, s, _peel_callback, _peel_user_data);
   }
 

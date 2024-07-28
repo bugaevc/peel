@@ -9,6 +9,7 @@
 #endif
 
 #if __cplusplus >= 202002L
+#define peel_cpp_20 1
 #define peel_nodiscard(reason) [[nodiscard (reason)]]
 #else
 #define peel_nodiscard(reason) [[nodiscard]]
