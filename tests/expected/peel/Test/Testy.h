@@ -206,6 +206,17 @@ public:
   }
 
   peel_nothrow
+  peel::UniquePtr<uint8_t[]>
+  return_owned_byte_array ()
+  {
+    gsize _peel_size;
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    gpointer _peel_return = test_testy_return_owned_byte_array (_peel_this, &_peel_size);
+    peel_assume (_peel_return);
+    return peel::UniquePtr<uint8_t[]>::adopt_ref (reinterpret_cast<uint8_t *> (_peel_return), _peel_size);
+  }
+
+  peel_nothrow
   const float
   (&return_fixed_size_array ())[4]
   {
@@ -359,6 +370,19 @@ protected:
     gconstpointer _peel_return = _peel_class->return_byte_array (_peel_this, &_peel_size);
     peel_assume (_peel_return);
     return peel::ArrayRef<const uint8_t> (reinterpret_cast<const uint8_t *> (_peel_return), _peel_size);
+  }
+
+  template<typename DerivedClass>
+  peel_nothrow
+  peel::UniquePtr<uint8_t[]>
+  parent_vfunc_return_owned_byte_array ()
+  {
+    ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    gsize _peel_size;
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    gpointer _peel_return = _peel_class->return_owned_byte_array (_peel_this, &_peel_size);
+    peel_assume (_peel_return);
+    return peel::UniquePtr<uint8_t[]>::adopt_ref (reinterpret_cast<uint8_t *> (_peel_return), _peel_size);
   }
 
   template<typename DerivedClass>
@@ -523,6 +547,19 @@ protected:
         DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
         peel::ArrayRef<const uint8_t> _peel_return = _peel_this->DerivedClass::vfunc_return_byte_array ();
         return (*size = _peel_return.count (), reinterpret_cast<gconstpointer> (_peel_return.ptr ()));
+      };
+    }
+
+    template<typename DerivedClass>
+    void
+    override_vfunc_return_owned_byte_array ()
+    {
+      ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
+      klass->return_owned_byte_array = +[] (::TestTesty *self, gsize *size) -> gpointer
+      {
+        DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
+        peel::UniquePtr<uint8_t[]> _peel_return = _peel_this->DerivedClass::vfunc_return_owned_byte_array ();
+        return (*size = _peel_return.count (), reinterpret_cast<gpointer> (std::move (_peel_return).release_ref ()));
       };
     }
 

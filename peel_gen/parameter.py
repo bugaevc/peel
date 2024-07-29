@@ -234,12 +234,16 @@ class Parameter(NodeHandler):
                     raise UnsupportedForNowException('out fixed-size array')
                 return '{} (&{})[{}]'.format(s, name, tp.fixed_size)
             elif tp.length is not None:
+                if self.ownership == 'none' or self.ownership is None:
+                    array_type = 'peel::ArrayRef<{}>'.format(s)
+                elif self.ownership in ('container', 'full'):
+                    array_type = 'peel::UniquePtr<{}[]>'.format(s)
                 if strip_refs:
                     assert(name is None)
                     return s
                 if name is None:
-                    return 'peel::ArrayRef<{}>'.format(s)
-                return 'peel::ArrayRef<{}> {}{}'.format(s, out_asterisk, name)
+                    return array_type
+                return '{} {}{}'.format(array_type, out_asterisk, name)
             else:
                 # TODO support null-terminated arrays
                 raise UnsupportedForNowException('Complex array')
@@ -291,10 +295,10 @@ class Parameter(NodeHandler):
             assert(itp is tp)
             return make_type('peel::FloatPtr<{}{}>'.format(constness0, type_name))
         elif self.ownership == 'container':
-            raise UnsupportedForNowException('transfer container')
-        else:
             if itp is not tp:
-                raise UnsupportedForNowException('array transfer full')
+                make_type(constness0 + add_asterisk(type_name) + constness1)
+            raise UnsupportedForNowException('non-array transfer container')
+        else:
             if itp.is_refcounted:
                 return make_type('peel::RefPtr<{}{}>'.format(constness0, type_name))
             elif itp.free_func:
@@ -393,8 +397,10 @@ class Parameter(NodeHandler):
             if tp.fixed_size is not None:
                 return 'reinterpret_cast<{}> ({})'.format(c_type, cpp_name)
             elif tp.length is not None:
-                if self.ownership != 'none' and self.ownership is not None:
-                    raise UnsupportedForNowException('Owned array')
+                if self.ownership == 'none' or self.ownership is None:
+                    ptr_expr = '{}.ptr ()'.format(cpp_name)
+                else:
+                    ptr_expr = 'std::move ({}).release_ref ()'.format(cpp_name)
                 if tp.length_param.direction == 'in':
                     length_param_place = tp.length_param.generate_casted_name()
                 else:
@@ -405,11 +411,11 @@ class Parameter(NodeHandler):
                         cpp_name,
                         cpp_name,
                     )
-                return '({} = {}.count (), reinterpret_cast<{}> ({}.ptr ()))'.format(
+                return '({} = {}.count (), reinterpret_cast<{}> ({}))'.format(
                     length_param_place,
                     cpp_name,
                     c_type,
-                    cpp_name,
+                    ptr_expr,
                 )
             else:
                 raise UnsupportedForNowException('Complex array')
@@ -441,7 +447,7 @@ class Parameter(NodeHandler):
         if self.ownership == 'none' or self.ownership is None:
             return 'reinterpret_cast<{}> ({})'.format(c_type, cpp_name)
         elif self.ownership == 'container':
-            raise UnsupportedForNowException('transfer container')
+            raise UnsupportedForNowException('non-array transfer container')
         elif self.ownership == 'floating':
             assert(not self.is_instance)
             return 'reinterpret_cast<{}> (std::move ({}).release_floating_ptr ())'.format(c_type, cpp_name)
@@ -473,8 +479,6 @@ class Parameter(NodeHandler):
             if tp.fixed_size is not None:
                 return 'reinterpret_cast<{}> (*{})'.format(plain_cpp_type, c_name)
             elif tp.length is not None:
-                if self.ownership != 'none' and self.ownership is not None:
-                    raise UnsupportedForNowException('Owned array')
                 if tp.length_param.direction == 'in':
                     length_param_name = tp.length_param.name
                 else:
@@ -483,11 +487,18 @@ class Parameter(NodeHandler):
                     ptr_expr = c_name
                 else:
                     ptr_expr = 'reinterpret_cast<{}> ({})'.format(add_asterisk(plain_cpp_type), c_name)
-                return 'peel::ArrayRef<{}> ({}, {})'.format(
-                    plain_cpp_type,
-                    ptr_expr,
-                    length_param_name,
-                )
+                if self.ownership == 'none' or self.ownership is None:
+                    return 'peel::ArrayRef<{}> ({}, {})'.format(
+                        plain_cpp_type,
+                        ptr_expr,
+                        length_param_name,
+                    )
+                else:
+                    return 'peel::UniquePtr<{}[]>::adopt_ref ({}, {})'.format(
+                        plain_cpp_type,
+                        ptr_expr,
+                        length_param_name,
+                    )
             else:
                 raise UnsupportedForNowException('Complex array')
 
@@ -538,7 +549,7 @@ class Parameter(NodeHandler):
             else:
                 raise UnsupportedForNowException('no idea about ownership semantics')
         elif self.ownership == 'container':
-            raise UnsupportedForNowException('transfer container')
+            raise UnsupportedForNowException('non-array transfer container')
         elif self.ownership == 'floating':
             return 'peel::FloatPtr<{}> (reinterpret_cast<{}> ({}))'.format(
                 plain_cpp_type,

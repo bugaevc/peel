@@ -61,6 +61,36 @@ public:
   {
     return p[index];
   }
+
+  typedef T value_type;
+  typedef T &reference;
+  typedef const T &const_reference;
+  typedef T *iterator;
+  typedef const T *const_iterator;
+
+  constexpr T *
+  begin () const
+  {
+    return p;
+  }
+
+  constexpr const T *
+  cbegin () const
+  {
+    return p;
+  }
+
+  constexpr T *
+  end () const
+  {
+    return p + c;
+  }
+
+  constexpr const T *
+  cend () const
+  {
+    return p + c;
+  }
 };
 
-}
+} /* namespace peel */
