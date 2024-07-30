@@ -243,7 +243,7 @@ public:
   {
     gsize _peel_buffer_size;
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
-    void * _peel_buffer = (_peel_buffer_size = buffer.count (), reinterpret_cast<void *> (buffer.ptr ()));
+    void * _peel_buffer = (_peel_buffer_size = buffer.size (), reinterpret_cast<void *> (buffer.ptr ()));
     return test_testy_read_in (_peel_this, _peel_buffer, _peel_buffer_size);
   }
 
@@ -418,7 +418,7 @@ protected:
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     gsize _peel_buffer_size;
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
-    void * _peel_buffer = (_peel_buffer_size = buffer.count (), reinterpret_cast<void *> (buffer.ptr ()));
+    void * _peel_buffer = (_peel_buffer_size = buffer.size (), reinterpret_cast<void *> (buffer.ptr ()));
     return _peel_class->read_in (_peel_this, _peel_buffer, _peel_buffer_size);
   }
 
@@ -546,7 +546,7 @@ protected:
       {
         DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
         peel::ArrayRef<const uint8_t> _peel_return = _peel_this->DerivedClass::vfunc_return_byte_array ();
-        return (*size = _peel_return.count (), reinterpret_cast<gconstpointer> (_peel_return.ptr ()));
+        return (*size = _peel_return.size (), reinterpret_cast<gconstpointer> (_peel_return.ptr ()));
       };
     }
 
@@ -559,7 +559,7 @@ protected:
       {
         DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
         peel::UniquePtr<uint8_t[]> _peel_return = _peel_this->DerivedClass::vfunc_return_owned_byte_array ();
-        return (*size = _peel_return.count (), reinterpret_cast<gpointer> (std::move (_peel_return).release_ref ()));
+        return (*size = _peel_return.size (), reinterpret_cast<gpointer> (std::move (_peel_return).release_ref ()));
       };
     }
 
@@ -585,7 +585,7 @@ protected:
       {
         DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
         peel::ArrayRef<const GObject::Binding::Flags> _peel_return = _peel_this->DerivedClass::vfunc_return_flags_array ();
-        return (*size = _peel_return.count (), reinterpret_cast<const ::GBindingFlags *> (_peel_return.ptr ()));
+        return (*size = _peel_return.size (), reinterpret_cast<const ::GBindingFlags *> (_peel_return.ptr ()));
       };
     }
 
@@ -612,7 +612,7 @@ protected:
         DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
         peel::ArrayRef<uint8_t> _peel_buffer;
         _peel_this->DerivedClass::vfunc_read_out (&_peel_buffer);
-        *buffer = (*buffer_size = _peel_buffer.count (), reinterpret_cast<void *> (_peel_buffer.ptr ()));
+        *buffer = (*buffer_size = _peel_buffer.size (), reinterpret_cast<void *> (_peel_buffer.ptr ()));
       };
     }
   };

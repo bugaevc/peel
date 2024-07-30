@@ -181,7 +181,7 @@ public:
   }
 
   static UniquePtr
-  adopt_ref (T *ptr, unsigned c)
+  adopt_ref (T *ptr, unsigned size)
   {
     UniquePtr p;
     p.ptr = ptr;
@@ -190,7 +190,7 @@ public:
   }
 
   constexpr unsigned
-  count () const
+  size () const
   {
     return c;
   }

@@ -406,12 +406,12 @@ class Parameter(NodeHandler):
                 else:
                     length_param_place = '*' + tp.length_param.name
                 if c_type == 'char **' and self.ownership in (None, 'none'):
-                    return '({} = {}.count (), const_cast<char **> ({}.ptr ()))'.format(
+                    return '({} = {}.size (), const_cast<char **> ({}.ptr ()))'.format(
                         length_param_place,
                         cpp_name,
                         cpp_name,
                     )
-                return '({} = {}.count (), reinterpret_cast<{}> ({}))'.format(
+                return '({} = {}.size (), reinterpret_cast<{}> ({}))'.format(
                     length_param_place,
                     cpp_name,
                     c_type,

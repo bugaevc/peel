@@ -27,9 +27,9 @@ public:
     , c (C)
   { }
 
-  constexpr ArrayRef (T *ptr, unsigned count)
+  constexpr ArrayRef (T *ptr, unsigned size)
     : p (ptr)
-    , c (count)
+    , c (size)
   { }
 
   constexpr T *
@@ -39,7 +39,7 @@ public:
   }
 
   constexpr unsigned
-  count () const
+  size () const
   {
     return c;
   }
