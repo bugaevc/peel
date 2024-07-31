@@ -6,9 +6,13 @@ from peel_gen import api_tweaks
 
 class Vfunc(FunctionLike):
     def __init__(self, attrs, cpp_class):
+        from peel_gen.klass import Class
         super().__init__(attrs, cpp_class.ns)
         self.cpp_class = cpp_class
         self.tweak_ident = cpp_class.c_type + '::vfunc_' + self.name
+        # Set visibility to protected for classes, but leave it public for interfaces.
+        if isinstance(cpp_class, Class):
+            self.visibility = 'protected'
 
     def __repr__(self):
         return 'Vfunc({!r}.{})'.format(self.cpp_class, self.name)
@@ -28,7 +32,7 @@ class Vfunc(FunctionLike):
             throws=self.throws,
             indent='  ',
             extra_decls=extra_decls,
-            templates=['DerivedClass'],
+            templates=['typename DerivedClass'],
         )
 
     def generate_override(self):
@@ -42,12 +46,13 @@ class Vfunc(FunctionLike):
             params = self.params.clone()
             for i in range(len(params.params)):
                 p = params.params[i]
+                # Note: this should check for is_instance, not is_cpp_this().
                 if p.is_instance:
                     p.resolve_stuff()
                     new_p = Parameter({
                         'name': p.name,
-                        'ownership': p.ownership,
                     }, ns=self.cpp_class.ns)
+                    new_p.ownership = p.ownership
                     new_p.is_instance = True
                     new_p.is_rv = False
                     new_p.c_type = p.c_type
@@ -56,6 +61,10 @@ class Vfunc(FunctionLike):
                         'c:type': p.type.c_type,
                         'peel-fake-defined-type': '1',
                     }, ns=self.cpp_class.ns)
+                    fake_class.is_refcounted = p.type.is_refcounted
+                    fake_class.is_initially_floating = p.type.is_initially_floating
+                    fake_class.is_initially_fully_unowned = p.type.is_initially_fully_unowned
+                    fake_class.has_resolved_stuff = True
                     new_p.type = fake_class
                     params.params[i] = new_p
 

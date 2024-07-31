@@ -20,7 +20,7 @@ def generate(cpp_callee, context, rv, params, throws, indent, extra_decls=None, 
     if extra_decls:
         l.append(extra_decls)
     args = []
-    instance_arg = None
+    cpp_this_arg = None
     have_local_copies = False
     if params is not None:
         for p in params.params:
@@ -53,8 +53,8 @@ def generate(cpp_callee, context, rv, params, throws, indent, extra_decls=None, 
                         arg = '&' + casted_name
                     else:
                         arg = casted_name
-                    if p.is_instance:
-                        instance_arg = arg
+                    if p.is_cpp_this():
+                        cpp_this_arg = arg
                     else:
                         args.append(arg)
             else:
@@ -71,8 +71,8 @@ def generate(cpp_callee, context, rv, params, throws, indent, extra_decls=None, 
         args.append('error ? &_peel_error : nullptr')
         have_local_copies = True
     call = '{} ({})'.format(cpp_callee, ', '.join(args))
-    if instance_arg:
-        call = '{}->{}'.format(instance_arg, call)
+    if cpp_this_arg:
+        call = '{}->{}'.format(cpp_this_arg, call)
     if rv.c_type != 'void':
         casted_name = rv.generate_casted_name()
         cast_to_c = rv.generate_cast_to_c(cpp_name=casted_name, context=context)

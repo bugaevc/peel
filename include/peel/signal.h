@@ -12,6 +12,11 @@
 
 namespace peel
 {
+namespace GObject
+{
+enum class SignalFlags : std::underlying_type<::GSignalFlags>::type;
+}
+
 namespace internals
 {
 
@@ -652,17 +657,19 @@ private:
 
 public:
   peel_nothrow
-  void
-  register_ (const char *name, GSignalFlags flags /* TODO: class closure, accumulator */)
+  static Signal
+  create (const char *name, GObject::SignalFlags flags = static_cast<GObject::SignalFlags> (G_SIGNAL_RUN_LAST) /* TODO: class closure, accumulator */)
   {
     ::GType instance_type = GObject::Type::of<Instance> ();
     ::GType return_type = GObject::Type::of<typename internals::SignalTraits<Ret>::PlainCppType> ();
     ::GType param_types[] = { GObject::Type::of<typename internals::SignalTraits<Args>::PlainCppType> ()..., G_TYPE_INVALID };
-    id = g_signal_newv (name, instance_type, flags,
-                        nullptr, nullptr, nullptr,
-                        marshal, return_type,
-                        sizeof... (Args), param_types);
-    g_signal_set_va_marshaller (id, instance_type, marshal_va);
+    Signal signal;
+    signal.id = g_signal_newv (name, instance_type, static_cast<::GSignalFlags> (flags),
+                               nullptr, nullptr, nullptr,
+                               marshal, return_type,
+                               sizeof... (Args), param_types);
+    g_signal_set_va_marshaller (signal.id, instance_type, marshal_va);
+    return signal;
   }
 
   peel_nothrow

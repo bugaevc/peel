@@ -27,7 +27,7 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
             # TODO: handle both at the same time
             assert(typed_tweak_callee is None)
         elif typed_tweak_callee:
-            templates.append('T')
+            templates.append('typename T')
     else:
         cpp_signature = ''
         templates = None
@@ -42,25 +42,24 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
         else:
             cpp_signature += ', ' + error_param
 
+    is_static = True
+    is_const = False
     if params is not None:
-        is_static = all(not p.is_instance for p in params.params)
-        is_const = False
         for p in params.params:
-            if not p.is_instance:
+            if not p.is_cpp_this():
                 continue
+            is_static = False
             constness = extract_constness_from_c_type(p.c_type)
             if len(constness) != 1:
                 raise UnsupportedForNowException('weird number of indirections in instance parameter')
             is_const = constness[0]
             break
-    else:
-        is_static = True
-        is_const = False
     if is_static:
         assert(not is_const)
+
     l = []
     if templates:
-        l.append(indent + 'template<{}>'.format(', '.join('typename ' + t for t in templates)))
+        l.append(indent + 'template<{}>'.format(', '.join(templates)))
     l.append(indent + 'peel_nothrow' + ''.join(' ' + attr for attr in attributes))
     fake_return_name = 'fake-return-name'
     rv_cpp_signature = rv.generate_cpp_type(name=fake_return_name, context=context)
@@ -114,9 +113,13 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
             if needs_local_copy:
                 have_local_copies = True
             if not needs_local_copy or p.direction == 'inout':
-                cast_to_c = p.generate_cast_to_c(cpp_name=p.name if not p.is_instance else 'this', context=context, for_local_copy=needs_local_copy)
+                if p.is_cpp_this():
+                    cpp_name = 'this'
+                else:
+                    cpp_name = p.name
+                cast_to_c = p.generate_cast_to_c(cpp_name=cpp_name, context=context, for_local_copy=needs_local_copy)
                 if cast_to_c is None:
-                    assert(not p.is_instance)
+                    assert(not p.is_cpp_this())
                     args.append(p.name)
                 else:
                     casted_name = p.generate_casted_name()

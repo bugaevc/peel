@@ -258,6 +258,26 @@
           </parameter>
         </parameters>
       </virtual-method>
+      <method name="takes_self_by_ref" c:identifier="test_testy_takes_self_by_ref">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="full">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+        </parameters>
+      </method>
+      <virtual-method name="takes_self_by_ref">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="full">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+        </parameters>
+      </virtual-method>
       <method name="nested_types" c:identifier="test_testy_nested_types">
         <return-value>
           <type name="none" c:type="void"/>

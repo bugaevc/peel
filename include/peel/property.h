@@ -279,19 +279,6 @@ public:
     return *this;
   }
 
-  template<typename F>
-  peel_nothrow
-  Getter &
-  get (F f)
-  {
-    if (!found_ptr)
-      return *this;
-    *found_ptr = true;
-    UnownedType v = f (instance);
-    GObject::Value::Traits<T>::set (value, v);
-    return *this;
-  }
-
   peel_nothrow
   Getter &
   set (...)
@@ -386,16 +373,16 @@ public:
     return *this;
   }
 
-  template<typename F>
+  // template<typename = peel::enable_if_derived<GObject::Object, T>>
   peel_nothrow
   Setter &
-  set (F f)
+  set (void (Class::*setter) (FloatPtr<T>))
   {
     if (!found_ptr)
       return *this;
     *found_ptr = true;
-    UnownedType v = GObject::Value::Traits<T>::get (value);
-    f (instance, v);
+    FloatPtr<T> obj = GObject::Value::Traits<T>::get (value);
+    (instance->*setter) (std::move (obj));
     return *this;
   }
 };

@@ -9,7 +9,7 @@ from peel_gen.field import Field
 from peel_gen.type import lookup_type, pick_base_type
 from peel_gen.exceptions import UnsupportedForNowException
 from peel_gen.specializations import generate_get_type_specialization, generate_ref_traits_specialization
-from peel_gen.utils import intern_get_type_map, escape_cpp_name
+from peel_gen.utils import intern_get_type_map, escape_cpp_name, VisibilityTracker
 from peel_gen import api_tweaks
 
 class Class(DefinedType):
@@ -269,12 +269,12 @@ class Class(DefinedType):
                         continue
                     l.append('  using {}::{};'.format(cpp_base_type_emit_name, constructor.emit_name()))
                 for method in self.parent.methods:
-                    if not method.is_static():
+                    if not method.is_cpp_static():
                         continue
                     if not self.should_hide(method):
                         continue
                     l.append('  using {}::{};'.format(cpp_base_type_emit_name, escape_cpp_name(method.name)))
-            l.extend([
+        l.extend([
             '  friend class GObject::Type;',
             '  friend class GObject::TypeInstance;',
             '  friend class GObject::TypeClass;',
@@ -282,6 +282,10 @@ class Class(DefinedType):
             '  {} () = delete;'.format(self.own_name),
             '  {} (const {} &) = delete;'.format(self.own_name, self.own_name),
             '  {} ({} &&) = delete;'.format(self.own_name, self.own_name),
+            '  {} &'.format(self.own_name),
+            '  operator = (const {} &) = delete;'.format(self.own_name),
+            '  {} &'.format(self.own_name),
+            '  operator = ({} &&) = delete;'.format(self.own_name),
             '',
             'protected:',
             '  ~{} () = default;'.format(self.own_name),
@@ -289,9 +293,13 @@ class Class(DefinedType):
         l.append('')
         l.append('public:')
         l.append(self.generate_nested_type_defs())
+
+        visibility = VisibilityTracker(l, 'public')
+
         for constructor in self.constructors:
             try:
                 constructor.resolve_stuff()
+                visibility.switch(constructor.visibility)
                 l.append(constructor.generate())
             except UnsupportedForNowException as e:
                 l.append('  /* Unsupported for now: {}: {} */'.format(constructor.name, e.reason))
@@ -307,6 +315,7 @@ class Class(DefinedType):
                     l.append('  /* {} bound as RefTraits */'.format(method.name))
                     l.append('')
                     continue
+                visibility.switch(method.visibility)
                 l.append(method.generate(indent='  '))
             except UnsupportedForNowException as e:
                 l.append('  /* Unsupported for now: {}: {} */'.format(method.name, e.reason))
@@ -318,10 +327,12 @@ class Class(DefinedType):
         for signal in self.signals:
             try:
                 signal.resolve_stuff()
+                visibility.switch(signal.visibility)
                 l.append(signal.generate())
             except UnsupportedForNowException as e:
                 l.append('  /* Unsupported for now: {}: {} */'.format(signal.name, e.reason))
             l.append('')
+        visibility.switch('public')
         for prop in self.props:
             try:
                 l.append(prop.generate())
@@ -331,10 +342,8 @@ class Class(DefinedType):
         s = api_tweaks.ifdef_for_non_opaque(self.c_type)
         if s:
             l.append(s)
-        need_protected = self.vfuncs or self.type_struct or (self.is_gobject_derived and not self.sealed)
-        if need_protected:
-            l.append('protected:')
         if self.is_gobject_derived and not self.sealed:
+            visibility.switch('protected')
             l.extend([
                 '  peel_nothrow',
                 '  static void',
@@ -351,11 +360,13 @@ class Class(DefinedType):
                     continue
                 try:
                     vfunc.resolve_stuff()
+                    visibility.switch(vfunc.visibility)
                     l.append(vfunc.generate())
                 except UnsupportedForNowException as e:
                     l.append('  /* Unsupported for now: {}: {} */'.format(vfunc.name, e.reason))
                 l.append('')
         if self.type_struct is not None:
+            visibility.switch('public')
             try:
                 l.append(self.type_struct.generate())
             except UnsupportedForNowException as e:

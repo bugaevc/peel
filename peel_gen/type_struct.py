@@ -5,6 +5,7 @@ from peel_gen.interface import Interface
 from peel_gen.field import Field
 from peel_gen.type import lookup_type
 from peel_gen.exceptions import UnsupportedForNowException
+from peel_gen.utils import VisibilityTracker
 from peel_gen import api_tweaks
 
 class TypeStruct(DefinedType):
@@ -151,19 +152,19 @@ class TypeStruct(DefinedType):
             s = api_tweaks.endif_for_non_opaque(self.c_type)
             if s:
                 l.append(s)
-        l.append('  public:');
+        visibility = VisibilityTracker(l, 'private', indent='  ')
         for method in self.methods:
             try:
                 method.resolve_stuff()
+                visibility.switch(method.visibility)
                 l.append(method.generate(indent='    '))
             except UnsupportedForNowException as e:
                 l.append('    /* Unsupported for now: {}: {} */'.format(method.name, e.reason))
             l.append('')
-        if self.type_struct_for.vfuncs and isinstance(self.type_struct_for, Class):
-            l.append('  protected:')
         for vfunc in self.type_struct_for.vfuncs:
             try:
                 vfunc.resolve_stuff()
+                visibility.switch(vfunc.visibility)
                 l.append(vfunc.generate_override())
             except UnsupportedForNowException as e:
                 l.append('    /* Unsupported for now: {}: {} */'.format(vfunc.name, e.reason))

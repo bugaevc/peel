@@ -110,13 +110,13 @@ class Parameters(NodeHandler):
             assert('::' not in s)
             assert('*' not in s)
             assert(' ' not in s)
-            l.append(s)
+            l.append('typename ' + s)
         if not l:
             return None
         return l
 
     def should_add_nonnull(self, p, tp):
-        if p.is_instance:
+        if p.is_cpp_this():
             return False
         if p.ownership is not None and p.ownership != 'none':
             # Cannot use p_nonnull_args () on smart pointers
@@ -144,11 +144,15 @@ class Parameters(NodeHandler):
         self.resolve_stuff(has_typed_tweak)
         l = []
         nonnull_args = []
-        index = 1
+        is_static = all(not p.is_cpp_this() for p in self.params)
+        index = 1 if is_static else 2
         for p in self.params:
             if p in self.skip_params:
                 continue
             elif p.name == '...':
+                continue
+            elif p.is_cpp_this():
+                # Do not increment index.
                 continue
             tp = chase_type_aliases(p.type)
             if isinstance(tp, (Callback, Array)) or p.closure is not None:
@@ -173,7 +177,7 @@ class Parameters(NodeHandler):
         self.resolve_stuff(has_typed_tweak=typed_tweak is not None)
         l = []
         for p in self.params:
-            if p.is_instance:
+            if p.is_cpp_this():
                 continue
             if p in self.skip_params:
                 continue

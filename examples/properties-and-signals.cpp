@@ -58,7 +58,7 @@ void
 Counter::Class::init ()
 {
   // At class initialization time, we register our signal.
-  sig_reached_10.register_ ("reached-10", G_SIGNAL_RUN_LAST);
+  sig_reached_10 = Signal<Counter, void (void)>::create ("reached-10");
 }
 
 void

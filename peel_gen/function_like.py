@@ -11,6 +11,7 @@ class FunctionLike(NodeHandler):
         self.throws = attrs.get('throws', '0') != '0'
         self.params = None
         self.rv = None
+        self.visibility = 'public'
         self.has_resolved_stuff = False
 
     def start_child_element(self, name, attrs):
@@ -25,10 +26,10 @@ class FunctionLike(NodeHandler):
             self.params = Parameters(attrs, ns=self.ns)
             return self.params
 
-    def is_static(self):
+    def is_cpp_static(self):
         if self.params is None:
             return True
-        return not any(p.is_instance for p in self.params.params)
+        return not any(p.is_cpp_this() for p in self.params.params)
 
     def find_param_for_tweak(self, tweak1):
         if tweak1 == 'return':
@@ -47,10 +48,12 @@ class FunctionLike(NodeHandler):
             for p in self.params.params:
                 p.resolve_stuff()
         for tweak in api_tweaks.lookup(self.tweak_ident):
-            if tweak[0] in ('float', 'unowned', 'owned', 'in', 'out', 'inout'):
+            if tweak[0] == 'protected':
+                self.visibility = 'protected'
+                continue
+            if tweak[0] in ('float', 'unowned', 'owned', 'in', 'out', 'inout', 'this'):
                 p = self.find_param_for_tweak(tweak[1])
                 if tweak[0] == 'float':
-                    assert(not p.is_instance)
                     tp = chase_type_aliases(p.type)
                     from peel_gen.klass import Class
                     from peel_gen.record import Record
@@ -68,6 +71,8 @@ class FunctionLike(NodeHandler):
                     p.direction = 'out'
                 elif tweak[0] == 'inout':
                     p.direction = 'inout'
+                elif tweak[0] == 'this':
+                    p.force_cpp_this = True
 
         assert(self.rv.type is not None)
         tp = chase_type_aliases(self.rv.type)

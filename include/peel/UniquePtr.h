@@ -185,7 +185,7 @@ public:
   {
     UniquePtr p;
     p.ptr = ptr;
-    p.c = c;
+    p.c = size;
     return p;
   }
 

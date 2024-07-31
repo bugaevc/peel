@@ -61,7 +61,7 @@ public:
   }
 
   void
-  set_child (Gtk::Widget *new_child);
+  set_child (FloatPtr<Gtk::Widget> new_child);
 
   PEEL_PROPERTY (Gtk::Widget, child, "child")
 
@@ -91,13 +91,13 @@ Button::Class::init ()
   set_accessible_role (Gtk::Accessible::Role::BUTTON);
   set_layout_manager_type (Type::of<Gtk::BinLayout> ());
 
-  sig_clicked.register_ ("clicked", G_SIGNAL_RUN_LAST);
+  sig_clicked = Signal<Button, void (void)>::create ("clicked");
 
   override_vfunc_dispose<Button> ();
 }
 
 void
-Button::set_child (Gtk::Widget *new_child)
+Button::set_child (FloatPtr<Gtk::Widget> new_child)
 {
   if (new_child == child)
     return;
@@ -106,7 +106,7 @@ Button::set_child (Gtk::Widget *new_child)
     child->unparent ();
   child = new_child;
   if (new_child)
-    new_child->set_parent (this);
+    set_parent (std::move (new_child));
 
   notify (prop_child ());
 }

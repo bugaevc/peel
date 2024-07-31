@@ -27,6 +27,7 @@ class Parameter(NodeHandler):
         self.scope = attrs.get('scope', None)
         self.closure = attrs.get('closure', None)
         self.destroy = attrs.get('destroy', None)
+        self.force_cpp_this = False
         self.has_resolved_stuff = False
 
     def __repr__(self):
@@ -71,6 +72,13 @@ class Parameter(NodeHandler):
                 assert(self.c_type.endswith('*'))
                 self.type.stdname = self.c_type[:-1].strip()
                 self.type.corresponds_exactly = True
+
+    def is_cpp_this(self):
+        if self.force_cpp_this:
+            return True
+        if not self.is_instance:
+            return False
+        return self.ownership in (None, 'none')
 
     def generate_extra_include_members(self):
         self.resolve_stuff()
@@ -308,7 +316,7 @@ class Parameter(NodeHandler):
 
     def generate_casted_name(self):
         self.resolve_stuff()
-        if self.is_instance:
+        if self.is_cpp_this():
             name = 'this'
         elif self.is_rv:
             name = 'return'
@@ -449,17 +457,13 @@ class Parameter(NodeHandler):
         elif self.ownership == 'container':
             raise UnsupportedForNowException('non-array transfer container')
         elif self.ownership == 'floating':
-            assert(not self.is_instance)
+            assert(not self.is_cpp_this())
             return 'reinterpret_cast<{}> (std::move ({}).release_floating_ptr ())'.format(c_type, cpp_name)
-        elif not self.is_instance:
-            if tp.is_refcounted or tp.free_func:
-                return 'reinterpret_cast<{}> (std::move ({}).release_ref ())'.format(c_type, cpp_name)
-            else:
-                raise UnsupportedForNowException('no idea about ownership semantics')
+        elif tp.is_refcounted or tp.free_func:
+            assert(not self.is_cpp_this())
+            return 'reinterpret_cast<{}> (std::move ({}).release_ref ())'.format(c_type, cpp_name)
         else:
-            # We'll have to take an extra ref here sadly :(
-            plain_cpp_type = self.generate_cpp_type(name=None, context=context, strip_refs=1)
-            return 'reinterpret_cast<{}> ((RefTraits<{}>::ref (this), this))'.format(c_type, plain_cpp_type)
+            raise UnsupportedForNowException('no idea about ownership semantics')
 
     def generate_cast_from_c(self, c_name, context, for_local_copy=False):
         self.resolve_stuff()

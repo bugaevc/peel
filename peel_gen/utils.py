@@ -108,3 +108,15 @@ intern_get_type_map = {
     'ParamSpecVariant':    'G_TYPE_PARAM_VARIANT',
     'Variant':             'G_TYPE_VARIANT',
 }
+
+class VisibilityTracker:
+    def __init__(self, l, initial_visibility, indent=''):
+        self.l = l
+        self.current_visibility = initial_visibility
+        self.indent = indent
+
+    def switch(self, visibility):
+        if self.current_visibility == visibility:
+            return
+        self.l.append(self.indent + visibility + ':')
+        self.current_visibility = visibility

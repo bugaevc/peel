@@ -58,8 +58,8 @@ MainColumnCell::init (Class *)
 
   FloatPtr<Gtk::TreeExpander> tree_expander = Gtk::TreeExpander::create ();
   tree_expander->set_child (std::move (box));
-  tree_expander->set_parent (this);
   this->tree_expander = tree_expander;
+  set_parent (std::move (tree_expander));
 }
 
 inline void

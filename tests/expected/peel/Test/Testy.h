@@ -58,6 +58,10 @@ private:
   Testy () = delete;
   Testy (const Testy &) = delete;
   Testy (Testy &&) = delete;
+  Testy &
+  operator = (const Testy &) = delete;
+  Testy &
+  operator = (Testy &&) = delete;
 
 protected:
   ~Testy () = default;
@@ -160,6 +164,14 @@ public:
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     ::GValue * _peel_value_ptr = reinterpret_cast<::GValue *> (value_ptr);
     test_testy_get_out_value (_peel_this, _peel_value_ptr);
+  }
+
+  peel_nothrow
+  static void
+  takes_self_by_ref (peel::RefPtr<Testy> self)
+  {
+    ::TestTesty * _peel_self = reinterpret_cast<::TestTesty *> (std::move (self).release_ref ());
+    test_testy_takes_self_by_ref (_peel_self);
   }
 
   peel_nothrow peel_arg_in (2) peel_nonnull_args (2)
@@ -336,6 +348,16 @@ protected:
     _peel_class->get_out_value (_peel_this, _peel_value_ptr);
   }
 
+  template<typename DerivedClass>
+  peel_nothrow
+  static void
+  parent_vfunc_takes_self_by_ref (peel::RefPtr<Testy> self)
+  {
+    ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    ::TestTesty * _peel_self = reinterpret_cast<::TestTesty *> (std::move (self).release_ref ());
+    _peel_class->takes_self_by_ref (_peel_self);
+  }
+
   template<typename DerivedClass, typename CoolCallback>
   peel_nothrow
   int
@@ -435,6 +457,7 @@ protected:
     *buffer = peel::ArrayRef<uint8_t> (reinterpret_cast<uint8_t *> (_peel_buffer), _peel_buffer_size);
   }
 
+public:
   class Class : public GObject::Object::Class
   {
   private:
@@ -442,7 +465,6 @@ protected:
     Class (const Class &) = delete;
     Class (Class &&) = delete;
 
-  public:
   protected:
     template<typename DerivedClass>
     void
@@ -532,6 +554,18 @@ protected:
         DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
         GObject::Value *_peel_value_ptr = reinterpret_cast<GObject::Value *> (value_ptr);
         _peel_this->DerivedClass::vfunc_get_out_value (_peel_value_ptr);
+      };
+    }
+
+    template<typename DerivedClass>
+    void
+    override_vfunc_takes_self_by_ref ()
+    {
+      ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
+      klass->takes_self_by_ref = +[] (::TestTesty *self) -> void
+      {
+        peel::RefPtr<DerivedClass> _peel_self = peel::RefPtr<DerivedClass>::adopt_ref (reinterpret_cast<DerivedClass *> (self));
+        DerivedClass::vfunc_takes_self_by_ref (std::move (_peel_self));
       };
     }
 
