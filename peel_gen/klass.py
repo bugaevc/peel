@@ -204,9 +204,15 @@ class Class(DefinedType):
     def should_hide(self, parent_member):
         # Only explicitly hide if we don't declare a member with the same name.
         if isinstance(parent_member, Constructor):
-            return not any(c.name == parent_member.name for c in self.constructors)
+            members = self.constructors
         elif isinstance(parent_member, Method):
-            return not any(c.name == parent_member.name for c in self.methods)
+            members = self.methods
+        if any(member.name == parent_member.name for member in members):
+            return False
+        if parent_member.c_ident in (self.parent.ref_func, self.parent.unref_func, self.parent.ref_sink_func):
+            # Not bound, so nothing to hide either.
+            return False
+        return True
 
     def should_emit_placeholder_member(self):
         # GInitiallyUnowned is typedefed from struct _GObject, not
