@@ -201,11 +201,16 @@ class Parameter(NodeHandler):
 
         if isinstance(tp, Callback):
             if self.closure is None:
-                # Plain C callback with no C++ callable wrapping
+                if not tp.force_cpp_wrapper:
+                    # Plain C callback with no C++ callable wrapping
+                    if name is None:
+                        return '::' + tp.c_type
+                    else:
+                        return '::' + tp.c_type + ' ' + name
                 if name is None:
-                    return '::' + tp.c_type
+                    return tp.name
                 else:
-                    return '::' + tp.c_type + ' ' + name
+                    return '{} {}'.format(tp.name, name)
             if strip_refs:
                 assert(name is None)
                 return tp.name
@@ -334,8 +339,39 @@ class Parameter(NodeHandler):
         if isinstance(tp, Callback):
             if self.direction != 'in':
                 raise UnsupportedForNowException('out callback parameter')
+            plain_closure_type = self.generate_cpp_type(
+                name=None,
+                context=context,
+                strip_refs=1,
+            )
             if self.closure is None:
-                return
+                if not tp.force_cpp_wrapper:
+                    return
+                cpp_callee = self.generate_casted_name()
+                extra_decls = '\n'.join([
+                    '        static_assert (std::is_empty<{}>::value || std::is_same<{}, decltype (nullptr)>::value, \"Use a captureless lambda\");'.format(
+                        plain_closure_type,
+                        plain_closure_type,
+                    ),
+                    '#ifdef peel_cpp_20',
+                    '        {} {};'.format(plain_closure_type, cpp_callee),
+                    '#else',
+                    '        {} &{} = *reinterpret_cast<{} *> (0x123456);'.format(
+                        plain_closure_type,
+                        cpp_callee,
+                        plain_closure_type,
+                    ),
+                    '#endif',
+                ])
+                return '+[] ' + cpp_function_wrapper.generate(
+                    cpp_callee=cpp_callee,
+                    context=context,
+                    rv=tp.rv,
+                    params=tp.params,
+                    throws=False,
+                    indent='      ',
+                    extra_decls=extra_decls,
+                )
             if tp.c_type == 'GCallback':
                 raise UnsupportedForNowException('GCallback')
             assert(tp.params is not None)
@@ -346,11 +382,6 @@ class Parameter(NodeHandler):
             # FIXME: This is a gross place to do this.
             if user_data_param not in tp.params.skip_params:
                  tp.params.skip_params.append(user_data_param)
-            plain_closure_type = self.generate_cpp_type(
-                name=None,
-                context=context,
-                strip_refs=1,
-            )
             extra_decls = '        {} &{} = reinterpret_cast<{} &> (*reinterpret_cast<unsigned char *> ({}));'.format(
                 plain_closure_type,
                 cpp_name,

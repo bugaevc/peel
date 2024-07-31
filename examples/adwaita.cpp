@@ -20,9 +20,6 @@ class Window : public Adw::ApplicationWindow
   void
   open_new_tab ();
 
-  static void
-  new_tab_action (Window *);
-
   Adw::TabView *
   on_create_window (Adw::TabView *);
 
@@ -39,16 +36,13 @@ public:
 
 PEEL_CLASS_IMPL (Window, "DemoWindow", Adw::ApplicationWindow)
 
-void
-Window::new_tab_action (Window *window)
-{
-  window->open_new_tab ();
-}
-
 inline void
 Window::Class::init ()
 {
-  install_action ("win.new-tab", nullptr, GtkWidgetActionActivateFunc (new_tab_action));
+  install_action ("win.new-tab", nullptr, [] (Gtk::Widget *widget, const char *action_name, GLib::Variant *parameter)
+  {
+    static_cast<Window *> (widget)->open_new_tab ();
+  });
 }
 
 inline void

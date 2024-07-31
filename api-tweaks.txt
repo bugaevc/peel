@@ -638,6 +638,9 @@ onstack	GtkBuildableParser
 nest	GtkBuildableParser		Buildable::Parser
 nest	GtkBuildableParseContext	Buildable::ParseContext
 
+cpp-wrapper GtkShortcutFunc
+cpp-wrapper GtkWidgetActionActivateFunc
+
 protected gtk_widget_class_add_binding
 protected gtk_widget_class_add_binding_action
 protected gtk_widget_class_add_binding_signal

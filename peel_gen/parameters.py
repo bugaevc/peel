@@ -100,9 +100,10 @@ class Parameters(NodeHandler):
         for p in self.params:
             if p in self.skip_params:
                 continue
-            if not isinstance(chase_type_aliases(p.type), Callback):
+            tp = chase_type_aliases(p.type)
+            if not isinstance(tp, Callback):
                 continue
-            if p.closure is None:
+            if p.closure is None and not tp.force_cpp_wrapper:
                 continue
             # We pass context=self.ns to get unqualified callback type name,
             # to be used as template name.

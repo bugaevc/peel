@@ -108,4 +108,3 @@ class FunctionLike(NodeHandler):
         if self.throws:
             s.add(lookup_type('Error', 'GLib'))
         return s
-
