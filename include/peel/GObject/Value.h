@@ -14,7 +14,7 @@ class FloatPtr;
 namespace GObject
 {
 
-class Value
+struct Value final
 {
 private:
   ::GValue value;

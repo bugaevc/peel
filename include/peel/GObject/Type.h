@@ -8,7 +8,7 @@ namespace peel
 namespace GObject
 {
 
-class Type
+class Type final
 {
 private:
   ::GType tp;

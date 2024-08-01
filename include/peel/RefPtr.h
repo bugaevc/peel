@@ -36,10 +36,12 @@ private:
   T *ptr;
 
 public:
+  peel_nothrow
   constexpr RefPtr ()
     : ptr (nullptr)
   { }
 
+  peel_nothrow
   constexpr RefPtr (decltype (nullptr))
     : ptr (nullptr)
   { }
@@ -60,12 +62,14 @@ public:
       RefTraits<T>::ref (ptr);
   }
 
+  peel_nothrow
   RefPtr (RefPtr &&other)
     : ptr (other.ptr)
   {
     other.ptr = nullptr;
   }
 
+  peel_nothrow
   RefPtr (const FloatPtr<T> &f)
     : RefPtr ((T *) f)
   { }
@@ -87,6 +91,7 @@ public:
 
   /* Upcast.  */
   template<typename U, peel::enable_if_derived<T, U, int> = 0>
+  peel_nothrow
   RefPtr (const RefPtr<U> &other)
     : ptr (other.ptr)
   {
@@ -96,6 +101,7 @@ public:
 
   /* Upcast.  */
   template<typename U, peel::enable_if_derived<T, U, int> = 0>
+  peel_nothrow
   RefPtr (RefPtr<U> &&other)
     : ptr (other.ptr)
   {
@@ -109,6 +115,7 @@ public:
       RefTraits<T>::unref (ptr);
   }
 
+  peel_nothrow
   static RefPtr
   adopt_ref (T *ptr)
   {
@@ -128,6 +135,7 @@ public:
   }
 */
 
+  peel_nothrow
   peel_nodiscard ("the reference will leak if unused")
   T *
   release_ref () &&
@@ -208,6 +216,7 @@ public:
   }
 
   template<typename U>
+  peel_nothrow
   RefPtr<U>
   cast () &&
   {

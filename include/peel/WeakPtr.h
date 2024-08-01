@@ -17,6 +17,7 @@ class WeakPtr
 private:
   T *ptr;
 
+  peel_nothrow
   void
   add_weak_ptr ()
   {
@@ -25,6 +26,7 @@ private:
                                  reinterpret_cast<gpointer*> (&ptr));
   }
 
+  peel_nothrow
   void
   remove_weak_ptr ()
   {
@@ -34,10 +36,12 @@ private:
   }
 
 public:
+  peel_nothrow
   constexpr WeakPtr ()
     : ptr (nullptr)
   { }
 
+  peel_nothrow
   constexpr WeakPtr (decltype (nullptr))
     : ptr (nullptr)
   { }
@@ -75,6 +79,7 @@ public:
 
   /* Upcast.  */
   template<typename U, peel::enable_if_derived<T, U, int> = 0>
+  peel_nothrow
   WeakPtr (const WeakPtr<U> &other)
     : ptr (static_cast<U *> (other))
   {

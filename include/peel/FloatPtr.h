@@ -26,22 +26,27 @@ private:
   }
 
 public:
+  peel_nothrow
   constexpr FloatPtr ()
     : ptr (nullptr)
   { }
 
+  peel_nothrow
   constexpr FloatPtr (decltype (nullptr))
     : ptr (nullptr)
   { }
 
+  peel_nothrow
   constexpr FloatPtr (T *ptr)
     : ptr (ptr)
   { }
 
+  peel_nothrow
   constexpr FloatPtr (const FloatPtr &other)
     : ptr (other.ptr)
   { }
 
+  peel_nothrow
   FloatPtr (FloatPtr &&other)
     : ptr (other.ptr)
   {
@@ -50,6 +55,7 @@ public:
 
   /* Upcast.  */
   template<typename U, peel::enable_if_derived<T, U, int> = 0>
+  peel_nothrow
   FloatPtr (FloatPtr<U> &&other)
     : ptr (other.ptr)
   {
@@ -62,6 +68,7 @@ public:
     do_dispose ();
   }
 
+  peel_nothrow
   FloatPtr &
   operator = (T *ptr)
   {
@@ -72,6 +79,7 @@ public:
     return *this;
   }
 
+  peel_nothrow
   FloatPtr &
   operator = (const FloatPtr &other)
   {
@@ -82,6 +90,7 @@ public:
     return *this;
   }
 
+  peel_nothrow
   FloatPtr &
   operator = (FloatPtr &&other)
   {

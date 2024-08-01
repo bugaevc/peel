@@ -24,16 +24,19 @@ private:
   T *ptr;
 
 public:
+  peel_nothrow
   constexpr UniquePtr ()
     : ptr (nullptr)
   { }
 
+  peel_nothrow
   constexpr UniquePtr (decltype (nullptr))
     : ptr (nullptr)
   { }
 
   UniquePtr (const UniquePtr &) = delete;
 
+  peel_nothrow
   UniquePtr (UniquePtr &&other)
     : ptr (other.ptr)
   {
@@ -47,6 +50,7 @@ public:
       UniqueTraits<T>::free (ptr);
   }
 
+  peel_nothrow
   static UniquePtr
   adopt_ref (T *ptr)
   {
@@ -55,6 +59,7 @@ public:
     return p;
   }
 
+  peel_nothrow
   peel_nodiscard ("the reference will leak if unused")
   T *
   release_ref () &&
@@ -112,32 +117,36 @@ class UniquePtr<T[]>
 {
 private:
   T *ptr;
-  unsigned c;
+  size_t c;
 
+  peel_nothrow
   void
   free ()
   {
     if (!std::is_trivially_destructible<T>::value)
       {
-        for (unsigned i = 0; i < c; i++)
+        for (size_t i = 0; i < c; i++)
           ptr[i].~T();
       }
-    g_free (ptr);
+    g_free (reinterpret_cast<gpointer> (ptr));
     ptr = nullptr;
     c = 0;
   }
 
 public:
+  peel_nothrow
   constexpr UniquePtr ()
     : ptr (nullptr)
     , c (0)
   { }
 
+  peel_nothrow
   constexpr UniquePtr (decltype (nullptr))
     : ptr (nullptr)
     , c (0)
   { }
 
+  peel_nothrow
   UniquePtr (UniquePtr &&other)
     : ptr (other.ptr)
     , c (other.c)
@@ -148,11 +157,13 @@ public:
 
   UniquePtr (const UniquePtr &) = delete;
 
+  peel_nothrow
   ~UniquePtr ()
   {
     free ();
   }
 
+  peel_nothrow
   peel_nodiscard ("the reference will leak if unused")
   T *
   release_ref () &&
@@ -180,8 +191,9 @@ public:
     return *this;
   }
 
+  peel_nothrow
   static UniquePtr
-  adopt_ref (T *ptr, unsigned size)
+  adopt_ref (T *ptr, size_t size)
   {
     UniquePtr p;
     p.ptr = ptr;
@@ -189,7 +201,7 @@ public:
     return p;
   }
 
-  constexpr unsigned
+  constexpr size_t
   size () const
   {
     return c;
@@ -202,13 +214,13 @@ public:
   }
 
   T &
-  operator [] (unsigned index)
+  operator [] (size_t index)
   {
     return ptr[index];
   }
 
   constexpr const T &
-  operator [] (unsigned index) const
+  operator [] (size_t index) const
   {
     return ptr[index];
   }
