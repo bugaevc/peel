@@ -281,6 +281,8 @@ class Parameter(NodeHandler):
                 assert(self.direction == 'in')
                 return make_type(self.c_type)
             elif isinstance(itp, PlainType):
+                if self.is_record_field and not itp.corresponds_exactly:
+                    return make_type(self.c_type)
                 return make_type(constness0 + itp.stdname)
             elif isinstance(itp, StrType):
                 if self.ownership == 'full':

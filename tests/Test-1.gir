@@ -575,6 +575,15 @@
       <field name="parent_class">
         <type name="GObject.ObjectClass" c:type="GObjectClass"/>
       </field>
+      <field name="an_int">
+        <type name="gint" c:type="int"/>
+      </field>
+      <field name="a_bool">
+        <type name="gboolean" c:type="gboolean"/>
+      </field>
+      <field name="a_gsize">
+        <type name="gsize" c:type="gsize"/>
+      </field>
     </record>
     <record name="Rec" c:type="RestRec">
       <method name="pass_inout_int" c:identifier="test_rec_pass_inout_int">

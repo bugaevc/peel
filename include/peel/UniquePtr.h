@@ -1,6 +1,7 @@
 #pragma once
 
 #include <peel/lang.h>
+#include <glib.h>
 
 namespace peel
 {

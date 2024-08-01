@@ -24,12 +24,11 @@ def generate(cpp_callee, context, rv, params, throws, indent, extra_decls=None, 
     have_local_copies = False
     if params is not None:
         for p in params.params:
+            if p in params.skip_params:
+                continue
             needs_local_copy = p.needs_local_copy()
             if needs_local_copy:
                 have_local_copies = True
-            if p in params.skip_params:
-                assert(not needs_local_copy)
-                continue
             if not needs_local_copy or p.direction == 'inout':
                 cast_from_c = p.generate_cast_from_c(
                     c_name=p.name,
