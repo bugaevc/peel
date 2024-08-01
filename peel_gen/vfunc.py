@@ -18,14 +18,28 @@ class Vfunc(FunctionLike):
         return 'Vfunc({!r}.{})'.format(self.cpp_class, self.name)
 
     def generate(self):
+        from peel_gen.klass import Class
+        from peel_gen.klass import Interface
+
         api_tweaks.skip_if_needed(self.tweak_ident, self.ns)
-        extra_decls = '    ::{} *_peel_class = reinterpret_cast<::{} *> (Class::peek<DerivedClass> ()->peek_parent ());'.format(
-            self.cpp_class.type_struct.c_type,
-            self.cpp_class.type_struct.c_type,
-        )
+        if isinstance(self.cpp_class, Class):
+            extra_decls = '    ::{} *_peel_class = reinterpret_cast<::{} *> (Class::peek<DerivedClass> ()->peek_parent ());'.format(
+                self.cpp_class.type_struct.c_type,
+                self.cpp_class.type_struct.c_type,
+            )
+            c_callee = '_peel_class->{}'.format(self.name)
+        elif isinstance(self.cpp_class, Interface):
+            extra_decls = '    ::{} *_peel_iface = reinterpret_cast<::{} *> (Class::peek<DerivedClass> ()->peek_interface (Type::of<{}> ())->peek_parent ());'.format(
+                self.cpp_class.type_struct.c_type,
+                self.cpp_class.type_struct.c_type,
+                self.cpp_class.emit_name,
+            )
+            c_callee = '_peel_iface->{}'.format(self.name)
+        else:
+            assert(False)
         return c_function_wrapper.generate(
             name='parent_vfunc_' + self.name,
-            c_callee='_peel_class->{}'.format(self.name),
+            c_callee=c_callee,
             context=self.cpp_class,
             rv=self.rv,
             params=self.params,

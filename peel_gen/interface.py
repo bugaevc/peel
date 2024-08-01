@@ -203,6 +203,13 @@ class Interface(DefinedType):
             except UnsupportedForNowException as e:
                 l.append('  /* Unsupported for now: {}: {} */'.format(prop.name, e.reason))
             l.append('')
+        for vfunc in self.vfuncs:
+            try:
+                vfunc.resolve_stuff()
+                l.append(vfunc.generate())
+            except UnsupportedForNowException as e:
+                l.append('  /* Unsupported for now: {}: {} */'.format(vfunc.name, e.reason))
+            l.append('')
         if self.type_struct is not None:
             l.append(self.type_struct.generate())
         if not l[-1]:

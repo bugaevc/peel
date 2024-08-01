@@ -360,17 +360,16 @@ class Class(DefinedType):
                 '  }',
                 '',
             ])
-        if self.vfuncs:
-            for vfunc in self.vfuncs:
-                if self.is_gobject_derived and vfunc.name == 'finalize':
-                    continue
-                try:
-                    vfunc.resolve_stuff()
-                    visibility.switch(vfunc.visibility)
-                    l.append(vfunc.generate())
-                except UnsupportedForNowException as e:
-                    l.append('  /* Unsupported for now: {}: {} */'.format(vfunc.name, e.reason))
-                l.append('')
+        for vfunc in self.vfuncs:
+            if self.is_gobject_derived and vfunc.name == 'finalize':
+                continue
+            try:
+                vfunc.resolve_stuff()
+                visibility.switch(vfunc.visibility)
+                l.append(vfunc.generate())
+            except UnsupportedForNowException as e:
+                l.append('  /* Unsupported for now: {}: {} */'.format(vfunc.name, e.reason))
+            l.append('')
         if self.type_struct is not None:
             visibility.switch('public')
             try:

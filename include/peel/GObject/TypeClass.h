@@ -124,10 +124,10 @@ public:
   }
 
   template<typename I>
-  typename I::Interface *
+  typename I::Iface *
   peek_interface () const
   {
-    return reinterpret_cast<typename I::Interface *> (peek_interface (Type::of<I> ()));
+    return reinterpret_cast<typename I::Iface *> (peek_interface (Type::of<I> ()));
   }
 };
 

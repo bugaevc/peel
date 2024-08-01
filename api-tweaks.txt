@@ -238,6 +238,7 @@ skip	g_null_settings_backend_new
 skip	g_cancellable_connect
 skip	g_vfs_register_uri_scheme
 skip	g_file_copy_async
+skip	GFile::vfunc_copy_async
 skip	GDBusProxy::vfunc_g_properties_changed
 skip	GDBusObjectManagerClient::vfunc_interface_proxy_properties_changed
 skip	GInetAddress::vfunc_to_bytes

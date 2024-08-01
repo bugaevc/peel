@@ -10,6 +10,7 @@ namespace GObject
 {
 
 class TypeClass;
+class TypeInterface;
 
 class TypeInstance
 {
@@ -87,7 +88,20 @@ public:
     return G_TYPE_INSTANCE_GET_CLASS (this, this doesnt matter, TypeClass);
   }
 
-  // get_interface
+  peel_nothrow
+  TypeInterface *
+  get_interface (Type tp) const
+  {
+    return G_TYPE_INSTANCE_GET_INTERFACE (this, static_cast<::GType> (tp), TypeInterface);
+  }
+
+  template<typename I>
+  peel_nothrow
+  typename I::Iface *
+  get_interface () const
+  {
+    return reinterpret_cast<typename I::Iface *> (get_interface (Type::of<I> ()));
+  }
 
   peel_nothrow
   Type
