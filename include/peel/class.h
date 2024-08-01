@@ -68,6 +68,109 @@ struct TypeInitHelper<Subclass, void_t<decltype (&Subclass::init_type)>>
 };
 
 template<typename Subclass>
+struct HdpHelper
+{
+
+#if defined (peel_hdp_via_visibility)
+  template<typename U>
+  constexpr static bool
+  hdp_helper (...)
+  {
+    return false;
+  }
+
+  template<typename U>
+  constexpr static bool
+  hdp_helper (decltype (&U::template define_properties<DummyVisitor>))
+  {
+    return true;
+  }
+#endif
+
+#ifndef peel_hdp_via_visibility
+  template<typename ParentClass>
+#endif
+  constexpr static bool
+  hdp ()
+  {
+#if defined (peel_hdp_via_visibility)
+    return hdp_helper<Subclass> (nullptr);
+#elif defined (_MSC_VER) /* peel_hdp_via_ptreq */
+    void (*subclass_method) (DummyVisitor &) = &Subclass::template define_properties<DummyVisitor>;
+    void (*parent_class_method) (DummyVisitor &) = &ParentClass::template define_properties<DummyVisitor>;
+    return subclass_method != parent_class_method;
+#else
+    return &Subclass::template define_properties<DummyVisitor> != &ParentClass::template define_properties<DummyVisitor>;
+#endif
+  }
+};
+
+#if defined (peel_hdp_via_visibility)
+template<typename Subclass, typename /* = void */>
+struct PropertyHelper
+{
+  static void
+  init_props (::GObjectClass *)
+  {
+    // The base implementation does nothing.
+  }
+};
+
+template<typename Subclass>
+struct PropertyHelper<Subclass, typename std::enable_if<HdpHelper<Subclass>::hdp ()>::type>
+{
+  typedef Subclass VisitorArgType;
+#else /* peel_hdp_via_ptreq */
+template<typename Subclass, typename ParentClass, typename /* = void */>
+struct PropertyHelper
+{
+  typedef typename std::conditional<HdpHelper<Subclass>::template hdp<ParentClass> (), Subclass, ParentClass>::type VisitorArgType;
+#endif
+
+  peel_nothrow
+  static void
+  get_property (::GObject *object, guint prop_id, ::GValue *value, ::GParamSpec *pspec)
+  {
+    Subclass *instance = reinterpret_cast<Subclass *> (object);
+    GetVisitor<VisitorArgType> visitor { instance, prop_id, value };
+    Subclass::define_properties (visitor);
+    if (G_UNLIKELY (!visitor.found))
+      {
+        typedef ::GObject GObject;
+        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+      }
+  }
+
+  peel_nothrow
+  static void
+  set_property (::GObject *object, guint prop_id, const ::GValue *value, ::GParamSpec *pspec)
+  {
+    Subclass *instance = reinterpret_cast<Subclass *> (object);
+    SetVisitor<VisitorArgType> visitor { instance, prop_id, value };
+    Subclass::define_properties (visitor);
+    if (G_UNLIKELY (!visitor.found))
+      {
+        typedef ::GObject GObject;
+        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+      }
+  }
+
+  static void
+  init_props (::GObjectClass * object_class)
+  {
+#ifdef peel_hdp_via_ptreq
+    constexpr bool c_hdp = HdpHelper<Subclass>::template hdp<ParentClass> ();
+    if (!c_hdp)
+      return;
+#endif
+    object_class->get_property = get_property;
+    object_class->set_property = set_property;
+    InstallVisitor<VisitorArgType> visitor { object_class };
+    Subclass::define_properties (visitor);
+  }
+};
+
+template<typename Subclass>
 struct ClassHelper
 {
   peel_nothrow
@@ -93,7 +196,13 @@ struct ClassHelper
     ::GObjectClass *object_class = reinterpret_cast<::GObjectClass *> (g_class);
     if (!std::is_trivially_destructible<Subclass>::value)
       object_class->finalize = finalize_vfunc;
-    PropertyHelper<Subclass, ParentClass>::init_props (object_class);
+
+    PropertyHelper<Subclass
+#ifdef peel_hdp_via_ptreq
+    , ParentClass
+#endif
+    >::init_props (object_class);
+
     klass->Subclass::Class::init ();
   }
 
@@ -135,10 +244,8 @@ GObject::Type::of ()
   friend struct ::peel::internals::ClassHelper<Subclass>;                      \
   friend struct ::peel::internals::InstanceInitHelper<Subclass>;               \
   friend struct ::peel::internals::TypeInitHelper<Subclass>;                   \
-                                                                               \
-  _peel_friend_hdp_helper (Subclass)                                           \
-  template<typename, typename, typename>                                       \
-  friend struct ::peel::internals::PropertyHelper;                             \
+  friend struct ::peel::internals::DummyVisitor;                               \
+  peel_friend_prop_helper (Subclass)                                           \
                                                                                \
 public:                                                                        \
   peel_nothrow G_GNUC_CONST                                                    \

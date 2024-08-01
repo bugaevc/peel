@@ -17,7 +17,7 @@ namespace peel
 
 namespace internals
 {
-template<typename C>
+template<typename>
 struct InstallVisitor;
 }
 
@@ -78,6 +78,18 @@ private:
 
   // using TypeInstance::create;
   using TypeInstance::free;
+
+#ifndef __GNUC__
+  template<typename, typename, typename>
+  friend struct internals::PropertyHelper;
+  template<typename>
+  friend struct internals::HdpHelper;
+
+  template<typename F>
+  static void
+  define_properties (F &)
+  { }
+#endif
 
 public:
   struct ConstructParam

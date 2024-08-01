@@ -20,8 +20,34 @@ struct Property;
 
 namespace internals
 {
-template<typename Class, typename ParentClass, typename = void>
+template<typename Subclass>
+struct HdpHelper;
+
+#ifdef __GNUC__
+#define peel_hdp_via_visibility
+#else
+#define peel_hdp_via_ptreq
+#endif
+
+#if defined (peel_hdp_via_visibility)
+
+template<typename Subclass, typename = void>
 struct PropertyHelper;
+#define peel_friend_prop_helper(Subclass)                                      \
+  friend struct ::peel::internals::PropertyHelper<Subclass>;                   \
+  friend struct ::peel::internals::HdpHelper<Subclass>;
+
+#elif defined (peel_hdp_via_ptreq)
+
+template<typename Subclass, typename ParentClass, typename = void>
+struct PropertyHelper;
+#define peel_friend_prop_helper(Subclass)                                      \
+  template<typename, typename, typename>                                       \
+  friend struct ::peel::internals::PropertyHelper;                             \
+  template<typename>                                                           \
+  friend struct ::peel::internals::HdpHelper;
+
+#endif
 
 template<typename T>
 struct PspecTraits;
@@ -290,8 +316,8 @@ public:
 template<typename Class>
 struct GetVisitor
 {
-  template<typename, typename, typename>
-  friend struct PropertyHelper;
+  peel_friend_prop_helper (Class)
+
 private:
   Class *instance;
   guint target_id;
@@ -390,8 +416,7 @@ public:
 template<typename Class>
 struct SetVisitor
 {
-  template<typename, typename, typename>
-  friend struct PropertyHelper;
+  peel_friend_prop_helper (Class)
 
 private:
   Class *instance;
@@ -558,8 +583,7 @@ public:
 template<typename Class>
 struct InstallVisitor
 {
-  template<typename, typename, typename>
-  friend struct PropertyHelper;
+  peel_friend_prop_helper (Class)
 
 private:
   ::GObjectClass *klass;
@@ -639,101 +663,6 @@ struct DummyVisitor
   override_prop (...)
   {
     return DummyVisitorRet { };
-  }
-};
-
-template<typename Class>
-struct HdpHelper
-{
-  template<typename U>
-  constexpr static void
-  (*get_define_properties (...)) (DummyVisitor &)
-  {
-    return nullptr;
-  };
-
-  template<typename U>
-  constexpr static void
-  (*get_define_properties (decltype (&U::template define_properties<DummyVisitor>))) (DummyVisitor &)
-  {
-    return &U::template define_properties<DummyVisitor>;
-  }
-
-  template<typename ParentClass>
-  constexpr static bool
-  has_define_properties ()
-  {
-    // GCC in versions prior to 12 has issues evaluating pointer
-    // equality in constant contexts, see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94716.
-    // But, it supports member visibility in all versions properly,
-    // unlike Clang and MSVC.
-    return get_define_properties<Class> (nullptr) != nullptr
-#if !defined (__GNUC__) || defined (__clang__)
-      && get_define_properties<Class> (nullptr) != HdpHelper<ParentClass>::template get_define_properties<ParentClass> (nullptr)
-#endif
-      ;
-  }
-};
-
-#if !defined (__GNUC__) || defined (__clang__)
-#define _peel_friend_hdp_helper(Class) \
-  template<typename T> friend struct ::peel::internals::HdpHelper;
-#else
-#define _peel_friend_hdp_helper(Class) \
-  friend struct ::peel::internals::HdpHelper<Class>;
-#endif
-
-template<typename Class, typename ParentClass, typename /* = void */>
-struct PropertyHelper
-{
-  peel_nothrow
-  static void
-  init_props (::GObjectClass *)
-  {
-    /* The base implementation does nothing */
-  }
-};
-
-template<typename Class, typename ParentClass>
-struct PropertyHelper<Class, ParentClass, typename std::enable_if<HdpHelper<Class>::template has_define_properties <ParentClass>()>::type>
-{
-  peel_nothrow
-  static void
-  get_property (::GObject *object, guint prop_id, ::GValue *value, ::GParamSpec *pspec)
-  {
-    Class *instance = reinterpret_cast<Class *> (object);
-    GetVisitor<Class> visitor { instance, prop_id, value };
-    Class::define_properties (visitor);
-    if (G_UNLIKELY (!visitor.found))
-      {
-        typedef ::GObject GObject;
-        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-      }
-  }
-
-  peel_nothrow
-  static void
-  set_property (::GObject *object, guint prop_id, const ::GValue *value, ::GParamSpec *pspec)
-  {
-    Class *instance = reinterpret_cast<Class *> (object);
-    SetVisitor<Class> visitor { instance, prop_id, value };
-    Class::define_properties (visitor);
-    if (G_UNLIKELY (!visitor.found))
-      {
-        typedef ::GObject GObject;
-        G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-      }
-  }
-
-  peel_nothrow
-  static void
-  init_props (::GObjectClass *klass)
-  {
-    klass->get_property = get_property;
-    klass->set_property = set_property;
-
-    InstallVisitor<Class> visitor { klass };
-    Class::define_properties (visitor);
   }
 };
 
