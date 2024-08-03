@@ -16,7 +16,7 @@ struct UniqueTraits;
 */
 
 template<typename T>
-class UniquePtr
+class UniquePtr final
 {
 private:
   template<typename U>
@@ -114,7 +114,7 @@ public:
 };
 
 template<typename T>
-class UniquePtr<T[]>
+class UniquePtr<T[]> final
 {
 private:
   T *ptr;

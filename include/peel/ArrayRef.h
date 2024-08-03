@@ -6,7 +6,7 @@ namespace peel
 {
 
 template<typename T>
-class ArrayRef
+class ArrayRef final
 {
   T *p;
   size_t c;

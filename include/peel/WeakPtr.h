@@ -12,7 +12,7 @@ class Object;
 };
 
 template<typename T, peel::enable_if_derived<GObject::Object, T, int> = 0>
-class WeakPtr
+class WeakPtr final
 {
 private:
   T *ptr;

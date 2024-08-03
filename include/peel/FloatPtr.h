@@ -6,7 +6,7 @@ namespace peel
 {
 
 template<typename T>
-class FloatPtr
+class FloatPtr final
 {
 private:
   template<typename U>

@@ -27,7 +27,7 @@ template<typename T>
 class FloatPtr;
 
 template<typename T>
-class RefPtr
+class RefPtr final
 {
 private:
   template<typename U>
