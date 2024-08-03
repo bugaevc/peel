@@ -252,6 +252,8 @@ in	g_socket_receive		size
 in	g_socket_receive_from		size
 in	g_socket_receive_with_blocking	size
 
+float	g_dbus_gvariant_to_gvalue	value
+
 onstack	GInputVector
 onstack	GOutputVector
 onstack	GActionEntry
@@ -602,6 +604,7 @@ take-value GskRenderNode		gsk_value_take_render_node
 
 # Gtk
 skip	gtk_tree_model_rows_reordered
+skip	GtkTreeModel::vfunc_rows_reordered
 skip	gtk_tree_path_get_indices
 
 # These ones are bound as Traits<Gtk::Expression>
