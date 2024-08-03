@@ -65,9 +65,7 @@ Window::Class::init ()
 
   PEEL_WIDGET_TEMPLATE_BIND_CHILD (Window, label);
 
-  auto scope = BuilderScope::create ();
-  scope->add_callback ("button_clicked_cb", &Window::button_clicked_cb);
-  set_template_scope (scope);
+  PEEL_WIDGET_TEMPLATE_BIND_CALLBACK (Window, button_clicked_cb);
 }
 
 inline void
