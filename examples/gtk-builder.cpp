@@ -6,7 +6,7 @@
 
 using namespace peel;
 
-static const char template_string[] = R"(
+static const uint8_t template_string[] = R"(
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <template class="DemoWindow" parent="GtkWindow">
@@ -60,7 +60,7 @@ Window::Class::init ()
   override_vfunc_dispose<Window> ();
 
   // Normally you'd use set_template_from_resource () instead of this.
-  auto template_bytes = GLib::Bytes::create_static ({ reinterpret_cast<const uint8_t *> (template_string), strlen (template_string) });
+  auto template_bytes = GLib::Bytes::create_static ({ template_string, sizeof (template_string) - 1 });
   set_template (template_bytes);
 
   PEEL_WIDGET_TEMPLATE_BIND_CHILD (Window, label);
