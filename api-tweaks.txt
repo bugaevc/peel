@@ -303,6 +303,11 @@ no-autobase GInitable
 no-autobase GAsyncInitable
 prefer-autobase GActionGroup		ActionMap
 
+float	g_dbus_proxy_call		parameters
+float	g_dbus_proxy_call_sync		parameters
+float	g_dbus_proxy_call_with_unix_fd_list		parameters
+float	g_dbus_proxy_call_with_unix_fd_list_sync	parameters
+
 # For compatibility reasons, these APIs are present in Gio-2.0.gir,
 # as well as in newer GioUnix-2.0.gir. We don't want to put them into
 # peel::Gio bindings, so skip them when generating that.
