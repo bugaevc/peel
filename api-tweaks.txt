@@ -103,6 +103,7 @@ skip	GUnixPipeEnd
 skip	GUnixPipe
 unowned	g_variant_type_string_scan	endptr
 unowned	g_bytes_new_static		data
+unowned	g_mapped_file_get_contents	return
 no-autoref GHook
 no-autofree GArray
 no-autofree GByteArray

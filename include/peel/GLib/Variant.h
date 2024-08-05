@@ -42,7 +42,7 @@ public:
   get_type_string ()
   {
     ::GVariant *_peel_this = reinterpret_cast<::GVariant *> (this);
-    return g_variant_get_type (_peel_this);
+    return g_variant_get_type_string (_peel_this);
   }
 
   peel_nothrow
