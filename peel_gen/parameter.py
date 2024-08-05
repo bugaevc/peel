@@ -349,7 +349,7 @@ class Parameter(NodeHandler):
                     return
                 cpp_callee = self.generate_casted_name()
                 extra_decls = '\n'.join([
-                    '        static_assert (std::is_empty<{}>::value || std::is_same<{}, decltype (nullptr)>::value, \"Use a captureless lambda\");'.format(
+                    '        static_assert (std::is_empty<{}>::value, \"Use a captureless lambda\");'.format(
                         plain_closure_type,
                         plain_closure_type,
                     ),
@@ -363,7 +363,7 @@ class Parameter(NodeHandler):
                     ),
                     '#endif',
                 ])
-                return '+[] ' + cpp_function_wrapper.generate(
+                lambda_expr = cpp_function_wrapper.generate(
                     cpp_callee=cpp_callee,
                     context=context,
                     rv=tp.rv,
@@ -372,6 +372,7 @@ class Parameter(NodeHandler):
                     indent='      ',
                     extra_decls=extra_decls,
                 )
+                return '((void) {}, +[] {})'.format(cpp_name, lambda_expr)
             if tp.c_type == 'GCallback':
                 raise UnsupportedForNowException('GCallback')
             assert(tp.params is not None)

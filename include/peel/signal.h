@@ -580,7 +580,7 @@ public:
     return SignalBlockGuard { instance, id };
   }
 
-  explicit constexpr
+  explicit
   operator bool () const
   {
     return id > 0;
