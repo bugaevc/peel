@@ -79,7 +79,7 @@ private:
   // using TypeInstance::create;
   using TypeInstance::free;
 
-#ifndef __GNUC__
+#ifdef peel_hdp_via_ptreq
   template<typename, typename, typename>
   friend struct internals::PropertyHelper;
   template<typename>
