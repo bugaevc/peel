@@ -23,7 +23,7 @@ namespace internals
 template<typename Subclass>
 struct HdpHelper;
 
-#ifdef __GNUC__
+#if defined (__GNUC__) && !defined (__clang__)
 #define peel_hdp_via_visibility
 #else
 #define peel_hdp_via_ptreq
