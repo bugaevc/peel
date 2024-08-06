@@ -175,6 +175,16 @@ protected:
     return RefPtr<Object>::adopt_ref (reinterpret_cast<Object *> (obj));
   }
 
+  template<typename DerivedClass>
+  peel_nothrow
+  void
+  parent_vfunc_constructed ()
+  {
+    ::GObjectClass *klass = reinterpret_cast<::GObjectClass *> (TypeClass::peek<DerivedClass> ()->peek_parent ());
+    ::GObject *self = reinterpret_cast<::GObject *> (this);
+    klass->constructed (self);
+  }
+
 public:
   template<typename Class, typename = void>
   struct Traits
