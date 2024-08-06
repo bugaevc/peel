@@ -50,6 +50,7 @@ function (peel_generate GIR_NAME GIR_VERSION)
       "-E" "env" "GI_GIR_PATH=${gi_gir_path}"
       "${Python3_EXECUTABLE}" "${PEEL_GEN_MODULE}"
       "--recursive" "${GIR_NAME}" "${GIR_VERSION}"
+    DEPENDS "${PEEL_GEN_MODULE}"
     WORKING_DIRECTORY "${gen_dir}"
     VERBATIM ${depends_explicit_only})
 
