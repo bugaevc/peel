@@ -60,8 +60,7 @@ public:
     return p;
   }
 
-  peel_nothrow
-  peel_nodiscard ("the reference will leak if unused")
+  peel_nodiscard ("the reference will leak if unused") peel_nothrow
   T *
   release_ref () &&
   {
@@ -164,8 +163,7 @@ public:
     free ();
   }
 
-  peel_nothrow
-  peel_nodiscard ("the reference will leak if unused")
+  peel_nodiscard ("the reference will leak if unused") peel_nothrow
   T *
   release_ref () &&
   {

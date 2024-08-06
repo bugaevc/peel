@@ -16,7 +16,7 @@ public:
 
   template<typename F, typename F2>
   static CallbackType
-  wrap_notified_callback (F &&f, F2 &&f2, gpointer *out_data, GDestroyNotify *out_notify)
+  wrap_notified_callback (F &&f, F2 &&, gpointer *out_data, GDestroyNotify *out_notify)
   {
     if (sizeof (F) <= sizeof (gpointer))
       {
@@ -73,7 +73,7 @@ public:
 
   template<typename F, typename F2>
   static CallbackType
-  wrap_async_callback (F &&f, F2 &&f2, gpointer *out_data)
+  wrap_async_callback (F &&f, F2 &&, gpointer *out_data)
   {
     if (sizeof (F) <= sizeof (gpointer))
       {
@@ -129,7 +129,7 @@ public:
 
   template<typename F, typename F2>
   static CallbackType
-  wrap_notified_callback (F &&f, F2 &&f2, gpointer *out_data, GDestroyNotify *out_notify)
+  wrap_notified_callback (F &&f, F2 &&, gpointer *out_data, GDestroyNotify *out_notify)
   {
     if (sizeof (F) <= sizeof (gpointer))
       {
@@ -186,7 +186,7 @@ public:
 
   template<typename F, typename F2>
   static CallbackType
-  wrap_async_callback (F &&f, F2 &&f2, gpointer *out_data)
+  wrap_async_callback (F &&f, F2 &&, gpointer *out_data)
   {
     if (sizeof (F) <= sizeof (gpointer))
       {

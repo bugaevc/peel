@@ -135,7 +135,6 @@ public:
   }
 */
 
-  peel_nothrow
   peel_nodiscard ("the reference will leak if unused")
   T *
   release_ref () &&

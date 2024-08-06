@@ -10,9 +10,20 @@
 
 #if __cplusplus >= 202002L
 #define peel_cpp_20 1
+#endif
+#if __cplusplus >= 201703L
+#define peel_cpp_17 1
+#endif
+#if __cplusplus >= 201402L
+#define peel_cpp_14 1
+#endif
+
+#if defined (peel_cpp_20)
 #define peel_nodiscard(reason) [[nodiscard (reason)]]
-#else
+#elif defined (peel_cpp_17)
 #define peel_nodiscard(reason) [[nodiscard]]
+#elif defined (__GNUC__)
+#define peel_nodiscard(reason) __attribute__ ((warn_unused_result))
 #endif
 
 #ifdef __GNUC__

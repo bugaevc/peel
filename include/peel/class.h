@@ -242,8 +242,10 @@ GObject::Type::of ()
   friend class ::peel::GObject::Object;                                        \
   friend class ::peel::GObject::TypeClass;                                     \
   friend struct ::peel::internals::ClassHelper<Subclass>;                      \
-  friend struct ::peel::internals::InstanceInitHelper<Subclass>;               \
-  friend struct ::peel::internals::TypeInitHelper<Subclass>;                   \
+  template<typename, typename> /* workaround Clang bug */                      \
+  friend struct ::peel::internals::InstanceInitHelper;                         \
+  template<typename, typename> /* workaround Clang bug */                      \
+  friend struct ::peel::internals::TypeInitHelper;                             \
   friend struct ::peel::internals::DummyVisitor;                               \
   peel_friend_prop_helper (Subclass)                                           \
                                                                                \

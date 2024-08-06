@@ -442,8 +442,7 @@ public:
 
 } /* namespace internals */
 
-class peel_nodiscard ("immediately unblocks if leaked")
-SignalBlockGuard
+class SignalBlockGuard
 {
   friend class SignalConnection;
 
@@ -497,8 +496,7 @@ public:
   }
 };
 
-class peel_nodiscard ("immediately disconnects if leaked")
-SignalConnection
+class SignalConnection
 {
 private:
   gpointer instance;
@@ -572,7 +570,7 @@ public:
     return *this;
   }
 
-  peel_nothrow
+  peel_nodiscard ("immediately unblocks if leaked") peel_nothrow
   SignalBlockGuard
   block ()
   {

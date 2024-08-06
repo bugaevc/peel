@@ -41,6 +41,8 @@ Window::Class::init ()
 {
   install_action ("win.new-tab", nullptr, [] (Gtk::Widget *widget, const char *action_name, GLib::Variant *parameter)
   {
+    (void) action_name;
+    (void) parameter;
     widget->cast<Window> ()->open_new_tab ();
   });
 }
