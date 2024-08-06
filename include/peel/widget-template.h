@@ -3,7 +3,6 @@
 #include <peel/class.h>
 #include <peel/signal.h>
 #include <peel/Gtk/Widget.h>
-#include <peel/Gtk/BuilderCScope.h>
 
 namespace peel
 {
