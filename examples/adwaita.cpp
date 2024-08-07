@@ -1,7 +1,9 @@
 #include <peel/Adw/Adw.h>
 #include <peel/Gtk/Gtk.h>
 #include <peel/Gio/Gio.h>
+#include <peel/GLib/functions.h>
 #include <peel/class.h>
+#include <functional>
 
 using namespace peel;
 
@@ -19,6 +21,9 @@ class Window : public Adw::ApplicationWindow
 
   void
   open_new_tab ();
+
+  void
+  close_current_tab ();
 
   Adw::TabView *
   on_create_window (Adw::TabView *);
@@ -45,6 +50,15 @@ Window::Class::init ()
     (void) parameter;
     widget->cast<Window> ()->open_new_tab ();
   });
+  install_action ("win.close-tab", nullptr, [] (Gtk::Widget *widget, const char *action_name, GLib::Variant *parameter)
+  {
+    (void) action_name;
+    (void) parameter;
+    widget->cast<Window> ()->close_current_tab ();
+  });
+
+  add_binding_action (GDK_KEY_T, Gdk::ModifierType::CONTROL_MASK, "win.new-tab", nullptr);
+  add_binding_action (GDK_KEY_W, Gdk::ModifierType::CONTROL_MASK, "win.close-tab", nullptr);
 }
 
 inline void
@@ -119,6 +133,17 @@ Window::open_new_tab ()
   tab_page->set_title (title);
 
   g_free (title);
+}
+
+void
+Window::close_current_tab ()
+{
+  Adw::TabPage *page = tab_view->get_selected_page ();
+  tab_view->close_page (page);
+
+  // If this was the last page, close the window.
+  if (tab_view->get_n_pages () == 0)
+    GLib::idle_add_once (std::bind (&Gtk::Window::close, this));
 }
 
 Adw::TabView *
