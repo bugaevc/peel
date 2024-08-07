@@ -51,7 +51,7 @@ class FunctionLike(NodeHandler):
             if tweak[0] == 'protected':
                 self.visibility = 'protected'
                 continue
-            if tweak[0] in ('float', 'unowned', 'owned', 'in', 'out', 'inout', 'this'):
+            if tweak[0] in ('float', 'unowned', 'owned', 'in', 'out', 'inout', 'this', 'scope'):
                 p = self.find_param_for_tweak(tweak[1])
                 if tweak[0] == 'float':
                     tp = chase_type_aliases(p.type)
@@ -73,6 +73,8 @@ class FunctionLike(NodeHandler):
                     p.direction = 'inout'
                 elif tweak[0] == 'this':
                     p.force_cpp_this = True
+                elif tweak[0] == 'scope':
+                    p.scope = tweak[2]
 
         assert(self.rv.type is not None)
         tp = chase_type_aliases(self.rv.type)

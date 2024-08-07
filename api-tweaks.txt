@@ -100,7 +100,7 @@ skip	g_vsprintf
 skip	g_tree_search
 skip	g_tree_search_node
 skip	g_idle_add
-skip	g_idle_add_once
+scope	g_idle_add_once			function	async
 skip	g_datalist_id_replace_data
 skip	g_ucs4_to_utf16
 skip	g_unichar_to_utf8
