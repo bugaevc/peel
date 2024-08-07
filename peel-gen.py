@@ -68,6 +68,9 @@ def emit_file(repo, file_path, members):
 
     extra_includes = []
     for extra_include_member in extra_include_members:
+        if isinstance(extra_include_member, str):
+            extra_includes.append(extra_include_member)
+            continue
         if not extra_include_member.ns.should_emit_file(extra_include_member):
             continue
         extra_include_at_end_members.discard(extra_include_member)

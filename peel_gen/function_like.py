@@ -12,6 +12,7 @@ class FunctionLike(NodeHandler):
         self.params = None
         self.rv = None
         self.visibility = 'public'
+        self.extra_includes = []
         self.has_resolved_stuff = False
 
     def start_child_element(self, name, attrs):
@@ -50,8 +51,9 @@ class FunctionLike(NodeHandler):
         for tweak in api_tweaks.lookup(self.tweak_ident):
             if tweak[0] == 'protected':
                 self.visibility = 'protected'
-                continue
-            if tweak[0] in ('float', 'unowned', 'owned', 'in', 'out', 'inout', 'this', 'scope'):
+            elif tweak[0] == 'include':
+                self.extra_includes.append(tweak[1])
+            elif tweak[0] in ('float', 'unowned', 'owned', 'in', 'out', 'inout', 'this', 'scope'):
                 p = self.find_param_for_tweak(tweak[1])
                 if tweak[0] == 'float':
                     tp = chase_type_aliases(p.type)
@@ -90,6 +92,7 @@ class FunctionLike(NodeHandler):
         s = self.rv.generate_extra_include_members()
         if self.params:
             s.update(self.params.generate_extra_include_members())
+        s.update(self.extra_includes)
         return s
 
     def generate_extra_forward_members(self):
