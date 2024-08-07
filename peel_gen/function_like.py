@@ -77,6 +77,10 @@ class FunctionLike(NodeHandler):
                     p.force_cpp_this = True
                 elif tweak[0] == 'scope':
                     p.scope = tweak[2]
+            elif tweak[0] == 'vararg':
+                p = self.params.params[-1]
+                assert(p.name == '...')
+                p.vararg_mode = tweak[1]
 
         assert(self.rv.type is not None)
         tp = chase_type_aliases(self.rv.type)

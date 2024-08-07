@@ -149,6 +149,10 @@ skip	GVariant			GLib		manual
 
 inout	g_time_zone_adjust_time		time_
 
+vararg	g_error_new			format
+vararg	g_string_printf			format
+vararg	g_string_append_printf		format
+
 # See comment on GioUnix below
 skip	GUnixFDSourceFunc		GLib
 skip	GUnixPipe			GLib
@@ -263,6 +267,31 @@ in	g_socket_receive_from		size
 in	g_socket_receive_with_blocking	size
 
 float	g_dbus_gvariant_to_gvalue	value
+
+vararg	g_simple_async_report_error_in_idle	format
+vararg	g_application_command_line_print	format
+vararg	g_application_command_line_printerr	format
+vararg	g_dbus_method_invocation_return_error	format
+vararg	g_dbus_message_new_method_error	format
+vararg	g_task_report_new_error		format
+vararg	g_task_return_new_error		format
+vararg	g_task_return_prefixed_error	format
+vararg	g_simple_async_result_new_error	format
+vararg	g_simple_async_result_set_error	format
+vararg	g_subprocess_launcher_spawn	argv
+vararg	g_subprocess_new		argv
+# Not actually argv, but close enough:
+vararg	g_file_new_build_filename	argv
+vararg	g_settings_get			variant-get
+vararg	g_settings_set			variant-new
+vararg	g_output_stream_printf		format
+vararg	g_menu_item_get_attribute	variant-get
+vararg	g_menu_item_set_attribute	variant-new
+vararg	g_menu_model_get_item_attribute	variant-get
+vararg	g_menu_item_set_action_and_target	variant-new
+vararg	g_notification_add_button_with_target	variant-new
+vararg	g_notification_set_default_action_and_target variant-new
+
 
 onstack	GInputVector
 onstack	GOutputVector
@@ -634,6 +663,21 @@ skip	gtk_enumerate_printers
 out	GtkWidget::vfunc_compute_expand	hexpand_p
 out	GtkWidget::vfunc_compute_expand	vexpand_p
 out	GtkEntryBuffer::vfunc_get_text	n_bytes
+
+vararg	gtk_snapshot_push_debug		format
+vararg	gtk_media_stream_error		format
+vararg	gtk_show_about_dialog		object-new
+vararg	gtk_shortcut_new_with_arguments	variant-new
+vararg	gtk_widget_activate_action	variant-new
+vararg	gtk_widget_class_add_binding	variant-new
+vararg	gtk_widget_class_add_binding_action	variant-new
+vararg	gtk_widget_class_add_binding_signal	variant-new
+vararg	gtk_actionable_set_action_target	variant-new
+
+vararg	gtk_message_dialog_new				format
+vararg	gtk_message_dialog_new_with_markup		format
+vararg	gtk_message_dialog_format_secondary_markup	format
+vararg	format_secondary_text				format
 
 onstack	GtkRequestedSize
 onstack	GtkRequisition

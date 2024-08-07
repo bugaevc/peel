@@ -28,6 +28,7 @@ class Parameter(NodeHandler):
         self.closure = attrs.get('closure', None)
         self.destroy = attrs.get('destroy', None)
         self.force_cpp_this = False
+        self.vararg_mode = None
         self.has_resolved_stuff = False
 
     def __repr__(self):
@@ -51,6 +52,8 @@ class Parameter(NodeHandler):
         if self.has_resolved_stuff:
             return
         self.has_resolved_stuff = True
+        if self.name == '...':
+            return
         if self.type is None:
             if self.type_name is None:
                 raise UnsupportedForNowException('no type name for {}'.format(self.name))
@@ -147,6 +150,8 @@ class Parameter(NodeHandler):
 
     def generate_c_type(self, for_local_copy=False):
         self.resolve_stuff()
+        # vararg shouldn't get here
+        assert(self.name != '...')
         tp = chase_type_aliases(self.type)
         # Handle the case where we don't have a C type and need to make one up
         # completely. This happens in signals.
@@ -183,6 +188,14 @@ class Parameter(NodeHandler):
 
     def generate_cpp_type(self, name, context, strip_refs=0, for_local_copy=False):
         self.resolve_stuff()
+
+        if self.name == '...':
+            if self.vararg_mode is None:
+                raise UnsupportedForNowException('varargs')
+            elif self.vararg_mode in ('format', 'argv'):
+                return 'Args ...' + name
+            return 'Args &&...' + name
+
         tp = chase_type_aliases(self.type)
 
         if self.direction == 'in' or for_local_copy:
@@ -333,6 +346,19 @@ class Parameter(NodeHandler):
 
     def generate_cast_to_c(self, cpp_name, context, for_local_copy=False):
         self.resolve_stuff()
+
+        if self.name == '...':
+            if self.vararg_mode is None:
+                raise UnsupportedForNowException('varargs')
+            elif self.vararg_mode == 'format':
+                return '{}...'.format(cpp_name)
+            elif self.vararg_mode == 'argv':
+                return '{}..., nullptr'.format(cpp_name)
+            elif self.vararg_mode == 'variant-new':
+                return 'GLib::Variant::Traits<Args>::cast_for_create (std::forward<Args> ({}))...'.format(cpp_name)
+            else:
+                raise UnsupportedForNowException('unimplemented vararg mode ' + self.vararg_mode)
+
         tp = chase_type_aliases(self.type)
         c_type = self.generate_c_type(for_local_copy=for_local_copy)
 

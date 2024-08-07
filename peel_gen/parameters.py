@@ -69,11 +69,10 @@ class Parameters(NodeHandler):
         for p in self.params:
             if p.is_instance:
                 offset = 1
-            if p.name == '...':
-                if has_typed_tweak:
-                    continue
-                raise UnsupportedForNowException('varargs')
             p.resolve_stuff()
+            if p.name == '...':
+                assert(p is self.params[-1])
+                break
             assert(p.type is not None)
             tp = chase_type_aliases(p.type)
             if isinstance(tp, Array):
@@ -100,6 +99,12 @@ class Parameters(NodeHandler):
         for p in self.params:
             if p in self.skip_params:
                 continue
+            if p.name == '...':
+                if p.vararg_mode is None:
+                    raise UnsupportedForNowException('varargs')
+                l.append('typename... Args')
+                assert(p is self.params[-1])
+                break
             tp = chase_type_aliases(p.type)
             if not isinstance(tp, Callback):
                 continue
@@ -185,11 +190,10 @@ class Parameters(NodeHandler):
             if typed_tweak and p is self.params[-2]:
                 l.append('typename GObject::Value::Traits<{}>::UnownedType value'.format(typed_tweak))
                 break
-            if p.name == '...':
-                # l.append('...')
-                # assert p is self.params[-1]
-                # continue
-                raise UnsupportedForNowException('varargs')
-            l.append(p.generate_cpp_type(name=p.name, context=context))
+            name = p.name
+            if name == '...':
+                assert(p is self.params[-1])
+                name = 'args'
+            l.append(p.generate_cpp_type(name, context))
         return ', '.join(l)
 
