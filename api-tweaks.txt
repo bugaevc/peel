@@ -1,11 +1,15 @@
 # GLib
 
 skip	g_ascii_dtostr
+skip	g_ascii_strtod
+skip	g_ascii_strtoll
+skip	g_ascii_strtoull
 skip	g_ascii_formatd
 skip	g_assertion_message_cmpstrv
 skip	g_atomic_int_add
 skip	g_atomic_int_and
 skip	g_atomic_int_compare_and_exchange
+skip	g_atomic_int_compare_and_exchange_full
 skip	g_atomic_int_dec_and_test
 skip	g_atomic_int_exchange
 skip	g_atomic_int_exchange_and_add
@@ -17,6 +21,7 @@ skip	g_atomic_int_xor
 skip	g_atomic_pointer_add
 skip	g_atomic_pointer_and
 skip	g_atomic_pointer_compare_and_exchange
+skip	g_atomic_pointer_compare_and_exchange_full
 skip	g_atomic_pointer_exchange
 skip	g_atomic_pointer_get
 skip	g_atomic_pointer_or
@@ -27,10 +32,11 @@ skip	g_atomic_ref_count_compare
 skip	g_atomic_ref_count_dec
 skip	g_atomic_ref_count_inc
 skip	g_atomic_ref_count_init
+skip	g_base64_decode_inplace
 skip	g_bit_lock
 skip	g_bit_trylock
 skip	g_bit_unlock
-#skip	g_build_filename_valist
+skip	g_clear_handle_id
 skip	g_clear_signal_handler
 skip	g_completion_complete
 skip	g_completion_complete_utf8
@@ -55,11 +61,12 @@ skip	g_once_init_leave_pointer
 skip	g_pointer_bit_lock
 skip	g_pointer_bit_trylock
 skip	g_pointer_bit_unlock
+skip	g_pointer_bit_lock_and_get
 skip	g_pointer_bit_unlock_and_set
+skip	g_prefix_error_literal
 skip	g_rand_new_with_seed_array
 skip	g_rand_set_seed_array
 skip	g_rc_box_dup
-#skip	g_variant_get_fixed_array
 skip	g_ref_count_compare
 skip	g_ref_count_dec
 skip	g_ref_count_inc
@@ -68,6 +75,7 @@ skip	g_ref_string_acquire
 skip	g_ref_string_length
 skip	g_ref_string_release
 skip	g_set_prgname_once
+skip	g_strtod
 skip	g_stpcpy
 skip	g_strcanon
 skip	g_strchomp
@@ -86,12 +94,7 @@ skip	g_type_class_adjust_private_offset
 skip	g_unicode_canonical_decomposition
 skip	g_utf8_strncpy
 skip	g_utime
-skip	g_value_set_string_take_ownership
-#skip	g_variant_get_va
-#skip	g_variant_new_parsed_va
-#owned	g_variant_new_take_string	string
-#skip	g_variant_new_va
-#skip	g_variant_parse
+owned	g_variant_new_take_string	string
 skip	g_vsnprintf
 skip	g_vsprintf
 skip	g_tree_search
@@ -99,6 +102,12 @@ skip	g_tree_search_node
 skip	g_idle_add
 skip	g_idle_add_once
 skip	g_datalist_id_replace_data
+skip	g_ucs4_to_utf16
+skip	g_unichar_to_utf8
+skip	g_utf16_to_ucs4
+skip	g_utf8_to_ucs4
+skip	g_utf8_to_ucs4_fast
+skip	g_utf8_to_utf16
 skip	GUnixPipeEnd
 skip	GUnixPipe
 unowned	g_variant_type_string_scan	endptr
