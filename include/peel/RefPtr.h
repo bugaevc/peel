@@ -148,13 +148,11 @@ public:
   RefPtr &
   operator = (T *ptr)
   {
-    if (ptr == this->ptr)
-      return *this;
+    if (ptr)
+      RefTraits<T>::ref (ptr);
     if (this->ptr)
       RefTraits<T>::unref (this->ptr);
     this->ptr = ptr;
-    if (ptr)
-      RefTraits<T>::ref (ptr);
     return *this;
   }
 
@@ -162,22 +160,18 @@ public:
   RefPtr &
   operator = (const RefPtr &other)
   {
-    if (ptr == other.ptr)
-      return *this;
-    if (ptr)
-      RefTraits<T>::unref (ptr);
-    ptr = other.ptr;
-    if (ptr)
-      RefTraits<T>::ref (ptr);
+    if (other.ptr)
+      RefTraits<T>::ref (other.ptr);
+    if (this->ptr)
+      RefTraits<T>::unref (this->ptr);
+    this->ptr = other.ptr;
     return *this;
   }
 
   peel_nothrow
   RefPtr &
-  operator = (RefPtr &&other)
+  operator = (RefPtr &&other) &
   {
-    if (ptr == other.ptr)
-      return *this;
     if (ptr)
       RefTraits<T>::unref (ptr);
     ptr = other.ptr;
