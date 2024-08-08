@@ -694,6 +694,16 @@ nest	GtkBuildableParseContext	Buildable::ParseContext
 cpp-wrapper GtkShortcutFunc
 cpp-wrapper GtkWidgetActionActivateFunc
 
+protected gtk_media_stream_prepared
+protected gtk_media_stream_unprepared
+protected gtk_media_stream_update
+protected gtk_media_stream_ended
+protected gtk_media_stream_seek_success
+protected gtk_media_stream_seek_failed
+protected gtk_media_stream_gerror
+protected gtk_media_stream_error
+protected gtk_media_stream_error_valist
+
 protected gtk_widget_class_add_binding
 protected gtk_widget_class_add_binding_action
 protected gtk_widget_class_add_binding_signal
