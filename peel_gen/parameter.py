@@ -623,7 +623,7 @@ class Parameter(NodeHandler):
         else:
             return 'reinterpret_cast<{}> ({})'.format(add_asterisk(plain_cpp_type), c_name)
 
-    def generate_rv_function_attributes(self):
+    def generate_rv_function_attributes(self, throws):
         assert(self.is_rv)
         # TODO: duplicated logic with Parameters.should_add_nonnull()
         tp = chase_type_aliases(self.type)
@@ -635,14 +635,19 @@ class Parameter(NodeHandler):
             return []
         if self.nullable:
             return []
+        if throws:
+            return []
         return ['peel_returns_nonnull']
 
-    def generate_post_call_assumes(self):
+    def generate_post_call_assumes(self, thrown):
         assert(self.is_rv)
+        casted_name = self.generate_casted_name()
         # TODO: same for out/inout params
         tp = chase_type_aliases(self.type)
+        if thrown:
+            return ['peel_assume (!{});'.format(casted_name)]
         if not tp.is_passed_by_ref():
             return None
         if self.nullable:
             return None
-        return ['peel_assume ({});'.format(self.generate_casted_name())]
+        return ['peel_assume ({});'.format(casted_name)]
