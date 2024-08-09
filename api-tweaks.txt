@@ -138,6 +138,7 @@ nest-alias GVariantIter			Variant::Iter
 nest	GVariantBuilder			Variant::Builder
 onstack	GTimeVal
 onstack	GDate
+onstack	GLogField
 opaque	GSource
 
 onstack	GHashTableIter
