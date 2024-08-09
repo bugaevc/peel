@@ -148,6 +148,17 @@ public:
     *obj_ptr = peel::RefPtr<GObject::Object>::adopt_ref (reinterpret_cast<GObject::Object *> (_peel_obj_ptr));
   }
 
+  peel_nothrow peel_arg_out (2)
+  void
+  get_out_owned_optional_object (peel::RefPtr<GObject::Object> *obj_ptr)
+  {
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    ::GObject * _peel_obj_ptr;
+    test_testy_get_out_owned_optional_object (_peel_this, obj_ptr ? &_peel_obj_ptr : nullptr);
+    if (obj_ptr)
+      *obj_ptr = peel::RefPtr<GObject::Object>::adopt_ref (reinterpret_cast<GObject::Object *> (_peel_obj_ptr));
+  }
+
   peel_nothrow peel_arg_in (2) peel_nonnull_args (2)
   void
   pass_value (const GObject::Value *v)
@@ -335,6 +346,19 @@ protected:
     ::GObject * _peel_obj_ptr;
     _peel_class->get_out_owned_object (_peel_this, &_peel_obj_ptr);
     *obj_ptr = peel::RefPtr<GObject::Object>::adopt_ref (reinterpret_cast<GObject::Object *> (_peel_obj_ptr));
+  }
+
+  template<typename DerivedClass>
+  peel_nothrow peel_arg_out (2)
+  void
+  parent_vfunc_get_out_owned_optional_object (peel::RefPtr<GObject::Object> *obj_ptr)
+  {
+    ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    ::GObject * _peel_obj_ptr;
+    _peel_class->get_out_owned_optional_object (_peel_this, obj_ptr ? &_peel_obj_ptr : nullptr);
+    if (obj_ptr)
+      *obj_ptr = peel::RefPtr<GObject::Object>::adopt_ref (reinterpret_cast<GObject::Object *> (_peel_obj_ptr));
   }
 
   template<typename DerivedClass>
@@ -542,6 +566,21 @@ public:
         peel::RefPtr<GObject::Object> _peel_obj_ptr;
         _peel_this->DerivedClass::vfunc_get_out_owned_object (&_peel_obj_ptr);
         *obj_ptr = reinterpret_cast<::GObject *> (std::move (_peel_obj_ptr).release_ref ());
+      };
+    }
+
+    template<typename DerivedClass>
+    void
+    override_vfunc_get_out_owned_optional_object ()
+    {
+      ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
+      klass->get_out_owned_optional_object = +[] (::TestTesty *self, ::GObject **obj_ptr) -> void
+      {
+        DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
+        peel::RefPtr<GObject::Object> _peel_obj_ptr;
+        _peel_this->DerivedClass::vfunc_get_out_owned_optional_object (obj_ptr ? &_peel_obj_ptr : nullptr);
+        if (obj_ptr)
+          *obj_ptr = reinterpret_cast<::GObject *> (std::move (_peel_obj_ptr).release_ref ());
       };
     }
 

@@ -219,6 +219,32 @@
           </parameter>
         </parameters>
       </virtual-method>
+      <method name="get_out_owned_optional_object" c:identifier="test_testy_get_out_owned_optional_object">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter direction="out" name="obj_ptr" transfer-ownership="full" optional="1">
+            <type name="GObject.Object" c:type="GObject**"/>
+          </parameter>
+        </parameters>
+      </method>
+      <virtual-method name="get_out_owned_optional_object">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter direction="out" name="obj_ptr" transfer-ownership="full" optional="1">
+            <type name="GObject.Object" c:type="GObject**"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
       <method name="pass_value" c:identifier="test_testy_pass_value">
         <return-value>
           <type name="none" c:type="void"/>

@@ -136,7 +136,10 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
             else:
                 casted_name = p.generate_casted_name()
                 l.append(indent + '  {} {};'.format(p.generate_c_type(for_local_copy=True), casted_name))
-                args.append('&' + casted_name)
+                if p.optional:
+                    args.append('{} ? &{} : nullptr'.format(p.name, casted_name))
+                else:
+                    args.append('&' + casted_name)
 
     if throws:
         l.append(indent + '  ::GError *_peel_error = nullptr;')
@@ -167,7 +170,13 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
             casted_name = p.generate_casted_name()
             cast_from_c = p.generate_cast_from_c(c_name=casted_name, context=context, for_local_copy=True)
             # TODO: surely it can't be that easy?
-            l.append(indent + '  *{} = {};'.format(p.name, cast_from_c))
+            if p.optional:
+                l.extend([
+                    indent + '  if ({})'.format(p.name),
+                    indent + '    *{} = {};'.format(p.name, cast_from_c),
+                ])
+            else:
+                l.append(indent + '  *{} = {};'.format(p.name, cast_from_c))
     if throws:
         l.append(indent + '  if (error)')
         l.append(indent + '    *error = peel::UniquePtr<GLib::Error>::adopt_ref (reinterpret_cast<GLib::Error *> (_peel_error));')

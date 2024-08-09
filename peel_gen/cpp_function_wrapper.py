@@ -64,7 +64,10 @@ def generate(cpp_callee, context, rv, params, throws, indent, extra_decls=None, 
                     for_local_copy=True,
                 )
                 l.append(indent + '  {};'.format(cpp_type))
-                args.append('&' + casted_name)
+                if p.optional:
+                    args.append('{} ? &{} : nullptr'.format(p.name, casted_name))
+                else:
+                    args.append('&' + casted_name)
     if throws:
         l.append(indent + '  peel::UniquePtr<GLib::Error> _peel_error;')
         args.append('error ? &_peel_error : nullptr')
@@ -96,7 +99,13 @@ def generate(cpp_callee, context, rv, params, throws, indent, extra_decls=None, 
             if cast_from_c is None:
                 cast_from_c = p.name
             # TODO: surely it can't be that easy?
-            l.append(indent + '  *{} = {};'.format(p.name, cast_from_c))
+            if p.optional:
+                l.extend([
+                    indent + '  if ({})'.format(p.name),
+                    indent + '    *{} = {};'.format(p.name, cast_from_c),
+                ])
+            else:
+                l.append(indent + '  *{} = {};'.format(p.name, cast_from_c))
     if throws:
         l.append(indent + '  if (error)')
         l.append(indent + '    *error = reinterpret_cast<::GError *> (std::move (_peel_error).release_ref ());')
