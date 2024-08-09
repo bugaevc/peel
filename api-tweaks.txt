@@ -932,3 +932,12 @@ take-value DexObject			dex_value_take_object
 skip	dex_value_get_object
 skip	dex_value_set_object
 skip	dex_value_take_object
+
+# Soup
+nest	SoupMessagePriority		Message::Priority
+nest	SoupMessageHeadersType		MessageHeaders::Type
+nest	SoupCookieJarAcceptPolicy	CookieJar::AcceptPolicy
+nest	SoupCacheType			Cache::Type
+nest	SoupSessionFeature		Session::Feature
+nest	SoupLoggerLogLevel		Logger::LogLevel
+vararg	soup_session_new_with_options	object-new
