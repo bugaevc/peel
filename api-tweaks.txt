@@ -1,5 +1,12 @@
 # GLib
 
+skip	g_strfreev
+skip	g_strjoinv
+skip	g_strv_contains
+skip	g_strv_equal
+skip	g_strv_length
+skip	g_vasprintf
+
 skip	g_ascii_dtostr
 skip	g_ascii_strtod
 skip	g_ascii_strtoll
@@ -50,6 +57,7 @@ skip	g_log_writer_default_set_debug_domains
 skip	g_io_channel_read
 skip	g_io_channel_read_line_string
 skip	g_io_channel_write
+out	g_io_channel_get_line_term	length
 skip	g_slice_get_config_state
 skip	g_mkdtemp
 skip	g_mkdtemp_full
@@ -92,6 +100,7 @@ skip	g_test_log_buffer_push
 skip	g_timer_elapsed
 skip	g_type_class_adjust_private_offset
 skip	g_unicode_canonical_decomposition
+skip	g_unicode_canonical_ordering
 skip	g_utf8_strncpy
 skip	g_utime
 owned	g_variant_new_take_string	string
@@ -102,12 +111,14 @@ skip	g_tree_search_node
 skip	g_idle_add
 scope	g_idle_add_once			function	async
 skip	g_datalist_id_replace_data
+skip	g_ucs4_to_utf8
 skip	g_ucs4_to_utf16
 skip	g_unichar_to_utf8
 skip	g_utf16_to_ucs4
 skip	g_utf8_to_ucs4
 skip	g_utf8_to_ucs4_fast
 skip	g_utf8_to_utf16
+skip	g_utf16_to_utf8
 skip	GUnixPipeEnd
 skip	GUnixPipe
 unowned	g_variant_type_string_scan	endptr
