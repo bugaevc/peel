@@ -119,6 +119,7 @@ skip	g_utf8_to_ucs4
 skip	g_utf8_to_ucs4_fast
 skip	g_utf8_to_utf16
 skip	g_utf16_to_utf8
+out	g_unichar_get_mirror_char	mirrored_ch
 skip	GUnixPipeEnd
 skip	GUnixPipe
 unowned	g_variant_type_string_scan	endptr
