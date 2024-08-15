@@ -891,6 +891,7 @@ no-autobase GtkAccessible
 prefer-autobase GtkSectionModel		SelectionModel
 
 prefer-autobase GtkTreeDragSource	TreeModel
+prefer-autobase GtkCellEditable		Editable
 
 # Adw
 float	adw_window_set_content		content
