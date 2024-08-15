@@ -41,9 +41,20 @@ peel_gen = configure_file(
   configuration: conf,
 )
 
+peel_dbus_gen = configure_file(
+  input: 'peel-dbus-gen.py',
+  output: 'peen-dbus-gen',
+  install: not meson.is_subproject(),
+  install_dir: get_option('bindir'),
+  configuration: {
+    'module_path': py.get_install_dir(),
+  }
+)
+
 if meson.is_subproject()
   meson.override_dependency('peel', peel_dep)
   meson.override_find_program('peel-gen', peel_gen)
+  meson.override_find_program('peel-dbus-gen', peel_dbus_gen)
 else
   py.install_sources(peel_gen_files, subdir: 'peel_gen')
   install_data('api-tweaks.txt')
