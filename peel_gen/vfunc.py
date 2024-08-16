@@ -85,6 +85,10 @@ class Vfunc(FunctionLike):
             rv_tp = chase_type_aliases(self.rv.type)
             if hasattr(rv_tp, 'length_param'):
                 params.skip_params.append(rv_tp.length_param)
+            if hasattr(self.rv, 'closure_param'):
+                params.skip_params.append(self.rv.closure_param)
+            if hasattr(self.rv, 'destroy_param'):
+                params.skip_params.append(self.rv.destroy_param)
 
             params.resolve_stuff(has_typed_tweak=False)
 

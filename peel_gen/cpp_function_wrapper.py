@@ -14,7 +14,11 @@ def generate(cpp_callee, context, rv, params, throws, indent, extra_decls=None, 
             c_signature = error_param
 
     l = [
-        '({}){} -> {}'.format(c_signature, ' ' + trailing_specs if trailing_specs else '', rv.generate_c_type()),
+        '({}){} -> {}'.format(
+            c_signature,
+            ' ' + trailing_specs if trailing_specs else '',
+            rv.generate_c_type()
+        ),
         indent + '{'
     ]
     if extra_decls:
@@ -31,9 +35,10 @@ def generate(cpp_callee, context, rv, params, throws, indent, extra_decls=None, 
                 have_local_copies = True
             if not needs_local_copy or p.direction == 'inout':
                 cast_from_c = p.generate_cast_from_c(
-                    c_name=p.name,
+                    c_name=p.name if not needs_local_copy else '*' + p.name,
                     context=context,
                     for_local_copy=needs_local_copy,
+                    skip_params_casted=False,
                 )
                 if cast_from_c is None:
                     assert(not p.is_instance)
@@ -45,13 +50,22 @@ def generate(cpp_callee, context, rv, params, throws, indent, extra_decls=None, 
                         context=context,
                         for_local_copy=needs_local_copy,
                     )
-                    l.append(indent + '  {} = {};'.format(cpp_type, cast_from_c))
+                    if needs_local_copy and p.optional:
+                        l.extend([
+                            indent + '  {};'.format(cpp_type),
+                            indent + '  if ({})'.format(p.name),
+                            indent + '    {} = {};'.format(casted_name, cast_from_c),
+                        ])
+                    else:
+                        l.append(indent + '  {} = {};'.format(cpp_type, cast_from_c))
                     if p.direction == 'in' and p.ownership is not None and p.ownership != 'none':
                         arg = 'std::move ({})'.format(casted_name)
-                    elif needs_local_copy:
+                    elif not needs_local_copy:
+                        arg = casted_name
+                    elif not p.optional:
                         arg = '&' + casted_name
                     else:
-                        arg = casted_name
+                        arg = '{} ? &{} : nullptr'.format(p.name, casted_name)
                     if p.is_cpp_this():
                         cpp_this_arg = arg
                     else:
@@ -64,10 +78,10 @@ def generate(cpp_callee, context, rv, params, throws, indent, extra_decls=None, 
                     for_local_copy=True,
                 )
                 l.append(indent + '  {};'.format(cpp_type))
-                if p.optional:
-                    args.append('{} ? &{} : nullptr'.format(p.name, casted_name))
-                else:
+                if not p.optional:
                     args.append('&' + casted_name)
+                else:
+                    args.append('{} ? &{} : nullptr'.format(p.name, casted_name))
     if throws:
         l.append(indent + '  peel::UniquePtr<GLib::Error> _peel_error;')
         args.append('error ? &_peel_error : nullptr')
@@ -77,7 +91,12 @@ def generate(cpp_callee, context, rv, params, throws, indent, extra_decls=None, 
         call = '{}->{}'.format(cpp_this_arg, call)
     if rv.c_type != 'void':
         casted_name = rv.generate_casted_name()
-        cast_to_c = rv.generate_cast_to_c(cpp_name=casted_name, context=context)
+        cast_to_c = rv.generate_cast_to_c(
+            cpp_name=casted_name,
+            context=context,
+            for_local_copy=False,
+            skip_params_casted=False,
+        )
         if cast_to_c is None and not have_local_copies:
             rv_expr = call
         else:
@@ -95,10 +114,14 @@ def generate(cpp_callee, context, rv, params, throws, indent, extra_decls=None, 
             if not p.needs_local_copy():
                 continue
             casted_name = p.generate_casted_name()
-            cast_from_c = p.generate_cast_to_c(cpp_name=casted_name, context=context, for_local_copy=True)
+            cast_from_c = p.generate_cast_to_c(
+                cpp_name=casted_name,
+                context=context,
+                for_local_copy=True,
+                skip_params_casted=False,
+            )
             if cast_from_c is None:
                 cast_from_c = p.name
-            # TODO: surely it can't be that easy?
             if p.optional:
                 l.extend([
                     indent + '  if ({})'.format(p.name),

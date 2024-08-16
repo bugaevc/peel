@@ -245,6 +245,84 @@
           </parameter>
         </parameters>
       </virtual-method>
+      <method name="inout_owned_optional_object" c:identifier="test_testy_inout_owned_optional_object">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter direction="inout" name="obj_ptr" transfer-ownership="full" optional="1">
+            <type name="GObject.Object" c:type="GObject**"/>
+          </parameter>
+        </parameters>
+      </method>
+      <virtual-method name="inout_owned_optional_object">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter direction="inout" name="obj_ptr" transfer-ownership="full" optional="1">
+            <type name="GObject.Object" c:type="GObject**"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <method name="inout_owned_optional_array" c:identifier="test_testy_inout_owned_optional_array">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter direction="inout"
+                     name="data"
+                     transfer-ownership="full"
+                     optional="1">
+            <array length="1" c:type="gconstpointer*">
+              <type name="guint8"/>
+            </array>
+          </parameter>
+          <parameter direction="inout"
+                     name="data_size"
+                     caller-allocates="0"
+                     transfer-ownership="full"
+                     optional="1"
+                     allow-none="1">
+            <type name="gsize" c:type="gsize*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <virtual-method name="inout_owned_optional_array">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter direction="inout"
+                     name="data"
+                     transfer-ownership="full"
+                     optional="1">
+            <array length="1" c:type="gconstpointer*">
+              <type name="guint8"/>
+            </array>
+          </parameter>
+          <parameter direction="inout"
+                     name="data_size"
+                     caller-allocates="0"
+                     transfer-ownership="full"
+                     optional="1"
+                     allow-none="1">
+            <type name="gsize" c:type="gsize*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
       <method name="pass_value" c:identifier="test_testy_pass_value">
         <return-value>
           <type name="none" c:type="void"/>
@@ -365,6 +443,52 @@
           </parameter>
           <parameter name="user_data" nullable="1" allow-none="1">
             <type name="gpointer" c:type="gpointer"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <method name="get_cool_callback" c:identifier="test_testy_get_cool_callback">
+        <return-value scope="async"
+                      closure="2">
+          <type name="CoolCallback" c:type="TestCoolCallback"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="binding" transfer-ownership="full">
+            <type name="GObject.Binding" c:type="GBinding*"/>
+          </parameter>
+          <parameter name="s" transfer-ownership="full">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+          <parameter name="user_data"
+                     nullable="1"
+                     allow-none="1"
+                     direction="out">
+            <type name="gpointer" c:type="gpointer*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <virtual-method name="get_cool_callback" invoker="get_cool_callback">
+        <return-value scope="async"
+                      closure="2">
+          <type name="CoolCallback" c:type="TestCoolCallback"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="binding" transfer-ownership="full">
+            <type name="GObject.Binding" c:type="GBinding*"/>
+          </parameter>
+          <parameter name="s" transfer-ownership="full">
+            <type name="utf8" c:type="char*"/>
+          </parameter>
+          <parameter name="user_data"
+                     nullable="1"
+                     allow-none="1"
+                     direction="out">
+            <type name="gpointer" c:type="gpointer*"/>
           </parameter>
         </parameters>
       </virtual-method>

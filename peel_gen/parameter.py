@@ -344,7 +344,7 @@ class Parameter(NodeHandler):
             name = self.name
         return '_peel_' + name
 
-    def generate_cast_to_c(self, cpp_name, context, for_local_copy=False):
+    def generate_cast_to_c(self, cpp_name, context, for_local_copy, skip_params_casted):
         self.resolve_stuff()
 
         if self.name == '...':
@@ -409,18 +409,19 @@ class Parameter(NodeHandler):
             # FIXME: This is a gross place to do this.
             if user_data_param not in tp.params.skip_params:
                  tp.params.skip_params.append(user_data_param)
+            captured_closure_name = '_peel_captured_' + cpp_name
             extra_decls = '        {} &{} = reinterpret_cast<{} &> (*reinterpret_cast<unsigned char *> ({}));'.format(
                 plain_closure_type,
-                cpp_name,
+                captured_closure_name,
                 plain_closure_type,
                 user_data_param.name,
             )
             if self.scope != 'async':
-                cpp_callee_expr = cpp_name
+                cpp_callee_expr = captured_closure_name
             else:
                 cpp_callee_expr = 'static_cast<{} &&> ({})'.format(
                     plain_closure_type,
-                    cpp_name,
+                    captured_closure_name,
                 )
             lambda_expr = cpp_function_wrapper.generate(
                 cpp_callee_expr,
@@ -431,7 +432,11 @@ class Parameter(NodeHandler):
                 indent='      ',
                 extra_decls=extra_decls,
             )
-            closure_param_name = self.closure_param.generate_casted_name()
+            if skip_params_casted:
+                closure_param_place = self.closure_param.generate_casted_name()
+            else:
+                assert(self.closure_param.direction != 'in')
+                closure_param_place = '*' + self.closure_param.name
             callback_helper_type = 'peel::internals::CallbackHelper<{}>'.format(', '.join(
                 p.generate_c_type() for p in [tp.rv] + tp.params.params if p is not user_data_param
             ))
@@ -449,7 +454,7 @@ class Parameter(NodeHandler):
                 misc_args = ''
             elif self.scope in ('call', None):
                 return '({} = reinterpret_cast<gpointer> (&{}), +[] {})'.format(
-                    self.closure_param.generate_casted_name(),
+                    closure_param_place,
                     cpp_name,
                     lambda_expr,
                 )
@@ -458,7 +463,7 @@ class Parameter(NodeHandler):
                     '{}::{} ('.format(callback_helper_type, wrap_method_name),
                     '      static_cast<{} &&> ({}),'.format(plain_closure_type, cpp_name),
                     '      [] {},'.format(lambda_expr),
-                    '      &{}{})'.format(closure_param_name, misc_args),
+                    '      &{}{})'.format(closure_param_place, misc_args),
                 ])
 
         if isinstance(tp, Array):
@@ -468,31 +473,43 @@ class Parameter(NodeHandler):
             if tp.fixed_size is not None:
                 return 'reinterpret_cast<{}> ({})'.format(c_type, cpp_name)
             elif tp.length is not None:
+                def make_call(call):
+                    if cpp_name.startswith('*'):
+                        return '{}->{}'.format(cpp_name[1:], call)
+                    return '{}.{}'.format(cpp_name, call)
+
                 if self.ownership == 'none' or self.ownership is None:
-                    ptr_expr = '{}.ptr ()'.format(cpp_name)
+                    ptr_expr = make_call('ptr ()')
                 else:
                     ptr_expr = 'std::move ({}).release_ref ()'.format(cpp_name)
-                if tp.length_param.direction == 'in':
+
+                if skip_params_casted:
                     length_param_place = tp.length_param.generate_casted_name()
-                else:
+                    set_length_param = '{} = {}'.format(length_param_place, make_call('size ()'))
+                elif not tp.length_param.optional:
+                    assert(tp.length_param.direction != 'in')
                     length_param_place = '*' + tp.length_param.name
-                if c_type == 'char **' and self.ownership in (None, 'none'):
-                    return '({} = {}.size (), const_cast<char **> ({}.ptr ()))'.format(
-                        length_param_place,
-                        cpp_name,
-                        cpp_name,
+                    set_length_param = '{} = {}'.format(length_param_place, make_call('size ()'))
+                else:
+                    assert(tp.length_param.direction != 'in')
+                    set_length_param = '({} ? (*{} = {}) : 0)'.format(
+                        tp.length_param.name,
+                        tp.length_param.name,
+                        make_call('size ()'),
                     )
-                return '({} = {}.size (), reinterpret_cast<{}> ({}))'.format(
-                    length_param_place,
-                    cpp_name,
+
+                if c_type == 'char **' and self.ownership in (None, 'none'):
+                    return '({}, const_cast<char **> ({}))'.format(
+                        set_length_param,
+                        ptr_expr,
+                    )
+                return '({}, reinterpret_cast<{}> ({}))'.format(
+                    set_length_param,
                     c_type,
                     ptr_expr,
                 )
             else:
                 raise UnsupportedForNowException('Complex array')
-
-        if self.direction == 'in' and for_local_copy:
-            cpp_name = '*' + cpp_name
 
         if self.direction != 'in' and not for_local_copy:
             if isinstance(tp, StrType):
@@ -528,7 +545,7 @@ class Parameter(NodeHandler):
         else:
             raise UnsupportedForNowException('no idea about ownership semantics')
 
-    def generate_cast_from_c(self, c_name, context, for_local_copy=False):
+    def generate_cast_from_c(self, c_name, context, for_local_copy, skip_params_casted):
         self.resolve_stuff()
         plain_cpp_type = self.generate_cpp_type(
             name=None,
@@ -546,10 +563,12 @@ class Parameter(NodeHandler):
             if tp.fixed_size is not None:
                 return 'reinterpret_cast<{}> (*{})'.format(plain_cpp_type, c_name)
             elif tp.length is not None:
-                if tp.length_param.direction == 'in':
+                if skip_params_casted:
+                    length_param_name = tp.length_param.generate_casted_name()
+                elif tp.length_param.direction == 'in':
                     length_param_name = tp.length_param.name
                 else:
-                    length_param_name = tp.length_param.generate_casted_name()
+                    length_param_name = '*' + tp.length_param.name
                 if self.c_type == add_asterisk(plain_cpp_type):
                     ptr_expr = c_name
                 else:
@@ -572,9 +591,6 @@ class Parameter(NodeHandler):
         if isinstance(tp, Callback):
             raise UnsupportedForNowException('casting callback from C to C++')
             # return '/* callback cast of {} goes here */'.format(c_name)
-
-        if for_local_copy and self.direction == 'in':
-            c_name = '*' + c_name
 
         if self.direction != 'in' and not for_local_copy:
             # Assuming we're not dealing with a local copy, we just need

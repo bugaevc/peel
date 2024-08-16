@@ -41,6 +41,7 @@ class FunctionLike(NodeHandler):
                 return p
 
     def resolve_stuff(self):
+        from peel_gen.callback import Callback
         if self.has_resolved_stuff:
             return
         self.has_resolved_stuff = True
@@ -82,14 +83,23 @@ class FunctionLike(NodeHandler):
                 assert(p.name == '...')
                 p.vararg_mode = tweak[1]
 
+        # TODO: code duplication with Parameters.resovle_stuff()
         assert(self.rv.type is not None)
+        offset = 1 if self.params and any(p.is_instance for p in self.params.params) else 0
         tp = chase_type_aliases(self.rv.type)
         if isinstance(tp, Array):
             if tp.length is not None:
                 assert(self.params is not None)
-                offset = 1 if any(p.is_instance for p in self.params.params) else 0
                 tp.length_param = self.params.params[int(tp.length) + offset]
                 self.params.skip_params.append(tp.length_param)
+        elif isinstance(tp, Callback):
+            if self.rv.closure is not None:
+                assert(self.params is not None)
+                self.rv.closure_param = self.params.params[int(self.rv.closure) + offset]
+                self.params.skip_params.append(self.rv.closure_param)
+                if self.rv.destroy is not None:
+                    self.rv.destroy_param = self.params.params[int(self.rv.destroy) + offset]
+                    self.params.skip_params.append(self.rv.destroy_param)
 
     def generate_extra_include_members(self):
         self.resolve_stuff()

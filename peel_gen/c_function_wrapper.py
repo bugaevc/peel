@@ -105,6 +105,7 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
                 if p.direction == 'in':
                     args.append(casted_name)
                 else:
+                    # FIXME: Should pass nullptr when the owning param is nullptr.
                     args.append('&' + casted_name)
                 continue
             if typed_tweak_callee and p is params.params[-2]:
@@ -117,7 +118,12 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
                 break
             if p.name == '...':
                 assert(p is params.params[-1])
-                cast_to_c = p.generate_cast_to_c(cpp_name='args', context=context, for_local_copy=False)
+                cast_to_c = p.generate_cast_to_c(
+                    cpp_name='args',
+                    context=context,
+                    for_local_copy=False,
+                    skip_params_casted=True,
+                )
                 args.append(cast_to_c)
                 break
             needs_local_copy = p.needs_local_copy()
@@ -128,20 +134,36 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
                     cpp_name = 'this'
                 else:
                     cpp_name = p.name
-                cast_to_c = p.generate_cast_to_c(cpp_name=cpp_name, context=context, for_local_copy=needs_local_copy)
+                cast_to_c = p.generate_cast_to_c(
+                    cpp_name=cpp_name if not needs_local_copy else '*' + cpp_name,
+                    context=context,
+                    for_local_copy=needs_local_copy,
+                    skip_params_casted=True,
+                )
                 if cast_to_c is None:
                     assert(not p.is_cpp_this())
                     args.append(p.name)
                 else:
                     casted_name = p.generate_casted_name()
-                    l.append(indent + '  {} {} = {};'.format(p.generate_c_type(for_local_copy=needs_local_copy), casted_name, cast_to_c))
+                    c_type = p.generate_c_type(for_local_copy=needs_local_copy)
+                    if needs_local_copy and p.optional:
+                        l.extend([
+                            indent + '  {} {};'.format(c_type, casted_name),
+                            indent + '  if ({})'.format(cpp_name),
+                            indent + '    {} = {};'.format(casted_name, cast_to_c),
+                        ])
+                    else:
+                        l.append(indent + '  {} {} = {};'.format(c_type, casted_name, cast_to_c))
                     if not needs_local_copy:
                         args.append(casted_name)
-                    else:
+                    elif not p.optional:
                         args.append('&' + casted_name)
+                    else:
+                        args.append('{} ? &{} : nullptr'.format(cpp_name, casted_name))
             else:
                 casted_name = p.generate_casted_name()
-                l.append(indent + '  {} {};'.format(p.generate_c_type(for_local_copy=True), casted_name))
+                c_type = p.generate_c_type(for_local_copy=True)
+                l.append(indent + '  {} {};'.format(c_type, casted_name))
                 if p.optional:
                     args.append('{} ? &{} : nullptr'.format(p.name, casted_name))
                 else:
@@ -154,7 +176,12 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
     call = '{} ({})'.format(c_callee if typed_tweak_callee is None else typed_tweak_callee, ', '.join(args))
     if rv.c_type != 'void':
         casted_name = rv.generate_casted_name()
-        cast_from_c = rv.generate_cast_from_c(c_name=casted_name, context=context)
+        cast_from_c = rv.generate_cast_from_c(
+            c_name=casted_name,
+            context=context,
+            for_local_copy=False,
+            skip_params_casted=True,
+        )
         if cast_from_c is None and not have_local_copies and not have_post_call_assumes:
             rv_expr = call
         else:
@@ -174,8 +201,12 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
             if not p.needs_local_copy():
                 continue
             casted_name = p.generate_casted_name()
-            cast_from_c = p.generate_cast_from_c(c_name=casted_name, context=context, for_local_copy=True)
-            # TODO: surely it can't be that easy?
+            cast_from_c = p.generate_cast_from_c(
+                c_name=casted_name,
+                context=context,
+                for_local_copy=True,
+                skip_params_casted=True,
+            )
             if p.optional:
                 l.extend([
                     indent + '  if ({})'.format(p.name),

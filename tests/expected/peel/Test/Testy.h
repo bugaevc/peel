@@ -159,6 +159,33 @@ public:
       *obj_ptr = peel::RefPtr<GObject::Object>::adopt_ref (reinterpret_cast<GObject::Object *> (_peel_obj_ptr));
   }
 
+  peel_nothrow peel_arg_inout (2)
+  void
+  inout_owned_optional_object (peel::RefPtr<GObject::Object> *obj_ptr)
+  {
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    ::GObject * _peel_obj_ptr;
+    if (obj_ptr)
+      _peel_obj_ptr = reinterpret_cast<::GObject *> (std::move (*obj_ptr).release_ref ());
+    test_testy_inout_owned_optional_object (_peel_this, obj_ptr ? &_peel_obj_ptr : nullptr);
+    if (obj_ptr)
+      *obj_ptr = peel::RefPtr<GObject::Object>::adopt_ref (reinterpret_cast<GObject::Object *> (_peel_obj_ptr));
+  }
+
+  peel_nothrow
+  void
+  inout_owned_optional_array (peel::UniquePtr<const uint8_t[]> *data)
+  {
+    gsize _peel_data_size;
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    gconstpointer _peel_data;
+    if (data)
+      _peel_data = (_peel_data_size = data->size (), reinterpret_cast<gconstpointer> (std::move (*data).release_ref ()));
+    test_testy_inout_owned_optional_array (_peel_this, data ? &_peel_data : nullptr, &_peel_data_size);
+    if (data)
+      *data = peel::UniquePtr<const uint8_t[]>::adopt_ref (reinterpret_cast<const uint8_t *> (_peel_data), _peel_data_size);
+  }
+
   peel_nothrow peel_arg_in (2) peel_nonnull_args (2)
   void
   pass_value (const GObject::Value *v)
@@ -359,6 +386,37 @@ protected:
     _peel_class->get_out_owned_optional_object (_peel_this, obj_ptr ? &_peel_obj_ptr : nullptr);
     if (obj_ptr)
       *obj_ptr = peel::RefPtr<GObject::Object>::adopt_ref (reinterpret_cast<GObject::Object *> (_peel_obj_ptr));
+  }
+
+  template<typename DerivedClass>
+  peel_nothrow peel_arg_inout (2)
+  void
+  parent_vfunc_inout_owned_optional_object (peel::RefPtr<GObject::Object> *obj_ptr)
+  {
+    ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    ::GObject * _peel_obj_ptr;
+    if (obj_ptr)
+      _peel_obj_ptr = reinterpret_cast<::GObject *> (std::move (*obj_ptr).release_ref ());
+    _peel_class->inout_owned_optional_object (_peel_this, obj_ptr ? &_peel_obj_ptr : nullptr);
+    if (obj_ptr)
+      *obj_ptr = peel::RefPtr<GObject::Object>::adopt_ref (reinterpret_cast<GObject::Object *> (_peel_obj_ptr));
+  }
+
+  template<typename DerivedClass>
+  peel_nothrow
+  void
+  parent_vfunc_inout_owned_optional_array (peel::UniquePtr<const uint8_t[]> *data)
+  {
+    ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    gsize _peel_data_size;
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    gconstpointer _peel_data;
+    if (data)
+      _peel_data = (_peel_data_size = data->size (), reinterpret_cast<gconstpointer> (std::move (*data).release_ref ()));
+    _peel_class->inout_owned_optional_array (_peel_this, data ? &_peel_data : nullptr, &_peel_data_size);
+    if (data)
+      *data = peel::UniquePtr<const uint8_t[]>::adopt_ref (reinterpret_cast<const uint8_t *> (_peel_data), _peel_data_size);
   }
 
   template<typename DerivedClass>
@@ -586,6 +644,40 @@ public:
 
     template<typename DerivedClass>
     void
+    override_vfunc_inout_owned_optional_object ()
+    {
+      ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
+      klass->inout_owned_optional_object = +[] (::TestTesty *self, ::GObject **obj_ptr) -> void
+      {
+        DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
+        peel::RefPtr<GObject::Object> _peel_obj_ptr;
+        if (obj_ptr)
+          _peel_obj_ptr = peel::RefPtr<GObject::Object>::adopt_ref (reinterpret_cast<GObject::Object *> (*obj_ptr));
+        _peel_this->DerivedClass::vfunc_inout_owned_optional_object (obj_ptr ? &_peel_obj_ptr : nullptr);
+        if (obj_ptr)
+          *obj_ptr = reinterpret_cast<::GObject *> (std::move (_peel_obj_ptr).release_ref ());
+      };
+    }
+
+    template<typename DerivedClass>
+    void
+    override_vfunc_inout_owned_optional_array ()
+    {
+      ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
+      klass->inout_owned_optional_array = +[] (::TestTesty *self, gconstpointer *data, gsize *data_size) -> void
+      {
+        DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
+        peel::UniquePtr<const uint8_t[]> _peel_data;
+        if (data)
+          _peel_data = peel::UniquePtr<const uint8_t[]>::adopt_ref (reinterpret_cast<const uint8_t *> (*data), *data_size);
+        _peel_this->DerivedClass::vfunc_inout_owned_optional_array (data ? &_peel_data : nullptr);
+        if (data)
+          *data = ((data_size ? (*data_size = _peel_data.size ()) : 0), reinterpret_cast<gconstpointer> (std::move (_peel_data).release_ref ()));
+      };
+    }
+
+    template<typename DerivedClass>
+    void
     override_vfunc_get_out_value ()
     {
       ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
@@ -620,7 +712,7 @@ public:
       {
         DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
         peel::ArrayRef<const uint8_t> _peel_return = _peel_this->DerivedClass::vfunc_return_byte_array ();
-        return (*size = _peel_return.size (), reinterpret_cast<gconstpointer> (_peel_return.ptr ()));
+        return ((size ? (*size = _peel_return.size ()) : 0), reinterpret_cast<gconstpointer> (_peel_return.ptr ()));
       };
     }
 
@@ -633,7 +725,7 @@ public:
       {
         DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
         peel::UniquePtr<uint8_t[]> _peel_return = _peel_this->DerivedClass::vfunc_return_owned_byte_array ();
-        return (*size = _peel_return.size (), reinterpret_cast<gpointer> (std::move (_peel_return).release_ref ()));
+        return ((size ? (*size = _peel_return.size ()) : 0), reinterpret_cast<gpointer> (std::move (_peel_return).release_ref ()));
       };
     }
 
@@ -659,7 +751,7 @@ public:
       {
         DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
         peel::ArrayRef<const GObject::Binding::Flags> _peel_return = _peel_this->DerivedClass::vfunc_return_flags_array ();
-        return (*size = _peel_return.size (), reinterpret_cast<const ::GBindingFlags *> (_peel_return.ptr ()));
+        return ((size ? (*size = _peel_return.size ()) : 0), reinterpret_cast<const ::GBindingFlags *> (_peel_return.ptr ()));
       };
     }
 
