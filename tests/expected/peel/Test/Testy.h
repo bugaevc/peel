@@ -234,15 +234,19 @@ public:
       static_cast<CoolCallback &&> (callback),
       [] (gboolean *b, gpointer user_data) -> ::TestTesty *
       {
-        CoolCallback &callback = reinterpret_cast<CoolCallback &> (*reinterpret_cast<unsigned char *> (user_data));
+        CoolCallback &_peel_captured_callback = reinterpret_cast<CoolCallback &> (*reinterpret_cast<unsigned char *> (user_data));
         bool _peel_b;
-        peel::RefPtr<Testy> _peel_return = static_cast<CoolCallback &&> (callback) (&_peel_b);
+        peel::RefPtr<Testy> _peel_return = static_cast<CoolCallback &&> (_peel_captured_callback) (&_peel_b);
         *b = static_cast<gboolean> (_peel_b);
         return reinterpret_cast<::TestTesty *> (std::move (_peel_return).release_ref ());
       },
       &_peel_user_data);
     return test_testy_add_cool_callback (_peel_this, _peel_binding, s, _peel_callback, _peel_user_data);
   }
+
+  /* Unsupported for now: get_cool_callback: casting callback from C to C++ */
+  static void
+  get_cool_callback (UnsupportedForNowToken);
 
   peel_nothrow
   peel::ArrayRef<const uint8_t>
@@ -453,15 +457,17 @@ protected:
       static_cast<CoolCallback &&> (callback),
       [] (gboolean *b, gpointer user_data) -> ::TestTesty *
       {
-        CoolCallback &callback = reinterpret_cast<CoolCallback &> (*reinterpret_cast<unsigned char *> (user_data));
+        CoolCallback &_peel_captured_callback = reinterpret_cast<CoolCallback &> (*reinterpret_cast<unsigned char *> (user_data));
         bool _peel_b;
-        peel::RefPtr<Testy> _peel_return = static_cast<CoolCallback &&> (callback) (&_peel_b);
+        peel::RefPtr<Testy> _peel_return = static_cast<CoolCallback &&> (_peel_captured_callback) (&_peel_b);
         *b = static_cast<gboolean> (_peel_b);
         return reinterpret_cast<::TestTesty *> (std::move (_peel_return).release_ref ());
       },
       &_peel_user_data);
     return _peel_class->add_cool_callback (_peel_this, _peel_binding, s, _peel_callback, _peel_user_data);
   }
+
+  /* Unsupported for now: get_cool_callback: casting callback from C to C++ */
 
   template<typename DerivedClass>
   peel_nothrow
@@ -702,6 +708,30 @@ public:
     }
 
     /* Unsupported for now: add_cool_callback: casting callback from C to C++ */
+
+    template<typename DerivedClass>
+    void
+    override_vfunc_get_cool_callback ()
+    {
+      ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
+      klass->get_cool_callback = +[] (::TestTesty *self, ::GBinding *binding, char *s, gpointer *user_data) -> ::TestCoolCallback
+      {
+        DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
+        peel::RefPtr<GObject::Binding> _peel_binding = peel::RefPtr<GObject::Binding>::adopt_ref (reinterpret_cast<GObject::Binding *> (binding));
+        CoolCallback &&_peel_return = _peel_this->DerivedClass::vfunc_get_cool_callback (std::move (_peel_binding), s);
+        return peel::internals::CallbackHelper<::TestTesty *, gboolean *>::wrap_async_callback (
+      static_cast<CoolCallback &&> (_peel_return),
+      [] (gboolean *b, gpointer user_data) -> ::TestTesty *
+      {
+        CoolCallback &_peel_captured__peel_return = reinterpret_cast<CoolCallback &> (*reinterpret_cast<unsigned char *> (user_data));
+        bool _peel_b;
+        peel::RefPtr<Testy> _peel_return = static_cast<CoolCallback &&> (_peel_captured__peel_return) (&_peel_b);
+        *b = static_cast<gboolean> (_peel_b);
+        return reinterpret_cast<::TestTesty *> (std::move (_peel_return).release_ref ());
+      },
+      &*user_data);
+      };
+    }
 
     template<typename DerivedClass>
     void
