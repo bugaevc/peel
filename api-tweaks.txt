@@ -108,8 +108,15 @@ skip	g_vsnprintf
 skip	g_vsprintf
 skip	g_tree_search
 skip	g_tree_search_node
-skip	g_idle_add
+scope	g_timeout_add			function	GSourceFunc
+scope	g_timeout_add_once		function	async
+scope	g_timeout_add_seconds		function	GSourceFunc
+scope	g_timeout_add_seconds_once	function	async
+scope	g_idle_add			function	GSourceFunc
 scope	g_idle_add_once			function	async
+scope	g_io_add_watch			func		GSourceFunc
+scope	g_unix_signal_add		handler		GSourceFunc
+scope	g_unix_fd_add			function	GSourceFunc
 skip	g_datalist_id_replace_data
 skip	g_ucs4_to_utf8
 skip	g_ucs4_to_utf16
@@ -167,23 +174,36 @@ vararg	g_error_new			format
 vararg	g_string_printf			format
 vararg	g_string_append_printf		format
 
-# See comment on GioUnix below
-skip	GUnixFDSourceFunc		GLib
-skip	GUnixPipe			GLib
-skip	GUnixPipeEnd			GLib
-skip	g_closefrom			GLib
-skip	g_unix_error_quark		GLib
-skip	g_unix_fd_add			GLib
-skip	g_unix_fd_add_full		GLib
-skip	g_unix_fd_source_new		GLib
-skip	g_fdwalk_set_cloexec		GLib
-skip	g_unix_get_passwd_entry		GLib
-skip	g_unix_open_pipe		GLib
-skip	g_unix_set_fd_nonblocking	GLib
-skip	g_unix_signal_add		GLib
-skip	g_unix_signal_add_full		GLib
-skip	g_unix_signal_source_new	GLib
-
+#ifdef	GUnixFDSourceFunc		G_OS_UNIX
+#ifdef	GUnixPipe			G_OS_UNIX
+#ifdef	GUnixPipeEnd			G_OS_UNIX
+#ifdef	g_closefrom			G_OS_UNIX
+#ifdef	g_unix_error_quark		G_OS_UNIX
+#ifdef	g_unix_fd_add			G_OS_UNIX
+#ifdef	g_unix_fd_add_full		G_OS_UNIX
+#ifdef	g_unix_fd_source_new		G_OS_UNIX
+#ifdef	g_fdwalk_set_cloexec		G_OS_UNIX
+#ifdef	g_unix_get_passwd_entry		G_OS_UNIX
+#ifdef	g_unix_open_pipe		G_OS_UNIX
+#ifdef	g_unix_set_fd_nonblocking	G_OS_UNIX
+#ifdef	g_unix_signal_add		G_OS_UNIX
+#ifdef	g_unix_signal_add_full		G_OS_UNIX
+#ifdef	g_unix_signal_source_new	G_OS_UNIX
+skip	GUnixFDSourceFunc
+skip	GUnixPipe
+skip	GUnixPipeEnd
+skip	g_closefrom
+skip	g_unix_error_quark
+skip	g_unix_fd_add
+skip	g_unix_fd_add_full
+skip	g_unix_fd_source_new
+skip	g_fdwalk_set_cloexec
+skip	g_unix_get_passwd_entry
+skip	g_unix_open_pipe
+skip	g_unix_set_fd_nonblocking
+skip	g_unix_signal_add
+skip	g_unix_signal_add_full
+skip	g_unix_signal_source_new
 ifdef	g_source_add_unix_fd		G_OS_UNIX
 ifdef	g_source_modify_unix_fd		G_OS_UNIX
 ifdef	g_source_remove_unix_fd		G_OS_UNIX

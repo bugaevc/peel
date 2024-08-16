@@ -119,6 +119,57 @@ public:
         };
       }
   }
+
+  template<typename F, typename F2>
+  static CallbackType
+  wrap_gsourcefunc_callback (F &&f, F2 &&, gpointer *out_data)
+  {
+    if (sizeof (F) <= sizeof (gpointer))
+      {
+        union U
+          {
+            F f;
+            F2 *f2;
+            gpointer data;
+            U (gpointer data) : data (data) { }
+            ~U () { }
+          } u { nullptr };
+        new (&u.f) F (static_cast<F &&> (f));
+        *out_data = u.data;
+        return +[] (Args... args, gpointer data) -> gboolean
+        {
+          U u { data };
+#ifdef peel_cpp_20
+          F2 f2;
+#else
+          // Make up a fake instance of F2.
+          F2 &f2 = *u.f2;
+#endif
+          gboolean again = f2 (args..., &u.data);
+          if (!again)
+            u.f.~F ();
+          return again;
+        };
+      }
+    else
+      {
+        F *heap_f = new F (static_cast<F &&> (f));
+        *out_data = heap_f;
+        return +[] (Args... args, gpointer data) -> gboolean
+        {
+#ifdef peel_cpp_20
+          F2 f2;
+#else
+          // Make up a fake instance of F2.
+          F2 &f2 = *reinterpret_cast<F2 *> (data);
+#endif
+          gboolean again = f2 (args..., data);
+          if (!again)
+            delete reinterpret_cast<F *> (data);
+          return again;
+        };
+      }
+  }
 };
 
 template<typename... Args>

@@ -444,6 +444,9 @@ class Parameter(NodeHandler):
             elif self.scope == 'async':
                 wrap_method_name = 'wrap_async_callback'
                 misc_args = ''
+            elif self.scope == 'GSourceFunc':
+                wrap_method_name = 'wrap_gsourcefunc_callback'
+                misc_args = ''
             elif self.scope in ('call', None):
                 return '({} = reinterpret_cast<gpointer> (&{}), +[] {})'.format(
                     self.closure_param.generate_casted_name(),
