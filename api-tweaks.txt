@@ -466,9 +466,6 @@ ifdef	g_dbus_proxy_call_with_unix_fd_list		G_OS_UNIX
 ifdef	g_dbus_proxy_call_with_unix_fd_list_finish	G_OS_UNIX
 ifdef	g_dbus_proxy_call_with_unix_fd_list_sync	G_OS_UNIX
 
-# FIXME: returning C arrays
-skip	GTlsPassword::vfunc_get_value
-
 # cairo
 raw	cairo
 #skip	cairo_image_surface_create
