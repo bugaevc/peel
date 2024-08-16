@@ -31,11 +31,16 @@ public:
         new (&u.f) F (static_cast<F &&> (f));
         *out_data = u.data;
         if (out_notify)
-          *out_notify = +[] (gpointer data)
           {
-            U u { data };
-            u.f.~F ();
-          };
+            if (std::is_trivially_destructible<F>::value)
+              *out_notify = nullptr;
+            else
+              *out_notify = +[] (gpointer data)
+              {
+                U u { data };
+                u.f.~F ();
+              };
+          }
         return +[] (Args... args, gpointer data) -> Ret
         {
           U u { data };
@@ -195,11 +200,16 @@ public:
         new (&u.f) F (static_cast<F &&> (f));
         *out_data = u.data;
         if (out_notify)
-          *out_notify = +[] (gpointer data)
           {
-            U u { data };
-            u.f.~F ();
-          };
+            if (std::is_trivially_destructible<F>::value)
+              *out_notify = nullptr;
+            else
+              *out_notify = +[] (gpointer data)
+              {
+                U u { data };
+                u.f.~F ();
+              };
+          }
         return +[] (Args... args, gpointer data) -> void
         {
           U u { data };
