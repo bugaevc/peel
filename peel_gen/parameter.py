@@ -410,7 +410,7 @@ class Parameter(NodeHandler):
             if user_data_param not in tp.params.skip_params:
                  tp.params.skip_params.append(user_data_param)
             captured_closure_name = '_peel_captured_' + cpp_name
-            extra_decls = '        {} &{} = reinterpret_cast<{} &> (*reinterpret_cast<unsigned char *> ({}));'.format(
+            extra_decls = '        {} &{} = *reinterpret_cast<{} *> ({});'.format(
                 plain_closure_type,
                 captured_closure_name,
                 plain_closure_type,
