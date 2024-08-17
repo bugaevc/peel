@@ -718,14 +718,14 @@ public:
       {
         DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
         peel::RefPtr<GObject::Binding> _peel_binding = peel::RefPtr<GObject::Binding>::adopt_ref (reinterpret_cast<GObject::Binding *> (binding));
-        CoolCallback &&_peel_return = _peel_this->DerivedClass::vfunc_get_cool_callback (std::move (_peel_binding), s);
+        auto _peel_return = _peel_this->DerivedClass::vfunc_get_cool_callback (std::move (_peel_binding), s);
         return peel::internals::CallbackHelper<::TestTesty *, gboolean *>::wrap_async_callback (
-      static_cast<CoolCallback &&> (_peel_return),
+      static_cast<decltype (_peel_return) &&> (_peel_return),
       [] (gboolean *b, gpointer user_data) -> ::TestTesty *
       {
-        CoolCallback &_peel_captured__peel_return = *reinterpret_cast<CoolCallback *> (user_data);
+        decltype (_peel_return) &_peel_captured__peel_return = *reinterpret_cast<decltype (_peel_return) *> (user_data);
         bool _peel_b;
-        peel::RefPtr<Testy> _peel_return = static_cast<CoolCallback &&> (_peel_captured__peel_return) (&_peel_b);
+        peel::RefPtr<Testy> _peel_return = static_cast<decltype (_peel_return) &&> (_peel_captured__peel_return) (&_peel_b);
         *b = static_cast<gboolean> (_peel_b);
         return reinterpret_cast<::TestTesty *> (std::move (_peel_return).release_ref ());
       },

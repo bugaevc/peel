@@ -213,6 +213,8 @@ class Parameter(NodeHandler):
             out_asterisk = '*'
 
         if isinstance(tp, Callback):
+            if self.direction != 'in':
+                raise UnsupportedForNowException('non-in callback')
             if self.closure is None:
                 if not tp.force_cpp_wrapper:
                     # Plain C callback with no C++ callable wrapping
@@ -220,17 +222,21 @@ class Parameter(NodeHandler):
                         return '::' + tp.c_type
                     else:
                         return '::' + tp.c_type + ' ' + name
-                if name is None:
-                    return tp.name
-                else:
-                    return '{} {}'.format(tp.name, name)
-            if strip_refs:
+                type_name = tp.name
+            elif self.is_rv:
+                type_name = 'auto'
+            elif strip_refs:
                 assert(name is None)
-                return tp.name
-            if name is None:
-                return tp.name + ' &&'
+                type_name = tp.name
             else:
-                return '{} &&{}'.format(tp.name, name)
+                type_name = tp.name + ' &&'
+
+            if name is None:
+                return type_name
+            elif type_name.endswith('&'):
+                return type_name + name
+            else:
+                return '{} {}'.format(type_name, name)
         # Other params marked with scope/closure/destroy should not reach here.
         assert(self.scope is None and self.closure is None and self.destroy is None)
 
@@ -370,6 +376,9 @@ class Parameter(NodeHandler):
                 context=context,
                 strip_refs=1,
             )
+            if plain_closure_type == 'auto':
+                assert(self.is_rv)
+                plain_closure_type = 'decltype ({})'.format(cpp_name)
             if self.closure is None:
                 if not tp.force_cpp_wrapper:
                     return
