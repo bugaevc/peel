@@ -24,6 +24,9 @@
 #define peel_nodiscard(reason) [[nodiscard]]
 #elif defined (__GNUC__)
 #define peel_nodiscard(reason) __attribute__ ((warn_unused_result))
+/* TODO: _Check_return_ on MSVC, but needs <sal.h> */
+#else
+#define peel_nodiscard(reason)
 #endif
 
 #ifdef __GNUC__
