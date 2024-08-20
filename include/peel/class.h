@@ -211,6 +211,12 @@ struct ClassHelper
   static ::GType
   register_type_static (const char *type_name)
   {
+    // TODO: add a way to pass abstract here
+    ::GTypeFlags type_flags = ::GTypeFlags (0);
+#if GLIB_CHECK_VERSION (2, 70, 0)
+    if (peel_is_final (Subclass))
+      type_flags = ::GTypeFlags (G_TYPE_FLAG_FINAL);
+#endif
     ::GType tp = g_type_register_static_simple (
         Type::of<ParentClass> (),
         g_intern_static_string (type_name),
@@ -218,8 +224,7 @@ struct ClassHelper
         &class_init<ParentClass>,
         sizeof (Subclass),
         InstanceInitHelper<Subclass>::get_instance_init (),
-        // TODO: add a way to pass final/abstract here
-        GTypeFlags (0));
+        type_flags);
     // TODO: add private
     TypeInitHelper<Subclass>::call_type_init (tp);
     return tp;

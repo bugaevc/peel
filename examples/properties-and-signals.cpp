@@ -8,7 +8,7 @@ using namespace peel;
 // The Counter class has a single read-only integer property "count", which can
 // be manipulated by adding values to it. The first time the counter reaches 10,
 // the "reached-10" signal is emitted.
-class Counter : public Object
+class Counter final : public Object
 {
   PEEL_SIMPLE_CLASS (Counter, Object)
 

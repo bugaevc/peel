@@ -10,7 +10,7 @@ using namespace peel;
 namespace Demo
 {
 
-class Window : public Adw::ApplicationWindow
+class Window final : public Adw::ApplicationWindow
 {
   PEEL_SIMPLE_CLASS (Window, Adw::ApplicationWindow)
 
@@ -154,7 +154,7 @@ Window::on_create_window (Adw::TabView *)
   return new_window->tab_view;
 }
 
-class Application : public Adw::Application
+class Application final : public Adw::Application
 {
   PEEL_SIMPLE_CLASS (Application, Adw::Application)
   friend class Gio::Application;

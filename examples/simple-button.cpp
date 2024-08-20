@@ -7,7 +7,7 @@ using namespace peel;
 namespace Demo
 {
 
-class Button : public Gtk::Widget
+class Button final : public Gtk::Widget
 {
   PEEL_SIMPLE_CLASS (Button, Gtk::Widget)
   friend class Gtk::Widget;

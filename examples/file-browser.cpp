@@ -7,7 +7,7 @@
 
 using namespace peel;
 
-class MainColumnCell : public Gtk::Widget
+class MainColumnCell final : public Gtk::Widget
 {
   PEEL_SIMPLE_CLASS (MainColumnCell, Gtk::Widget)
 

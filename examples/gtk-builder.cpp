@@ -35,7 +35,7 @@ static const uint8_t template_string[] = R"(
 namespace Demo
 {
 
-class Window : public Gtk::Window
+class Window final : public Gtk::Window
 {
   PEEL_SIMPLE_CLASS (Window, Gtk::Window);
 

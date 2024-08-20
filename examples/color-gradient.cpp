@@ -11,7 +11,7 @@ using namespace peel;
 namespace Demo
 {
 
-class Gradient : public Gtk::Widget
+class Gradient final : public Gtk::Widget
 {
   PEEL_SIMPLE_CLASS (Gradient, Gtk::Widget)
   friend class Gtk::Widget;

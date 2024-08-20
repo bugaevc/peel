@@ -65,6 +65,13 @@
 #define peel_returns_nonnull
 #endif
 
+#if defined (peel_cpp_14)
+#define peel_is_final(T) std::is_final<T>::value
+#else
+/* Works on all the compilers we care about.  */
+#define peel_is_final(T) __is_final(T)
+#endif
+
 #if defined (__GNUC__)
 #define _peel_diagnostic_push_ignored_offsetof                                 \
   _Pragma ("GCC diagnostic push");                                             \

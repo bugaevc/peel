@@ -3,7 +3,7 @@
 
 using namespace peel;
 
-class MyClass : public Object
+class MyClass final : public Object
 {
   PEEL_SIMPLE_CLASS (MyClass, Object)
 

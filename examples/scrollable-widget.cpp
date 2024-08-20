@@ -10,7 +10,7 @@ namespace Demo
 
 #define CELL_SIZE 50
 
-class Table : public Gtk::Widget
+class Table final : public Gtk::Widget
 {
   PEEL_SIMPLE_CLASS (Table, Gtk::Widget)
   friend class Gtk::Widget;

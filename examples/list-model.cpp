@@ -8,7 +8,7 @@ using namespace peel;
 namespace Demo
 {
 
-class Model : public Gio::ListModel
+class Model final : public Gio::ListModel
 {
   PEEL_SIMPLE_CLASS (Model, Object)
   friend class Gio::ListModel;

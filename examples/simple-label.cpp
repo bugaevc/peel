@@ -10,7 +10,7 @@ using namespace peel;
 namespace Demo
 {
 
-class Label : public Gtk::Widget
+class Label final : public Gtk::Widget
 {
   PEEL_SIMPLE_CLASS (Label, Gtk::Widget)
   friend class Gtk::Widget;
