@@ -10,6 +10,7 @@ namespace peel
 namespace GLib
 {
 
+struct Error;
 class VariantIter;
 
 class Variant
@@ -37,6 +38,7 @@ public:
   {
     ::GVariant *_peel_this = reinterpret_cast<::GVariant *> (this);
     const ::GVariantType *_peel_return = g_variant_get_type (_peel_this);
+    peel_assume (_peel_return);
     return reinterpret_cast<const Type *> (_peel_return);
   }
 
@@ -48,7 +50,7 @@ public:
     return g_variant_get_type_string (_peel_this);
   }
 
-  peel_nothrow
+  peel_nothrow peel_nonnull_args (2)
   bool
   is_of_type (const GVariantType *type)
   {
@@ -70,11 +72,11 @@ public:
   // ...
 
   template<typename ...Args>
-  peel_nothrow
+  peel_nothrow peel_nonnull_args (1)
   static peel::FloatPtr<Variant>
-  create (const char *format_string, Args... args)
+  create (const char *format_string, Args &&...args)
   {
-    ::GVariant *_peel_return = g_variant_new (format_string, Traits<Args>::cast_for_create (args)...);
+    ::GVariant *_peel_return = g_variant_new (format_string, Traits<Args>::cast_for_create (std::forward<Args> (args))...);
     peel_assume (_peel_return);
     return peel::FloatPtr<Variant> (reinterpret_cast<Variant *> (_peel_return));
   }
@@ -87,6 +89,16 @@ public:
     ::GVariant *v = Traits<T>::create (std::move (value));
     peel_assume (v);
     return peel::FloatPtr<Variant> (reinterpret_cast<Variant *> (v));
+  }
+
+  template<typename ...Args>
+  peel_nothrow peel_nonnull_args (1)
+  static peel::FloatPtr<Variant>
+  create_parsed (const char *format_string, Args &&...args)
+  {
+    ::GVariant *_peel_return = g_variant_new_parsed (format_string, Traits<Args>::cast_for_create (std::forward<Args> (args))...);
+    peel_assume (_peel_return);
+    return peel::FloatPtr<Variant> (reinterpret_cast<Variant *> (_peel_return));
   }
 
   peel_nothrow
@@ -161,7 +173,7 @@ public:
     return peel::RefPtr<Variant>::adopt_ref (reinterpret_cast<Variant *> (_peel_return));
   }
 
-  peel_nothrow
+  peel_nothrow peel_nonnull_args (1)
   static bool
   is_object_path (const char *string)
   {
@@ -169,12 +181,33 @@ public:
     return !!_peel_return;
   }
 
-  peel_nothrow
+  peel_nothrow peel_nonnull_args (1)
   static bool
   is_signature (const char *string)
   {
     gboolean _peel_return = g_variant_is_signature (string);
     return !!_peel_return;
+  }
+
+  peel_nothrow peel_nonnull_args (2)
+  static peel::RefPtr<Variant>
+  parse (const Variant::Type *type, const char *text, const char *limit, const char **endptr, peel::UniquePtr<GLib::Error> *error)
+  {
+    ::GError *_peel_error = nullptr;
+    const ::GVariantType *_peel_type = reinterpret_cast<const ::GVariantType *> (type);
+    ::GVariant *_peel_return = g_variant_parse (_peel_type, text, limit, endptr, error ? &_peel_error : nullptr);
+    if (error)
+      *error = peel::UniquePtr<GLib::Error>::adopt_ref (reinterpret_cast<GLib::Error *> (_peel_error));
+    return peel::RefPtr<Variant>::adopt_ref (reinterpret_cast<Variant *> (_peel_return));
+  }
+
+  peel_nothrow
+  /* owned */ char *
+  print (bool type_annotate)
+  {
+    ::GVariant *_peel_this = reinterpret_cast<::GVariant *> (this);
+    gboolean _peel_type_annotate = static_cast<gboolean> (type_annotate);
+    return g_variant_print (_peel_this, _peel_type_annotate);
   }
 };
 
@@ -460,7 +493,7 @@ struct Variant::Traits<Variant>
   }
 
   static ::GVariant *
-  create (peel::FloatPtr<Variant> child)
+  create (peel::FloatPtr<Variant> &&child)
   {
     ::GVariant *_peel_child = reinterpret_cast<::GVariant *> (std::move (child).release_floating_ptr ());
     return g_variant_new_variant (_peel_child);
