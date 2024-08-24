@@ -444,8 +444,10 @@ skip	g_unix_mount_point_is_readonly	Gio
 skip	g_unix_mount_point_is_user_mountable Gio
 skip	g_unix_mount_points_changed_since Gio
 skip	g_unix_mount_points_get		Gio
+skip	g_unix_mount_points_get_from_file Gio
 skip	g_unix_mounts_changed_since	Gio
 skip	g_unix_mounts_get		Gio
+skip	g_unix_mounts_get_from_file	Gio
 
 ifdef	g_dbus_message_get_unix_fd_list	G_OS_UNIX
 ifdef	g_dbus_message_set_unix_fd_list	G_OS_UNIX
