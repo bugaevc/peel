@@ -382,18 +382,23 @@ class Parameter(NodeHandler):
             if self.closure is None:
                 if not tp.force_cpp_wrapper:
                     return
-                cpp_callee = self.generate_casted_name()
+                cpp_callee = cpp_callee_name = self.generate_casted_name()
+                if self.nullable:
+                    cpp_callee = 'peel::internals::invoke_if_nonnull<{}> ({})'.format(
+                        tp.rv.generate_cpp_type(name=None, context=context),
+                        cpp_callee,
+                    )
                 extra_decls = '\n'.join([
                     '        static_assert (std::is_empty<{}>::value, \"Use a captureless lambda\");'.format(
                         plain_closure_type,
                         plain_closure_type,
                     ),
                     '#ifdef peel_cpp_20',
-                    '        {} {};'.format(plain_closure_type, cpp_callee),
+                    '        {} {};'.format(plain_closure_type, cpp_callee_name),
                     '#else',
                     '        {} &{} = *reinterpret_cast<{} *> (0x123456);'.format(
                         plain_closure_type,
-                        cpp_callee,
+                        cpp_callee_name,
                         plain_closure_type,
                     ),
                     '#endif',
@@ -407,7 +412,14 @@ class Parameter(NodeHandler):
                     indent='      ',
                     extra_decls=extra_decls,
                 )
-                return '((void) {}, +[] {})'.format(cpp_name, lambda_expr)
+                if not self.nullable:
+                    return '((void) {}, +[] {})'.format(cpp_name, lambda_expr)
+                else:
+                    return '((void) {}, std::is_same<{}, decltype (nullptr)>::value ? nullptr : +[] {})'.format(
+                        plain_closure_type,
+                        cpp_name,
+                        lambda_expr,
+                    )
             if tp.c_type == 'GCallback':
                 raise UnsupportedForNowException('GCallback')
             assert(tp.params is not None)
@@ -431,6 +443,11 @@ class Parameter(NodeHandler):
                 cpp_callee_expr = 'static_cast<{} &&> ({})'.format(
                     plain_closure_type,
                     captured_closure_name,
+                )
+            if self.nullable:
+                cpp_callee_expr = 'peel::internals::invoke_if_nonnull<{}> ({})'.format(
+                    tp.rv.generate_cpp_type(name=None, context=context),
+                    cpp_callee_expr,
                 )
             lambda_expr = cpp_function_wrapper.generate(
                 cpp_callee_expr,

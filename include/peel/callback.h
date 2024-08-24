@@ -8,6 +8,21 @@ namespace peel
 namespace internals
 {
 
+template<typename Ret, typename F>
+F &&
+invoke_if_nonnull (F &&f)
+{
+  return static_cast<F &&> (f);
+}
+
+template<typename Ret>
+Ret
+(*invoke_if_nonnull (decltype (nullptr) &&)) (...)
+{
+  peel_unreachable;
+  return nullptr;
+}
+
 template<typename Ret, typename... Args>
 class CallbackHelper
 {
@@ -18,6 +33,13 @@ public:
   static CallbackType
   wrap_notified_callback (F &&f, F2 &&, gpointer *out_data, GDestroyNotify *out_notify)
   {
+    if (std::is_same<F, decltype (nullptr)>::value)
+      {
+        if (out_notify)
+          *out_notify = nullptr;
+        *out_data = nullptr;
+        return nullptr;
+      }
     if (sizeof (F) <= sizeof (gpointer))
       {
         union U
@@ -80,6 +102,11 @@ public:
   static CallbackType
   wrap_async_callback (F &&f, F2 &&, gpointer *out_data)
   {
+    if (std::is_same<F, decltype (nullptr)>::value)
+      {
+        *out_data = nullptr;
+        return nullptr;
+      }
     if (sizeof (F) <= sizeof (gpointer))
       {
         union U
@@ -129,6 +156,11 @@ public:
   static CallbackType
   wrap_gsourcefunc_callback (F &&f, F2 &&, gpointer *out_data)
   {
+    if (std::is_same<F, decltype (nullptr)>::value)
+      {
+        *out_data = nullptr;
+        return nullptr;
+      }
     if (sizeof (F) <= sizeof (gpointer))
       {
         union U
@@ -187,6 +219,13 @@ public:
   static CallbackType
   wrap_notified_callback (F &&f, F2 &&, gpointer *out_data, GDestroyNotify *out_notify)
   {
+    if (std::is_same<F, decltype (nullptr)>::value)
+      {
+        if (out_notify)
+          *out_notify = nullptr;
+        *out_data = nullptr;
+        return nullptr;
+      }
     if (sizeof (F) <= sizeof (gpointer))
       {
         union U
@@ -249,6 +288,11 @@ public:
   static CallbackType
   wrap_async_callback (F &&f, F2 &&, gpointer *out_data)
   {
+    if (std::is_same<F, decltype (nullptr)>::value)
+      {
+        *out_data = nullptr;
+        return nullptr;
+      }
     if (sizeof (F) <= sizeof (gpointer))
       {
         union U
