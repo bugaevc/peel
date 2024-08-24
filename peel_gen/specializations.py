@@ -8,7 +8,7 @@ def generate_get_type_specialization(cpp_type, gtype_expr):
         '}',
     ])
 
-def generate_ref_traits_specialization(cpp_type, c_type, ref_func, unref_func, ref_sink_func=None, template_derived=True):
+def generate_ref_traits_specialization(cpp_type, c_type, ref_func, unref_func, ref_sink_func=None, sink_func=None, template_derived=True):
     l = []
     if template_derived:
         name = 'T'
@@ -44,9 +44,21 @@ def generate_ref_traits_specialization(cpp_type, c_type, ref_func, unref_func, r
             '  {',
             '    {} (reinterpret_cast<::{} *> (ptr));'.format(ref_sink_func, c_type),
             '  }',
+        ])
+    if sink_func:
+        l.extend([
             '',
             '  static void',
-            '  sink_unref ({} *ptr)'.format(name),
+            '  sink ({} *ptr)'.format(name),
+            '  {',
+            '    {} (reinterpret_cast<::{} *> (ptr));'.format(sink_func, c_type),
+            '  }',
+        ])
+    elif ref_sink_func:
+        l.extend([
+            '',
+            '  static void',
+            '  sink ({} *ptr)'.format(name),
             '  {',
             '    {} (reinterpret_cast<::{} *> (ptr));'.format(ref_sink_func, c_type),
             '    {} (reinterpret_cast<::{} *> (ptr));'.format(unref_func, c_type),

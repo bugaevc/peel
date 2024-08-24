@@ -627,7 +627,7 @@ using GObject::Object;
    but not static inline. */
 peel_always_inline peel_nothrow
 void
-peel_sink_unref_gobject_if_floating (void *object)
+peel_sink_gobject_if_floating (void *object)
 {
   static guint (*floating_flag_handler)(::GObject *, gint);
 
@@ -667,10 +667,10 @@ struct RefTraits<T, peel::enable_if_derived<GObject::Object, T, void>>
 
   peel_always_inline
   static void
-  sink_unref (T *obj)
+  sink (T *obj)
   {
 #ifdef PEEL_USE_COMPAT_CONTROL_HACK
-    peel_sink_unref_gobject_if_floating (obj);
+    peel_sink_gobject_if_floating (obj);
 #else
     g_object_ref_sink (obj);
     g_object_unref (obj);

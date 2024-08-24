@@ -21,7 +21,7 @@ private:
     if (!ptr)
       return;
 
-    RefTraits<T>::sink_unref (ptr);
+    RefTraits<T>::sink (ptr);
     ptr = nullptr;
   }
 
@@ -104,7 +104,7 @@ public:
 
   peel_nothrow
   RefPtr<T>
-  sink () &&
+  ref_sink () &&
   {
     if (!ptr)
       return nullptr;

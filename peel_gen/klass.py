@@ -481,6 +481,7 @@ class Class(DefinedType):
                 self.ref_func,
                 self.unref_func,
                 self.ref_sink_func,
+                sink_func=None,
                 template_derived=True,
             )
         si = api_tweaks.ifdef_if_needed(self.c_type)

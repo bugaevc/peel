@@ -19,7 +19,7 @@ struct RefTraits;
   ref_sink (T *);
 
   static void
-  sink_unref (T *);
+  sink (T *);
 }
 */
 
@@ -76,7 +76,7 @@ public:
 
   peel_nothrow
   RefPtr (FloatPtr<T> &&f)
-    : RefPtr (static_cast<FloatPtr<T> &&> (f).sink ())
+    : RefPtr (static_cast<FloatPtr<T> &&> (f).ref_sink ())
   { }
 
   /* Upcast.  */

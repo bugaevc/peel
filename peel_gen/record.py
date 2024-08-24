@@ -20,6 +20,7 @@ class Record(DefinedType):
         self.unref_func = None
         self.free_func = None
         self.ref_sink_func = None
+        self.sink_func = None
         self.fields = []
         self.methods = []
         self.constructors = []
@@ -57,6 +58,9 @@ class Record(DefinedType):
                 return
             elif m_name == 'ref_sink':
                 self.ref_sink_func = c_ident
+                return
+            elif m_name == 'sink':
+                self.sink_func = c_ident
                 return
             m = Method(attrs, self)
             self.methods.append(m)
@@ -295,6 +299,7 @@ class Record(DefinedType):
                 self.ref_func,
                 self.unref_func,
                 self.ref_sink_func,
+                self.sink_func,
                 template_derived=False,
             )
         elif self.free_func:

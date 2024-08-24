@@ -557,7 +557,7 @@ struct RefTraits<GLib::Variant, void>
   }
 
   static void
-  sink_unref (GLib::Variant *v)
+  sink (GLib::Variant *v)
   {
     g_variant_ref_sink (reinterpret_cast<::GVariant *> (v));
     g_variant_unref (reinterpret_cast<::GVariant *> (v));
