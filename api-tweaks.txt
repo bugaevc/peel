@@ -524,6 +524,9 @@ raw	cairo
 #skip	cairo_image_surface_create
 nest	cairo_surface_type_t		Surface::Type
 
+# xlib
+raw	xlib
+
 # freetype2
 raw	freetype2
 
@@ -645,6 +648,9 @@ onstack	PangoAttrString
 in	pango_font_get_features		len
 in	PangoFont::vfunc_get_features	len
 
+# TODO: conflicts with a field, rename the field
+skip	pango_layout_line_is_paragraph_start
+
 # Graphene
 onstack	graphene_rect_t
 onstack	graphene_point_t
@@ -705,6 +711,11 @@ pointer	GdkToplevelSize
 pointer	GdkDragSurfaceSize
 onstack	GdkRGBA
 onstack	GdkRectangle
+
+# GdkX11
+skip	gdk_x11_display_text_property_to_text_list
+skip	gdk_x11_free_text_list
+skip	gdk_x11_free_compound_text
 
 # Gsk
 #ifdef	GskBroadwayRenderer		GDK_WINDOWING_BROADWAY

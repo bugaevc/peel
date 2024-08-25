@@ -11,6 +11,12 @@ def massage_c_type(c_type):
         return c_type
     return c_type[:i+1] + ' ' + '*' * ast_count
 
+def add_root_namespace(c_type):
+    if c_type.startswith('const '):
+        return 'const ::' + c_type[6:]
+    else:
+        return '::' + c_type
+
 def add_asterisk(tp):
     if tp.endswith('*'):
         return tp + '*'

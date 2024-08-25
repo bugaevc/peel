@@ -1,7 +1,7 @@
 from peel_gen.node_handler import NodeHandler
 from peel_gen.array import Array
 from peel_gen.alias import chase_type_aliases
-from peel_gen.utils import massage_c_type, extract_constness_from_c_type, add_asterisk
+from peel_gen.utils import massage_c_type, extract_constness_from_c_type, add_asterisk, add_root_namespace
 from peel_gen.type import lookup_type, PlainType, VoidType, StrType, VaListType
 from peel_gen.callback import Callback
 from peel_gen.enumeration import Enumeration
@@ -173,12 +173,10 @@ class Parameter(NodeHandler):
         else:
             itp = tp
 
-        if not isinstance(itp, DefinedType) or itp.ns.emit_raw:
+        if not isinstance(itp, DefinedType):
             type_name = self.c_type
-        elif self.c_type.startswith('const '):
-            type_name = 'const ::' + self.c_type[6:]
         else:
-            type_name = '::' + self.c_type
+            type_name = add_root_namespace(self.c_type)
 
         if self.direction != 'in' and for_local_copy:
             assert(type_name.endswith('*'))
@@ -284,7 +282,7 @@ class Parameter(NodeHandler):
             #if self.c_type is not None:
             #    c_type = self.c_type
             #else:
-            c_type = itp.c_type
+            c_type = add_root_namespace(itp.c_type)
             if itp.is_passed_by_ref() and (itp is tp or not itp.can_be_allocated_by_value()):
                 c_type = add_asterisk(c_type)
             return make_type(constness0 + c_type)
