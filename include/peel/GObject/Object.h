@@ -106,6 +106,9 @@ private:
   template<typename... Args>
   struct PropsCollector;
 
+  template<typename T1, typename T2, typename C, typename = void>
+  struct BindingTransformHelper;
+
 protected:
   ~Object () = default;
 
@@ -265,18 +268,152 @@ public:
 
   // TODO: variadic get/set
 
-  template<typename T1, typename T2>
+  template<typename T1, typename T2, typename TransformTo = decltype (nullptr), typename TransformFrom = decltype (nullptr)>
   peel_nothrow
   static Binding *
   bind_property (
     Object *source, Property<T1> source_property,
     Object *target, Property<T2> target_property,
-    BindingFlags flags = BindingFlags (0))
+    BindingFlags flags = BindingFlags (0),
+    TransformTo &&transform_to = nullptr,
+    TransformFrom &&transform_from = nullptr)
   {
-    ::GBinding *raw_binding = g_object_bind_property (
+    ::GBindingTransformFunc _peel_transform_to;
+    ::GBindingTransformFunc _peel_transform_from;
+    gpointer _peel_user_data;
+    ::GDestroyNotify _peel_notify;
+
+    typedef typename std::remove_reference<TransformTo>::type CTo;
+    typedef typename std::remove_reference<TransformFrom>::type CFrom;
+    constexpr size_t c_to_size = (std::is_same<CTo, decltype (nullptr)>::value || std::is_empty<CTo>::value) ? 0 : sizeof (CTo);
+    constexpr size_t c_from_size = (std::is_same<CFrom, decltype (nullptr)>::value || std::is_empty<CFrom>::value) ? 0 : sizeof (CFrom);
+    if (c_to_size + c_from_size <= sizeof (gpointer))
+      {
+        union U
+        {
+          CTo transform_to;
+          CFrom transform_from;
+          gpointer data;
+          U (gpointer data) : data (data) { }
+          ~U () { }
+        } u { nullptr };
+        union U2
+        {
+          CFrom transform_from;
+          unsigned char storage[sizeof (CFrom)];
+          U2 () : storage { 0 } { }
+          ~U2 () { }
+        } u2;
+        if (c_to_size == 0)
+          {
+            new (&u.transform_to) CTo (static_cast<TransformTo &&> (transform_to));
+            new (&u.transform_from) CFrom (static_cast<TransformFrom &&> (transform_from));
+          }
+        else if (c_from_size == 0)
+          {
+            new (&u.transform_from) CFrom (static_cast<TransformFrom &&> (transform_from));
+            new (&u.transform_to) CTo (static_cast<TransformTo &&> (transform_to));
+          }
+        else
+          {
+            new (&u.transform_to) CTo (static_cast<TransformTo &&> (transform_to));
+            new (&u2.transform_from) CFrom (static_cast<TransformFrom &&> (transform_from));
+            memcpy (&u.transform_to + 1, &u2.transform_from, sizeof (CFrom));
+          }
+        _peel_user_data = u.data;
+        if (std::is_trivially_destructible<CTo>::value && std::is_trivially_destructible<CFrom>::value)
+          _peel_notify = nullptr;
+        else
+          _peel_notify = +[] (gpointer data)
+          {
+            U u { data };
+            if (c_to_size == 0 || c_from_size == 0)
+              {
+                u.transform_from.~CFrom ();
+                u.transform_to.~CTo ();
+              }
+            else
+              {
+                U2 u2;
+                memcpy (&u2.transform_from, &u.transform_to + 1, sizeof (CFrom));
+                u.transform_to.~CTo ();
+                u2.transform_from.~CFrom ();
+              }
+          };
+        _peel_transform_to = std::is_same<CTo, decltype (nullptr)>::value ? nullptr : +[] (::GBinding *binding, const ::GValue *from_value, ::GValue *to_value, gpointer data) -> gboolean
+        {
+          Binding *_peel_binding = reinterpret_cast<Binding *> (binding);
+          const Value *_peel_from_value = reinterpret_cast<const Value *> (from_value);
+          Value *_peel_to_value = reinterpret_cast<Value *> (to_value);
+          U u { data };
+          bool transformed = BindingTransformHelper<T1, T2, CTo>::transform (u.transform_to, _peel_from_value, _peel_to_value);
+          return static_cast<gboolean> (transformed);
+        };
+        _peel_transform_from = std::is_same<CFrom, decltype (nullptr)>::value ? nullptr : +[] (::GBinding *binding, const ::GValue *from_value, ::GValue *to_value, gpointer data) -> gboolean
+        {
+          Binding *_peel_binding = reinterpret_cast<Binding *> (binding);
+          const Value *_peel_from_value = reinterpret_cast<const Value *> (from_value);
+          Value *_peel_to_value = reinterpret_cast<Value *> (to_value);
+          U u { data };
+          U2 u2;
+          CFrom *transform_from;
+          if (c_to_size == 0 || c_from_size == 0)
+            transform_from = &u.transform_from;
+          else
+            {
+              memcpy (&u2.transform_from, &u.transform_to + 1, sizeof (CFrom));
+              transform_from = &u2.transform_from;
+            }
+          bool transformed = BindingTransformHelper<T2, T1, CFrom>::transform (*transform_from, _peel_from_value, _peel_to_value);
+          return static_cast<gboolean> (transformed);
+        };
+      }
+    else
+      {
+        struct TransformClosure
+        {
+          CTo transform_to;
+          CFrom transform_from;
+        };
+        TransformClosure *closure = new TransformClosure
+        {
+          static_cast<TransformTo &&> (transform_to),
+          static_cast<TransformFrom &&> (transform_from)
+        };
+        _peel_user_data = closure;
+        _peel_notify = +[] (gpointer data)
+        {
+          peel_assume (data);
+          delete reinterpret_cast<TransformClosure *> (data);
+        };
+        _peel_transform_to = std::is_same<CTo, decltype (nullptr)>::value ? nullptr : +[] (::GBinding *binding, const ::GValue *from_value, ::GValue *to_value, gpointer data) -> gboolean
+        {
+          Binding *_peel_binding = reinterpret_cast<Binding *> (binding);
+          const Value *_peel_from_value = reinterpret_cast<const Value *> (from_value);
+          Value *_peel_to_value = reinterpret_cast<Value *> (to_value);
+          TransformClosure *closure = reinterpret_cast<TransformClosure *> (data);
+          bool transformed = BindingTransformHelper<T1, T2, CTo>::transform (closure->transform_to, _peel_from_value, _peel_to_value);
+          return static_cast<gboolean> (transformed);
+        };
+        _peel_transform_from = std::is_same<CFrom, decltype (nullptr)>::value ? nullptr : +[] (::GBinding *binding, const ::GValue *from_value, ::GValue *to_value, gpointer data) -> gboolean
+        {
+          Binding *_peel_binding = reinterpret_cast<Binding *> (binding);
+          const Value *_peel_from_value = reinterpret_cast<const Value *> (from_value);
+          Value *_peel_to_value = reinterpret_cast<Value *> (to_value);
+          TransformClosure *closure = reinterpret_cast<TransformClosure *> (data);
+          bool transformed = BindingTransformHelper<T2, T1, CFrom>::transform (closure->transform_from, _peel_from_value, _peel_to_value);
+          return static_cast<gboolean> (transformed);
+        };
+      }
+
+    ::GBinding *raw_binding = g_object_bind_property_full (
       source, source_property.name,
       target, target_property.name,
-      static_cast<::GBindingFlags> (flags));
+      static_cast<::GBindingFlags> (flags),
+      _peel_transform_to,
+      _peel_transform_from,
+      _peel_user_data,
+      _peel_notify);
     return reinterpret_cast<Binding *> (raw_binding);
   }
 
@@ -613,6 +750,38 @@ struct Object::PropsCollector<Property<T>, U, Args...>
       g_value_unset (&values[i]);
 
     return obj;
+  }
+};
+
+template<typename T1, typename T2, typename C, typename>
+struct Object::BindingTransformHelper
+{
+  static bool
+  transform (C &callback, const Value *from_value, Value *to_value)
+  {
+    return callback (from_value, to_value);
+  }
+};
+
+template<typename T1, typename T2, typename C>
+struct Object::BindingTransformHelper<T1, T2, C, decltype (std::declval<Value> ().set<T2> (std::declval<C> () (std::declval<typename Value::Traits<T1>::UnownedType> ())))>
+{
+  static bool
+  transform (C &callback, const Value *from_value, Value *to_value)
+  {
+    to_value->set<T2> (callback (from_value->get<T1> ()));
+    return true;
+  }
+};
+
+template<typename T1, typename T2>
+struct Object::BindingTransformHelper<T1, T2, decltype (nullptr), void>
+{
+  static bool
+  transform (...)
+  {
+    peel_unreachable;
+    return false;
   }
 };
 
