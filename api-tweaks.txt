@@ -323,6 +323,21 @@ float	g_dbus_connection_register_object_with_closures	set_property_closure
 float	g_settings_bind_with_mapping_closures	get_mapping
 float	g_settings_bind_with_mapping_closures	set_mapping
 
+float	g_action_change_state		value
+float	GAction::vfunc_change_state	value
+float	g_action_activate		parameter
+float	GAction::vfunc_activate		parameter
+float	g_action_group_activate_action	parameter
+float	GActionGroup::vfunc_activate_action	parameter
+float	g_action_group_change_action_state	value
+float	GActionGroup::vfunc_change_action_state	value
+float	g_simple_action_new_stateful	state
+float	g_simple_action_set_state	value
+float	g_menu_item_set_attribute_value	value
+float	g_menu_item_set_action_and_target_value			target_value
+float	g_notification_add_button_with_target_value		target
+float	g_notification_set_default_action_and_target_value	target
+
 vararg	g_simple_async_report_error_in_idle	format
 vararg	g_application_command_line_print	format
 vararg	g_application_command_line_printerr	format
@@ -375,6 +390,9 @@ nest	GDBusConnectionFlags		DBusConnection::Flags
 nest	GDBusProxyFlags			DBusProxy::Flags
 nest	GDBusServerFlags		DBusServer::Flags
 nest	GDBusMessageFlags		DBusMessage::Flags
+nest	GDBusMessageType		DBusMessage::Type
+nest	GDBusMessageByteOrder		DBusMessage::ByteOrder
+nest	GDBusMessageHeaderField		DBusMessage::HeaderField
 nest	GDBusPropertyInfoFlags		DBusPropertyInfo::Flags
 nest	GDBusInterfaceSkeletonFlags	DBusInterfaceSkeleton::Flags
 nest	GDBusInterfaceInfo		DBusInterface::Info
@@ -403,6 +421,16 @@ float	g_dbus_proxy_call		parameters
 float	g_dbus_proxy_call_sync		parameters
 float	g_dbus_proxy_call_with_unix_fd_list		parameters
 float	g_dbus_proxy_call_with_unix_fd_list_sync	parameters
+float	g_dbus_connection_call		parameters
+float	g_dbus_connection_call_sync	parameters
+float	g_dbus_connection_call_with_unix_fd_list	parameters
+float	g_dbus_connection_call_with_unix_fd_list_sync	parameters
+float	g_dbus_connection_emit_signal	parameters
+float	g_dbus_proxy_set_cached_property value
+float	g_dbus_message_set_body		body
+float	g_dbus_message_set_header	value
+float	g_dbus_method_invocation_return_value		parameters
+float	g_dbus_method_invocation_return_value_with_unix_fd_list parameters
 
 cpp-wrapper GTaskThreadFunc
 
@@ -844,8 +872,13 @@ float	gtk_range_set_adjustment	adjustment
 float	gtk_scrollbar_set_adjustment	adjustment
 float	gtk_scrolled_window_set_hadjustment hadjustment
 float	gtk_scrolled_window_set_vadjustment vadjustment
+
 unowned	GtkWindow			construct
 typed	gtk_constant_expression_new	gtk_constant_expression_new_for_value
+
+float	gtk_actionable_set_action_target_value		target_value
+float	GtkActionable::vfunc_set_action_target_value	target_value
+float	gtk_shortcut_set_arguments	args
 
 nest	GtkAccessibleAnnouncementPriority Accessible::AnnouncementPriority
 nest	GtkAccessibleAutocomplete	Accessible::Autocomplete
@@ -952,6 +985,9 @@ float	adw_tab_view_insert		child
 float	adw_tab_view_insert_pinned	child
 float	adw_tab_view_prepend		child
 float	adw_tab_view_prepend_pinned	child
+
+vararg	adw_toast_set_action_target	variant-new
+float	adw_toast_set_action_target_value action_target
 
 nest	AdwBreakpointConditionLengthType BreakpointCondition::LengthType
 nest	AdwBreakpointConditionRatioType	BreakpointCondition::RatioType

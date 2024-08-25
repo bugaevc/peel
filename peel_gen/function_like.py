@@ -56,6 +56,7 @@ class FunctionLike(NodeHandler):
                 self.extra_includes.append(tweak[1])
             elif tweak[0] in ('float', 'unowned', 'owned', 'in', 'out', 'inout', 'this', 'scope'):
                 p = self.find_param_for_tweak(tweak[1])
+                assert(p is not None)
                 if tweak[0] == 'float':
                     tp = chase_type_aliases(p.type)
                     from peel_gen.klass import Class
