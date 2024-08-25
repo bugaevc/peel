@@ -33,34 +33,35 @@ public:
   static CallbackType
   wrap_notified_callback (F &&f, F2 &&, gpointer *out_data, GDestroyNotify *out_notify)
   {
-    if (std::is_same<F, decltype (nullptr)>::value)
+    typedef typename std::remove_reference<F>::type C;
+    if (std::is_same<C, decltype (nullptr)>::value)
       {
         if (out_notify)
           *out_notify = nullptr;
         *out_data = nullptr;
         return nullptr;
       }
-    if (sizeof (F) <= sizeof (gpointer))
+    if (sizeof (C) <= sizeof (gpointer))
       {
         union U
           {
-            F f;
+            C f;
             F2 *f2;
             gpointer data;
             U (gpointer data) : data (data) { }
             ~U () { }
           } u { nullptr };
-        new (&u.f) F (static_cast<F &&> (f));
+        new (&u.f) C (static_cast<F &&> (f));
         *out_data = u.data;
         if (out_notify)
           {
-            if (std::is_trivially_destructible<F>::value)
+            if (std::is_trivially_destructible<C>::value)
               *out_notify = nullptr;
             else
               *out_notify = +[] (gpointer data)
               {
                 U u { data };
-                u.f.~F ();
+                u.f.~C ();
               };
           }
         return +[] (Args... args, gpointer data) -> Ret
@@ -77,16 +78,18 @@ public:
       }
     else
       {
-        F *heap_f = new F (static_cast<F &&> (f));
+        C *heap_f = new C (static_cast<F &&> (f));
         *out_data = heap_f;
         if (out_notify)
           *out_notify = +[] (gpointer data)
           {
-            F *f = reinterpret_cast<F *> (data);
+            peel_assume (data);
+            C *f = reinterpret_cast<C *> (data);
             delete f;
           };
         return +[] (Args... args, gpointer data) -> Ret
         {
+          peel_assume (data);
 #ifdef peel_cpp_20
           F2 f2;
 #else
@@ -102,22 +105,23 @@ public:
   static CallbackType
   wrap_async_callback (F &&f, F2 &&, gpointer *out_data)
   {
-    if (std::is_same<F, decltype (nullptr)>::value)
+    typedef typename std::remove_reference<F>::type C;
+    if (std::is_same<C, decltype (nullptr)>::value)
       {
         *out_data = nullptr;
         return nullptr;
       }
-    if (sizeof (F) <= sizeof (gpointer))
+    if (sizeof (C) <= sizeof (gpointer))
       {
         union U
           {
-            F f;
+            C f;
             F2 *f2;
             gpointer data;
             U (gpointer data) : data (data) { }
             ~U () { }
           } u { nullptr };
-        new (&u.f) F (static_cast<F &&> (f));
+        new (&u.f) C (static_cast<F &&> (f));
         *out_data = u.data;
         return +[] (Args... args, gpointer data) -> Ret
         {
@@ -129,16 +133,17 @@ public:
           F2 &f2 = *u.f2;
 #endif
           Ret ret = f2 (args..., &u.data);
-          u.f.~F ();
+          u.f.~C ();
           return ret;
         };
       }
     else
       {
-        F *heap_f = new F (static_cast<F &&> (f));
+        C *heap_f = new C (static_cast<F &&> (f));
         *out_data = heap_f;
         return +[] (Args... args, gpointer data) -> Ret
         {
+          peel_assume (data);
 #ifdef peel_cpp_20
           F2 f2;
 #else
@@ -146,7 +151,7 @@ public:
           F2 &f2 = *reinterpret_cast<F2 *> (data);
 #endif
           Ret ret = f2 (args..., data);
-          delete reinterpret_cast<F *> (data);
+          delete reinterpret_cast<C *> (data);
           return ret;
         };
       }
@@ -156,22 +161,23 @@ public:
   static CallbackType
   wrap_gsourcefunc_callback (F &&f, F2 &&, gpointer *out_data)
   {
-    if (std::is_same<F, decltype (nullptr)>::value)
+    typedef typename std::remove_reference<F>::type C;
+    if (std::is_same<C, decltype (nullptr)>::value)
       {
         *out_data = nullptr;
         return nullptr;
       }
-    if (sizeof (F) <= sizeof (gpointer))
+    if (sizeof (C) <= sizeof (gpointer))
       {
         union U
           {
-            F f;
+            C f;
             F2 *f2;
             gpointer data;
             U (gpointer data) : data (data) { }
             ~U () { }
           } u { nullptr };
-        new (&u.f) F (static_cast<F &&> (f));
+        new (&u.f) C (static_cast<F &&> (f));
         *out_data = u.data;
         return +[] (Args... args, gpointer data) -> gboolean
         {
@@ -184,16 +190,17 @@ public:
 #endif
           gboolean again = f2 (args..., &u.data);
           if (!again)
-            u.f.~F ();
+            u.f.~C ();
           return again;
         };
       }
     else
       {
-        F *heap_f = new F (static_cast<F &&> (f));
+        C *heap_f = new C (static_cast<F &&> (f));
         *out_data = heap_f;
         return +[] (Args... args, gpointer data) -> gboolean
         {
+          peel_assume (data);
 #ifdef peel_cpp_20
           F2 f2;
 #else
@@ -202,7 +209,7 @@ public:
 #endif
           gboolean again = f2 (args..., data);
           if (!again)
-            delete reinterpret_cast<F *> (data);
+            delete reinterpret_cast<C *> (data);
           return again;
         };
       }
@@ -219,34 +226,35 @@ public:
   static CallbackType
   wrap_notified_callback (F &&f, F2 &&, gpointer *out_data, GDestroyNotify *out_notify)
   {
-    if (std::is_same<F, decltype (nullptr)>::value)
+    typedef typename std::remove_reference<F>::type C;
+    if (std::is_same<C, decltype (nullptr)>::value)
       {
         if (out_notify)
           *out_notify = nullptr;
         *out_data = nullptr;
         return nullptr;
       }
-    if (sizeof (F) <= sizeof (gpointer))
+    if (sizeof (C) <= sizeof (gpointer))
       {
         union U
           {
-            F f;
+            C f;
             F2 *f2;
             gpointer data;
             U (gpointer data) : data (data) { }
             ~U () { }
           } u { nullptr };
-        new (&u.f) F (static_cast<F &&> (f));
+        new (&u.f) C (static_cast<F &&> (f));
         *out_data = u.data;
         if (out_notify)
           {
-            if (std::is_trivially_destructible<F>::value)
+            if (std::is_trivially_destructible<C>::value)
               *out_notify = nullptr;
             else
               *out_notify = +[] (gpointer data)
               {
                 U u { data };
-                u.f.~F ();
+                u.f.~C ();
               };
           }
         return +[] (Args... args, gpointer data) -> void
@@ -263,16 +271,18 @@ public:
       }
     else
       {
-        F *heap_f = new F (static_cast<F &&> (f));
+        C *heap_f = new C (static_cast<F &&> (f));
         *out_data = heap_f;
         if (out_notify)
           *out_notify = +[] (gpointer data)
           {
-            F *f = reinterpret_cast<F *> (data);
+            peel_assume (data);
+            C *f = reinterpret_cast<C *> (data);
             delete f;
           };
         return +[] (Args... args, gpointer data) -> void
         {
+          peel_assume (data);
 #ifdef peel_cpp_20
           F2 f2;
 #else
@@ -288,22 +298,23 @@ public:
   static CallbackType
   wrap_async_callback (F &&f, F2 &&, gpointer *out_data)
   {
-    if (std::is_same<F, decltype (nullptr)>::value)
+    typedef typename std::remove_reference<F>::type C;
+    if (std::is_same<C, decltype (nullptr)>::value)
       {
         *out_data = nullptr;
         return nullptr;
       }
-    if (sizeof (F) <= sizeof (gpointer))
+    if (sizeof (C) <= sizeof (gpointer))
       {
         union U
           {
-            F f;
+            C f;
             F2 *f2;
             gpointer data;
             U (gpointer data) : data (data) { }
             ~U () { }
           } u { nullptr };
-        new (&u.f) F (static_cast<F &&> (f));
+        new (&u.f) C (static_cast<F &&> (f));
         *out_data = u.data;
         return +[] (Args... args, gpointer data) -> void
         {
@@ -315,15 +326,16 @@ public:
           F2 &f2 = *u.f2;
 #endif
           f2 (args..., &u.data);
-          u.f.~F ();
+          u.f.~C ();
         };
       }
     else
       {
-        F *heap_f = new F (static_cast<F &&> (f));
+        C *heap_f = new C (static_cast<F &&> (f));
         *out_data = heap_f;
         return +[] (Args... args, gpointer data) -> void
         {
+          peel_assume (data);
 #ifdef peel_cpp_20
           F2 f2;
 #else
@@ -331,7 +343,7 @@ public:
           F2 &f2 = *reinterpret_cast<F2 *> (data);
 #endif
           f2 (args..., data);
-          delete reinterpret_cast<F *> (data);
+          delete reinterpret_cast<C *> (data);
         };
       }
   }
