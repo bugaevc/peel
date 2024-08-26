@@ -24,9 +24,8 @@ class Signal(FunctionLike):
         )
         l = [
             '  template<typename Handler>',
-            '  peel_nothrow',
             '  peel::SignalConnection::Token',
-            '  connect_{} (Handler &&handler, bool after = false)'.format(connect_signal_name),
+            '  connect_{} (Handler &&handler, bool after = false) noexcept'.format(connect_signal_name),
             '  {',
             '    return {}::_peel_connect_by_name (this, "{}", static_cast<Handler &&> (handler), after);'.format(
                 signal_type,
@@ -35,9 +34,8 @@ class Signal(FunctionLike):
             '  }',
             '',
             '  template<typename HandlerObject>',
-            '  peel_nothrow',
             '  peel::enable_if_derived<GObject::Object, HandlerObject, peel::SignalConnection::Token>',
-            '  connect_{} (HandlerObject *object, {} (HandlerObject::*handler_method) ({}), bool after = false)'.format(
+            '  connect_{} (HandlerObject *object, {} (HandlerObject::*handler_method) ({}), bool after = false) noexcept'.format(
                 connect_signal_name,
                 rv_cpp_type,
                 ', '.join([self.containing_type.emit_name + ' *'] + param_types)

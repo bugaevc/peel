@@ -30,10 +30,8 @@
 #endif
 
 #ifdef __GNUC__
-#define peel_nothrow __attribute__ ((nothrow))
 #define peel_no_warn_unused __attribute__ ((unused))
 #else
-#define peel_nothrow
 #define peel_no_warn_unused
 #endif
 

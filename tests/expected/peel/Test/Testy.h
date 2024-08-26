@@ -68,51 +68,47 @@ protected:
 
 public:
 
-  peel_nothrow
   static peel::RefPtr<Testy>
-  create ()
+  create () noexcept
   {
     ::TestTesty * _peel_return = test_testy_new ();
     peel_assume (_peel_return);
     return peel::RefPtr<Testy>::adopt_ref (reinterpret_cast<Testy *> (_peel_return));
   }
 
-  peel_nothrow
   int
-  get_int ()
+  get_int () noexcept
   {
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     return test_testy_get_int (_peel_this);
   }
 
-  peel_nothrow
   void
-  pass_bool (bool b)
+  pass_bool (bool b) noexcept
   {
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     gboolean _peel_b = static_cast<gboolean> (b);
     test_testy_pass_bool (_peel_this, _peel_b);
   }
 
-  peel_nothrow
   void
-  pass_gtype (GObject::Type gt)
+  pass_gtype (GObject::Type gt) noexcept
   {
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     test_testy_pass_gtype (_peel_this, gt);
   }
 
-  peel_nothrow peel_arg_out (2) peel_arg_out (3) peel_nonnull_args (2, 3)
+  peel_arg_out (2) peel_arg_out (3) peel_nonnull_args (2, 3)
   void
-  get_out_int (int *int_ptr, int *int_ptr2)
+  get_out_int (int *int_ptr, int *int_ptr2) noexcept
   {
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     test_testy_get_out_int (_peel_this, int_ptr, int_ptr2);
   }
 
-  peel_nothrow peel_arg_out (2) peel_nonnull_args (2)
+  peel_arg_out (2) peel_nonnull_args (2)
   void
-  get_out_bool (bool *b)
+  get_out_bool (bool *b) noexcept
   {
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     gboolean _peel_b;
@@ -120,27 +116,27 @@ public:
     *b = !!_peel_b;
   }
 
-  peel_nothrow peel_arg_out (2) peel_nonnull_args (2)
+  peel_arg_out (2) peel_nonnull_args (2)
   void
-  get_out_gtype (GObject::Type *gt)
+  get_out_gtype (GObject::Type *gt) noexcept
   {
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     GType * _peel_gt = reinterpret_cast<GType *> (gt);
     test_testy_get_out_gtype (_peel_this, _peel_gt);
   }
 
-  peel_nothrow peel_arg_out (2) peel_nonnull_args (2)
+  peel_arg_out (2) peel_nonnull_args (2)
   void
-  get_out_object (GObject::Object **obj_ptr)
+  get_out_object (GObject::Object **obj_ptr) noexcept
   {
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     ::GObject ** _peel_obj_ptr = reinterpret_cast<::GObject **> (obj_ptr);
     test_testy_get_out_object (_peel_this, _peel_obj_ptr);
   }
 
-  peel_nothrow peel_arg_out (2)
+  peel_arg_out (2)
   void
-  get_out_owned_object (peel::RefPtr<GObject::Object> *obj_ptr)
+  get_out_owned_object (peel::RefPtr<GObject::Object> *obj_ptr) noexcept
   {
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     ::GObject * _peel_obj_ptr;
@@ -148,9 +144,9 @@ public:
     *obj_ptr = peel::RefPtr<GObject::Object>::adopt_ref (reinterpret_cast<GObject::Object *> (_peel_obj_ptr));
   }
 
-  peel_nothrow peel_arg_out (2)
+  peel_arg_out (2)
   void
-  get_out_owned_optional_object (peel::RefPtr<GObject::Object> *obj_ptr)
+  get_out_owned_optional_object (peel::RefPtr<GObject::Object> *obj_ptr) noexcept
   {
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     ::GObject * _peel_obj_ptr;
@@ -159,9 +155,9 @@ public:
       *obj_ptr = peel::RefPtr<GObject::Object>::adopt_ref (reinterpret_cast<GObject::Object *> (_peel_obj_ptr));
   }
 
-  peel_nothrow peel_arg_inout (2)
+  peel_arg_inout (2)
   void
-  inout_owned_optional_object (peel::RefPtr<GObject::Object> *obj_ptr)
+  inout_owned_optional_object (peel::RefPtr<GObject::Object> *obj_ptr) noexcept
   {
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     ::GObject * _peel_obj_ptr;
@@ -172,9 +168,8 @@ public:
       *obj_ptr = peel::RefPtr<GObject::Object>::adopt_ref (reinterpret_cast<GObject::Object *> (_peel_obj_ptr));
   }
 
-  peel_nothrow
   void
-  inout_owned_optional_array (peel::UniquePtr<const uint8_t[]> *data)
+  inout_owned_optional_array (peel::UniquePtr<const uint8_t[]> *data) noexcept
   {
     gsize _peel_data_size;
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
@@ -186,35 +181,34 @@ public:
       *data = peel::UniquePtr<const uint8_t[]>::adopt_ref (reinterpret_cast<const uint8_t *> (_peel_data), _peel_data_size);
   }
 
-  peel_nothrow peel_arg_in (2) peel_nonnull_args (2)
+  peel_arg_in (2) peel_nonnull_args (2)
   void
-  pass_value (const GObject::Value *v)
+  pass_value (const GObject::Value *v) noexcept
   {
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     const ::GValue * _peel_v = reinterpret_cast<const ::GValue *> (v);
     test_testy_pass_value (_peel_this, _peel_v);
   }
 
-  peel_nothrow peel_arg_out (2) peel_nonnull_args (2)
+  peel_arg_out (2) peel_nonnull_args (2)
   void
-  get_out_value (GObject::Value *value_ptr)
+  get_out_value (GObject::Value *value_ptr) noexcept
   {
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     ::GValue * _peel_value_ptr = reinterpret_cast<::GValue *> (value_ptr);
     test_testy_get_out_value (_peel_this, _peel_value_ptr);
   }
 
-  peel_nothrow
   static void
-  takes_self_by_ref (peel::RefPtr<Testy> self)
+  takes_self_by_ref (peel::RefPtr<Testy> self) noexcept
   {
     ::TestTesty * _peel_self = reinterpret_cast<::TestTesty *> (std::move (self).release_ref ());
     test_testy_takes_self_by_ref (_peel_self);
   }
 
-  peel_nothrow peel_arg_in (2) peel_nonnull_args (2)
+  peel_arg_in (2) peel_nonnull_args (2)
   void
-  nested_types (GObject::Object::ConstructParam *construct_param, GObject::Binding::Flags binding_flags)
+  nested_types (GObject::Object::ConstructParam *construct_param, GObject::Binding::Flags binding_flags) noexcept
   {
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     ::GObjectConstructParam * _peel_construct_param = reinterpret_cast<::GObjectConstructParam *> (construct_param);
@@ -223,9 +217,8 @@ public:
   }
 
   template<typename CoolCallback>
-  peel_nothrow
   int
-  add_cool_callback (peel::RefPtr<GObject::Binding> binding, /* owned */ char *s, CoolCallback &&callback)
+  add_cool_callback (peel::RefPtr<GObject::Binding> binding, /* owned */ char *s, CoolCallback &&callback) noexcept
   {
     gpointer _peel_user_data;
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
@@ -248,9 +241,8 @@ public:
   static void
   get_cool_callback (UnsupportedForNowToken);
 
-  peel_nothrow
   peel::ArrayRef<const uint8_t>
-  return_byte_array ()
+  return_byte_array () noexcept
   {
     gsize _peel_size;
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
@@ -259,9 +251,8 @@ public:
     return peel::ArrayRef<const uint8_t> (reinterpret_cast<const uint8_t *> (_peel_return), _peel_size);
   }
 
-  peel_nothrow
   peel::UniquePtr<uint8_t[]>
-  return_owned_byte_array ()
+  return_owned_byte_array () noexcept
   {
     gsize _peel_size;
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
@@ -270,9 +261,8 @@ public:
     return peel::UniquePtr<uint8_t[]>::adopt_ref (reinterpret_cast<uint8_t *> (_peel_return), _peel_size);
   }
 
-  peel_nothrow
   const float
-  (&return_fixed_size_array ())[4]
+  (&return_fixed_size_array () noexcept)[4]
   {
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     const float * _peel_return = test_testy_return_fixed_size_array (_peel_this);
@@ -280,9 +270,8 @@ public:
     return reinterpret_cast<const float (&)[4]> (*_peel_return);
   }
 
-  peel_nothrow
   peel::ArrayRef<const GObject::Binding::Flags>
-  return_flags_array ()
+  return_flags_array () noexcept
   {
     gsize _peel_size;
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
@@ -291,9 +280,8 @@ public:
     return peel::ArrayRef<const GObject::Binding::Flags> (reinterpret_cast<const GObject::Binding::Flags *> (_peel_return), _peel_size);
   }
 
-  peel_nothrow
   size_t
-  read_in (peel::ArrayRef<uint8_t> buffer)
+  read_in (peel::ArrayRef<uint8_t> buffer) noexcept
   {
     gsize _peel_buffer_size;
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
@@ -301,9 +289,8 @@ public:
     return test_testy_read_in (_peel_this, _peel_buffer, _peel_buffer_size);
   }
 
-  peel_nothrow
   void
-  read_out (peel::ArrayRef<uint8_t> *buffer)
+  read_out (peel::ArrayRef<uint8_t> *buffer) noexcept
   {
     gsize _peel_buffer_size;
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
@@ -314,9 +301,8 @@ public:
 
 protected:
   template<typename DerivedClass>
-  peel_nothrow
   int
-  parent_vfunc_get_int ()
+  parent_vfunc_get_int () noexcept
   {
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
@@ -324,9 +310,8 @@ protected:
   }
 
   template<typename DerivedClass>
-  peel_nothrow
   void
-  parent_vfunc_pass_bool (bool b)
+  parent_vfunc_pass_bool (bool b) noexcept
   {
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
@@ -335,9 +320,9 @@ protected:
   }
 
   template<typename DerivedClass>
-  peel_nothrow peel_arg_out (2) peel_arg_out (3) peel_nonnull_args (2, 3)
+  peel_arg_out (2) peel_arg_out (3) peel_nonnull_args (2, 3)
   void
-  parent_vfunc_get_out_int (int *int_ptr, int *int_ptr2)
+  parent_vfunc_get_out_int (int *int_ptr, int *int_ptr2) noexcept
   {
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
@@ -345,9 +330,9 @@ protected:
   }
 
   template<typename DerivedClass>
-  peel_nothrow peel_arg_out (2) peel_nonnull_args (2)
+  peel_arg_out (2) peel_nonnull_args (2)
   void
-  parent_vfunc_get_out_bool (bool *b)
+  parent_vfunc_get_out_bool (bool *b) noexcept
   {
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
@@ -357,9 +342,9 @@ protected:
   }
 
   template<typename DerivedClass>
-  peel_nothrow peel_arg_out (2) peel_nonnull_args (2)
+  peel_arg_out (2) peel_nonnull_args (2)
   void
-  parent_vfunc_get_out_object (GObject::Object **obj_ptr)
+  parent_vfunc_get_out_object (GObject::Object **obj_ptr) noexcept
   {
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
@@ -368,9 +353,9 @@ protected:
   }
 
   template<typename DerivedClass>
-  peel_nothrow peel_arg_out (2)
+  peel_arg_out (2)
   void
-  parent_vfunc_get_out_owned_object (peel::RefPtr<GObject::Object> *obj_ptr)
+  parent_vfunc_get_out_owned_object (peel::RefPtr<GObject::Object> *obj_ptr) noexcept
   {
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
@@ -380,9 +365,9 @@ protected:
   }
 
   template<typename DerivedClass>
-  peel_nothrow peel_arg_out (2)
+  peel_arg_out (2)
   void
-  parent_vfunc_get_out_owned_optional_object (peel::RefPtr<GObject::Object> *obj_ptr)
+  parent_vfunc_get_out_owned_optional_object (peel::RefPtr<GObject::Object> *obj_ptr) noexcept
   {
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
@@ -393,9 +378,9 @@ protected:
   }
 
   template<typename DerivedClass>
-  peel_nothrow peel_arg_inout (2)
+  peel_arg_inout (2)
   void
-  parent_vfunc_inout_owned_optional_object (peel::RefPtr<GObject::Object> *obj_ptr)
+  parent_vfunc_inout_owned_optional_object (peel::RefPtr<GObject::Object> *obj_ptr) noexcept
   {
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
@@ -408,9 +393,8 @@ protected:
   }
 
   template<typename DerivedClass>
-  peel_nothrow
   void
-  parent_vfunc_inout_owned_optional_array (peel::UniquePtr<const uint8_t[]> *data)
+  parent_vfunc_inout_owned_optional_array (peel::UniquePtr<const uint8_t[]> *data) noexcept
   {
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     gsize _peel_data_size;
@@ -424,9 +408,9 @@ protected:
   }
 
   template<typename DerivedClass>
-  peel_nothrow peel_arg_out (2) peel_nonnull_args (2)
+  peel_arg_out (2) peel_nonnull_args (2)
   void
-  parent_vfunc_get_out_value (GObject::Value *value_ptr)
+  parent_vfunc_get_out_value (GObject::Value *value_ptr) noexcept
   {
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
@@ -435,9 +419,8 @@ protected:
   }
 
   template<typename DerivedClass>
-  peel_nothrow
   static void
-  parent_vfunc_takes_self_by_ref (peel::RefPtr<Testy> self)
+  parent_vfunc_takes_self_by_ref (peel::RefPtr<Testy> self) noexcept
   {
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     ::TestTesty * _peel_self = reinterpret_cast<::TestTesty *> (std::move (self).release_ref ());
@@ -445,9 +428,8 @@ protected:
   }
 
   template<typename DerivedClass, typename CoolCallback>
-  peel_nothrow
   int
-  parent_vfunc_add_cool_callback (peel::RefPtr<GObject::Binding> binding, /* owned */ char *s, CoolCallback &&callback)
+  parent_vfunc_add_cool_callback (peel::RefPtr<GObject::Binding> binding, /* owned */ char *s, CoolCallback &&callback) noexcept
   {
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     gpointer _peel_user_data;
@@ -470,9 +452,8 @@ protected:
   /* Unsupported for now: get_cool_callback: casting callback from C to C++ */
 
   template<typename DerivedClass>
-  peel_nothrow
   peel::ArrayRef<const uint8_t>
-  parent_vfunc_return_byte_array ()
+  parent_vfunc_return_byte_array () noexcept
   {
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     gsize _peel_size;
@@ -483,9 +464,8 @@ protected:
   }
 
   template<typename DerivedClass>
-  peel_nothrow
   peel::UniquePtr<uint8_t[]>
-  parent_vfunc_return_owned_byte_array ()
+  parent_vfunc_return_owned_byte_array () noexcept
   {
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     gsize _peel_size;
@@ -496,9 +476,8 @@ protected:
   }
 
   template<typename DerivedClass>
-  peel_nothrow
   const float
-  (&parent_vfunc_return_fixed_size_array ())[4]
+  (&parent_vfunc_return_fixed_size_array () noexcept)[4]
   {
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
@@ -508,9 +487,8 @@ protected:
   }
 
   template<typename DerivedClass>
-  peel_nothrow
   peel::ArrayRef<const GObject::Binding::Flags>
-  parent_vfunc_return_flags_array ()
+  parent_vfunc_return_flags_array () noexcept
   {
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     gsize _peel_size;
@@ -521,9 +499,8 @@ protected:
   }
 
   template<typename DerivedClass>
-  peel_nothrow
   size_t
-  parent_vfunc_read_in (peel::ArrayRef<uint8_t> buffer)
+  parent_vfunc_read_in (peel::ArrayRef<uint8_t> buffer) noexcept
   {
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     gsize _peel_buffer_size;
@@ -533,9 +510,8 @@ protected:
   }
 
   template<typename DerivedClass>
-  peel_nothrow
   void
-  parent_vfunc_read_out (peel::ArrayRef<uint8_t> *buffer)
+  parent_vfunc_read_out (peel::ArrayRef<uint8_t> *buffer) noexcept
   {
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
     gsize _peel_buffer_size;

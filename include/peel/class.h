@@ -37,9 +37,8 @@ struct InstanceInitHelper<Subclass, typename std::enable_if<has_own_member<Subcl
     return call_instance_init;
   }
 
-  peel_nothrow
   static void
-  call_instance_init (::GTypeInstance *instance, gpointer g_class)
+  call_instance_init (::GTypeInstance *instance, gpointer g_class) noexcept
   {
     Subclass *self = reinterpret_cast<Subclass *> (instance);
     typename Subclass::Class *klass = reinterpret_cast<typename Subclass::Class *> (g_class);
@@ -127,9 +126,8 @@ struct PropertyHelper
   typedef typename std::conditional<HdpHelper<Subclass>::template hdp<ParentClass> (), Subclass, ParentClass>::type VisitorArgType;
 #endif
 
-  peel_nothrow
   static void
-  get_property (::GObject *object, guint prop_id, ::GValue *value, ::GParamSpec *pspec)
+  get_property (::GObject *object, guint prop_id, ::GValue *value, ::GParamSpec *pspec) noexcept
   {
     Subclass *instance = reinterpret_cast<Subclass *> (object);
     GetVisitor<VisitorArgType> visitor { instance, prop_id, value };
@@ -141,9 +139,8 @@ struct PropertyHelper
       }
   }
 
-  peel_nothrow
   static void
-  set_property (::GObject *object, guint prop_id, const ::GValue *value, ::GParamSpec *pspec)
+  set_property (::GObject *object, guint prop_id, const ::GValue *value, ::GParamSpec *pspec) noexcept
   {
     Subclass *instance = reinterpret_cast<Subclass *> (object);
     SetVisitor<VisitorArgType> visitor { instance, prop_id, value };
@@ -173,9 +170,8 @@ struct PropertyHelper
 template<typename Subclass>
 struct ClassHelper
 {
-  peel_nothrow
   static void
-  finalize_vfunc (::GObject *obj)
+  finalize_vfunc (::GObject *obj) noexcept
   {
     Subclass *self = reinterpret_cast<Subclass *> (obj);
     // Call the C++ destructor; this destructs all the C++ classes hierarchy,
@@ -186,9 +182,8 @@ struct ClassHelper
   }
 
   template<typename ParentClass>
-  peel_nothrow
   static void
-  class_init (gpointer g_class, gpointer class_data)
+  class_init (gpointer g_class, gpointer class_data) noexcept
   {
     (void) class_data;
     // static_assert (std::is_trivially_copyable<typename Subclass::Class>::value);
@@ -207,9 +202,9 @@ struct ClassHelper
   }
 
   template<typename ParentClass>
-  G_NO_INLINE peel_nothrow
+  G_NO_INLINE
   static ::GType
-  register_type_static (const char *type_name)
+  register_type_static (const char *type_name) noexcept
   {
     // TODO: add a way to pass abstract here
     ::GTypeFlags type_flags = ::GTypeFlags (0);
@@ -255,9 +250,9 @@ GObject::Type::of ()
   peel_friend_prop_helper (Subclass)                                           \
                                                                                \
 public:                                                                        \
-  peel_nothrow G_GNUC_CONST                                                    \
+  G_GNUC_CONST                                                                 \
   static ::peel::GObject::Type                                                 \
-  _peel_get_type ();                                                           \
+  _peel_get_type () noexcept;                                                  \
                                                                                \
 protected:                                                                     \
   class Class;                                                                 \
@@ -298,9 +293,9 @@ private:                                                                       \
 #endif
 
 #define PEEL_CLASS_IMPL(Subclass, type_name, ParentClass)                      \
-peel_nothrow G_GNUC_CONST                                                      \
+G_GNUC_CONST                                                                   \
 ::peel::GObject::Type                                                          \
-Subclass::_peel_get_type ()                                                    \
+Subclass::_peel_get_type () noexcept                                           \
 {                                                                              \
   static ::GType _peel_tp;                                                     \
                                                                                \

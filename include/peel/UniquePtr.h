@@ -25,44 +25,39 @@ private:
   T *ptr;
 
 public:
-  peel_nothrow
-  constexpr UniquePtr ()
+  constexpr UniquePtr () noexcept
     : ptr (nullptr)
   { }
 
-  peel_nothrow
-  constexpr UniquePtr (decltype (nullptr))
+  constexpr UniquePtr (decltype (nullptr)) noexcept
     : ptr (nullptr)
   { }
 
   UniquePtr (const UniquePtr &) = delete;
 
-  peel_nothrow
-  UniquePtr (UniquePtr &&other)
+  UniquePtr (UniquePtr &&other) noexcept
     : ptr (other.ptr)
   {
     other.ptr = nullptr;
   }
 
-  peel_nothrow
-  ~UniquePtr ()
+  ~UniquePtr () noexcept
   {
     if (ptr)
       UniqueTraits<T>::free (ptr);
   }
 
-  peel_nothrow
   static UniquePtr
-  adopt_ref (T *ptr)
+  adopt_ref (T *ptr) noexcept
   {
     UniquePtr p;
     p.ptr = ptr;
     return p;
   }
 
-  peel_nodiscard ("the reference will leak if unused") peel_nothrow
+  peel_nodiscard ("the reference will leak if unused")
   T *
-  release_ref () &&
+  release_ref () && noexcept
   {
     T *p = ptr;
     ptr = nullptr;
@@ -72,9 +67,8 @@ public:
   UniquePtr &
   operator = (const UniquePtr &) = delete;
 
-  peel_nothrow
   UniquePtr &
-  operator = (UniquePtr &&other)
+  operator = (UniquePtr &&other) noexcept
   {
     if (this == &other)
       return *this;
@@ -119,9 +113,8 @@ private:
   T *ptr;
   size_t c;
 
-  peel_nothrow
   void
-  free ()
+  free () noexcept
   {
     if (!std::is_trivially_destructible<T>::value)
       {
@@ -134,20 +127,17 @@ private:
   }
 
 public:
-  peel_nothrow
-  constexpr UniquePtr ()
+  constexpr UniquePtr () noexcept
     : ptr (nullptr)
     , c (0)
   { }
 
-  peel_nothrow
-  constexpr UniquePtr (decltype (nullptr))
+  constexpr UniquePtr (decltype (nullptr)) noexcept
     : ptr (nullptr)
     , c (0)
   { }
 
-  peel_nothrow
-  UniquePtr (UniquePtr &&other)
+  UniquePtr (UniquePtr &&other) noexcept
     : ptr (other.ptr)
     , c (other.c)
   {
@@ -157,15 +147,14 @@ public:
 
   UniquePtr (const UniquePtr &) = delete;
 
-  peel_nothrow
-  ~UniquePtr ()
+  ~UniquePtr () noexcept
   {
     free ();
   }
 
-  peel_nodiscard ("the reference will leak if unused") peel_nothrow
+  peel_nodiscard ("the reference will leak if unused")
   T *
-  release_ref () &&
+  release_ref () && noexcept
   {
     T *p = ptr;
     ptr = nullptr;
@@ -176,9 +165,8 @@ public:
   UniquePtr &
   operator = (const UniquePtr &) = delete;
 
-  peel_nothrow
   UniquePtr &
-  operator = (UniquePtr &&other)
+  operator = (UniquePtr &&other) noexcept
   {
     if (this == &other)
       return *this;
@@ -190,9 +178,8 @@ public:
     return *this;
   }
 
-  peel_nothrow
   static UniquePtr
-  adopt_ref (T *ptr, size_t size)
+  adopt_ref (T *ptr, size_t size) noexcept
   {
     UniquePtr p;
     p.ptr = ptr;

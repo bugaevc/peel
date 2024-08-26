@@ -36,53 +36,45 @@ private:
   T *ptr;
 
 public:
-  peel_nothrow
-  constexpr RefPtr ()
+  constexpr RefPtr () noexcept
     : ptr (nullptr)
   { }
 
-  peel_nothrow
-  constexpr RefPtr (decltype (nullptr))
+  constexpr RefPtr (decltype (nullptr)) noexcept
     : ptr (nullptr)
   { }
 
-  peel_nothrow
-  RefPtr (T *ptr)
+  RefPtr (T *ptr) noexcept
     : ptr (ptr)
   {
     if (ptr)
       RefTraits<T>::ref (ptr);
   }
 
-  peel_nothrow
-  RefPtr (const RefPtr &other)
+  RefPtr (const RefPtr &other) noexcept
     : ptr (other.ptr)
   {
     if (ptr)
       RefTraits<T>::ref (ptr);
   }
 
-  peel_nothrow
-  RefPtr (RefPtr &&other)
+  RefPtr (RefPtr &&other) noexcept
     : ptr (other.ptr)
   {
     other.ptr = nullptr;
   }
 
-  peel_nothrow
-  RefPtr (const FloatPtr<T> &f)
+  RefPtr (const FloatPtr<T> &f) noexcept
     : RefPtr ((T *) f)
   { }
 
-  peel_nothrow
-  RefPtr (FloatPtr<T> &&f)
+  RefPtr (FloatPtr<T> &&f) noexcept
     : RefPtr (static_cast<FloatPtr<T> &&> (f).ref_sink ())
   { }
 
   /* Upcast.  */
   template<typename U, peel::enable_if_derived<T, U, int> = 0>
-  peel_nothrow
-  RefPtr (U *ptr)
+  RefPtr (U *ptr) noexcept
     : ptr (ptr)
   {
     if (ptr)
@@ -91,8 +83,7 @@ public:
 
   /* Upcast.  */
   template<typename U, peel::enable_if_derived<T, U, int> = 0>
-  peel_nothrow
-  RefPtr (const RefPtr<U> &other)
+  RefPtr (const RefPtr<U> &other) noexcept
     : ptr (other.ptr)
   {
     if (ptr)
@@ -101,39 +92,25 @@ public:
 
   /* Upcast.  */
   template<typename U, peel::enable_if_derived<T, U, int> = 0>
-  peel_nothrow
-  RefPtr (RefPtr<U> &&other)
+  RefPtr (RefPtr<U> &&other) noexcept
     : ptr (other.ptr)
   {
     other.ptr = nullptr;
   }
 
-  peel_nothrow
-  ~RefPtr ()
+  ~RefPtr () noexcept
   {
     if (ptr)
       RefTraits<T>::unref (ptr);
   }
 
-  peel_nothrow
   static RefPtr
-  adopt_ref (T *ptr)
+  adopt_ref (T *ptr) noexcept
   {
     RefPtr p;
     p.ptr = ptr;
     return p;
   }
-
-/*
-  peel_nothrow
-  static RefPtr
-  sink_ref (T *ptr)
-  {
-    RefPtr p;
-    p.ptr = g_object_ref_sink (ptr);
-    return p;
-  }
-*/
 
   peel_nodiscard ("the reference will leak if unused")
   T *
@@ -144,9 +121,8 @@ public:
     return p;
   }
 
-  peel_nothrow
   RefPtr &
-  operator = (T *ptr)
+  operator = (T *ptr) noexcept
   {
     if (ptr)
       RefTraits<T>::ref (ptr);
@@ -156,9 +132,8 @@ public:
     return *this;
   }
 
-  peel_nothrow
   RefPtr &
-  operator = (const RefPtr &other)
+  operator = (const RefPtr &other) noexcept
   {
     if (other.ptr)
       RefTraits<T>::ref (other.ptr);
@@ -168,9 +143,8 @@ public:
     return *this;
   }
 
-  peel_nothrow
   RefPtr &
-  operator = (RefPtr &&other) &
+  operator = (RefPtr &&other) & noexcept
   {
     if (ptr)
       RefTraits<T>::unref (ptr);
@@ -209,9 +183,8 @@ public:
   }
 
   template<typename U>
-  peel_nothrow
   RefPtr<U>
-  cast () &&
+  cast () && noexcept
   {
     U *u_ptr = ptr->template cast<U> ();
     ptr = nullptr;

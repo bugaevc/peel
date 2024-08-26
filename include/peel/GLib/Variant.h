@@ -32,9 +32,8 @@ public:
   struct Builder;
   typedef VariantIter Iter;
 
-  peel_nothrow
   const Variant::Type *
-  get_type ()
+  get_type () noexcept
   {
     ::GVariant *_peel_this = reinterpret_cast<::GVariant *> (this);
     const ::GVariantType *_peel_return = g_variant_get_type (_peel_this);
@@ -42,17 +41,16 @@ public:
     return reinterpret_cast<const Type *> (_peel_return);
   }
 
-  peel_nothrow
   const char *
-  get_type_string ()
+  get_type_string () noexcept
   {
     ::GVariant *_peel_this = reinterpret_cast<::GVariant *> (this);
     return g_variant_get_type_string (_peel_this);
   }
 
-  peel_nothrow peel_nonnull_args (2)
+  peel_nonnull_args (2)
   bool
-  is_of_type (const GVariantType *type)
+  is_of_type (const GVariantType *type) noexcept
   {
     ::GVariant *_peel_this = reinterpret_cast<::GVariant *> (this);
     const ::GVariantType *_peel_type = reinterpret_cast<const ::GVariantType *> (type);
@@ -60,9 +58,8 @@ public:
     return !!_peel_return;
   }
 
-  peel_nothrow
   bool
-  is_container ()
+  is_container () noexcept
   {
     ::GVariant *_peel_this = reinterpret_cast<::GVariant *> (this);
     gboolean _peel_return = g_variant_is_container (_peel_this);
@@ -72,9 +69,9 @@ public:
   // ...
 
   template<typename ...Args>
-  peel_nothrow peel_nonnull_args (1)
+  peel_nonnull_args (1)
   static peel::FloatPtr<Variant>
-  create (const char *format_string, Args &&...args)
+  create (const char *format_string, Args &&...args) noexcept
   {
     ::GVariant *_peel_return = g_variant_new (format_string, Traits<Args>::cast_for_create (std::forward<Args> (args))...);
     peel_assume (_peel_return);
@@ -82,9 +79,8 @@ public:
   }
 
   template<typename T>
-  peel_nothrow
   static peel::FloatPtr<Variant>
-  create (typename Traits<T>::CreateCppType value)
+  create (typename Traits<T>::CreateCppType value) noexcept
   {
     ::GVariant *v = Traits<T>::create (std::move (value));
     peel_assume (v);
@@ -92,18 +88,17 @@ public:
   }
 
   template<typename ...Args>
-  peel_nothrow peel_nonnull_args (1)
+  peel_nonnull_args (1)
   static peel::FloatPtr<Variant>
-  create_parsed (const char *format_string, Args &&...args)
+  create_parsed (const char *format_string, Args &&...args) noexcept
   {
     ::GVariant *_peel_return = g_variant_new_parsed (format_string, Traits<Args>::cast_for_create (std::forward<Args> (args))...);
     peel_assume (_peel_return);
     return peel::FloatPtr<Variant> (reinterpret_cast<Variant *> (_peel_return));
   }
 
-  peel_nothrow
   static peel::FloatPtr<Variant>
-  create_maybe (const Variant::Type *child_type, peel::FloatPtr<Variant> child)
+  create_maybe (const Variant::Type *child_type, peel::FloatPtr<Variant> child) noexcept
   {
     const ::GVariantType *_peel_child_type = reinterpret_cast<const ::GVariantType *> (child_type);
     ::GVariant *_peel_child = reinterpret_cast<::GVariant *> (std::move (child).release_floating_ptr ());
@@ -112,18 +107,16 @@ public:
     return peel::FloatPtr<Variant> (reinterpret_cast<Variant *> (_peel_return));
   }
 
-  peel_nothrow
   static peel::FloatPtr<Variant>
-  create_object_path (const char *object_path)
+  create_object_path (const char *object_path) noexcept
   {
     ::GVariant *_peel_return = g_variant_new_object_path (object_path);
     peel_assume (_peel_return);
     return peel::FloatPtr<Variant> (reinterpret_cast<Variant *> (_peel_return));
   }
 
-  peel_nothrow
   static peel::FloatPtr<Variant>
-  create_dict_entry (peel::FloatPtr<Variant> key, peel::FloatPtr<Variant> value)
+  create_dict_entry (peel::FloatPtr<Variant> key, peel::FloatPtr<Variant> value) noexcept
   {
     ::GVariant *_peel_key = reinterpret_cast<::GVariant *> (std::move (key).release_floating_ptr ());
     ::GVariant *_peel_value = reinterpret_cast<::GVariant *> (std::move (value).release_floating_ptr ());
@@ -132,9 +125,8 @@ public:
     return peel::FloatPtr<Variant> (reinterpret_cast<Variant *> (_peel_return));
   }
 
-  peel_nothrow
   static peel::FloatPtr<Variant>
-  create_tuple (peel::ArrayRef<Variant * const> children)
+  create_tuple (peel::ArrayRef<Variant * const> children) noexcept
   {
     ::GVariant * const *_peel_children = reinterpret_cast<::GVariant * const *> (children.ptr ());
     gsize _peel_n_children = children.size ();
@@ -146,17 +138,15 @@ public:
   // TODO: FloatPtr-enabled overload of create_tuple
 
   template<typename T>
-  peel_nothrow
   typename Traits<T>::GetCppType
-  get ()
+  get () noexcept
   {
     ::GVariant *v = reinterpret_cast<::GVariant *> (this);
     return Traits<T>::get (v);
   }
 
-  peel_nothrow
   peel::RefPtr<Variant>
-  get_child_value (size_t index)
+  get_child_value (size_t index) noexcept
   {
     ::GVariant *v = reinterpret_cast<::GVariant *> (this);
     ::GVariant *_peel_return = g_variant_get_child_value (v, index);
@@ -164,34 +154,33 @@ public:
     return peel::RefPtr<Variant>::adopt_ref (reinterpret_cast<Variant *> (_peel_return));
   }
 
-  peel_nothrow
   peel::RefPtr<Variant>
-  get_maybe ()
+  get_maybe () noexcept
   {
     ::GVariant *_peel_this = reinterpret_cast<::GVariant *> (this);
     ::GVariant *_peel_return = g_variant_get_maybe (_peel_this);
     return peel::RefPtr<Variant>::adopt_ref (reinterpret_cast<Variant *> (_peel_return));
   }
 
-  peel_nothrow peel_nonnull_args (1)
+  peel_nonnull_args (1)
   static bool
-  is_object_path (const char *string)
+  is_object_path (const char *string) noexcept
   {
     gboolean _peel_return = g_variant_is_object_path (string);
     return !!_peel_return;
   }
 
-  peel_nothrow peel_nonnull_args (1)
+  peel_nonnull_args (1)
   static bool
-  is_signature (const char *string)
+  is_signature (const char *string) noexcept
   {
     gboolean _peel_return = g_variant_is_signature (string);
     return !!_peel_return;
   }
 
-  peel_nothrow peel_nonnull_args (2)
+  peel_nonnull_args (2)
   static peel::RefPtr<Variant>
-  parse (const Variant::Type *type, const char *text, const char *limit, const char **endptr, peel::UniquePtr<GLib::Error> *error)
+  parse (const Variant::Type *type, const char *text, const char *limit, const char **endptr, peel::UniquePtr<GLib::Error> *error) noexcept
   {
     ::GError *_peel_error = nullptr;
     const ::GVariantType *_peel_type = reinterpret_cast<const ::GVariantType *> (type);
@@ -201,9 +190,8 @@ public:
     return peel::RefPtr<Variant>::adopt_ref (reinterpret_cast<Variant *> (_peel_return));
   }
 
-  peel_nothrow
   /* owned */ char *
-  print (bool type_annotate)
+  print (bool type_annotate) noexcept
   {
     ::GVariant *_peel_this = reinterpret_cast<::GVariant *> (this);
     gboolean _peel_type_annotate = static_cast<gboolean> (type_annotate);

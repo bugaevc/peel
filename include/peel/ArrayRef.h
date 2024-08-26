@@ -13,62 +13,53 @@ class ArrayRef final
 
 public:
   // The default constructor is used by generated local copies.
-  peel_nothrow
-  constexpr ArrayRef ()
+  constexpr ArrayRef () noexcept
     : p (nullptr)
     , c (0)
   { }
 
-  peel_nothrow
-  constexpr ArrayRef (decltype (nullptr))
+  constexpr ArrayRef (decltype (nullptr)) noexcept
     : p (nullptr)
     , c (0)
   { }
 
   template<size_t C>
-  peel_nothrow
-  constexpr ArrayRef (T (&arr)[C])
+  constexpr ArrayRef (T (&arr)[C]) noexcept
     : p (arr)
     , c (C)
   { }
 
-  peel_nothrow
-  constexpr ArrayRef (T *ptr, size_t size)
+  constexpr ArrayRef (T *ptr, size_t size) noexcept
     : p (ptr)
     , c (size)
   { }
 
-  peel_nothrow
   constexpr T *
-  ptr () const
+  ptr () const noexcept
   {
     return p;
   }
 
-  peel_nothrow
   constexpr size_t
-  size () const
+  size () const noexcept
   {
     return c;
   }
 
-  peel_nothrow
   explicit constexpr
-  operator bool () const
+  operator bool () const noexcept
   {
     return p;
   }
 
-  peel_nothrow
   T &
-  operator [] (size_t index)
+  operator [] (size_t index) noexcept
   {
     return p[index];
   }
 
-  peel_nothrow
   constexpr const T &
-  operator [] (size_t index) const
+  operator [] (size_t index) const noexcept
   {
     return p[index];
   }
@@ -79,30 +70,26 @@ public:
   typedef T *iterator;
   typedef const T *const_iterator;
 
-  peel_nothrow
   constexpr T *
-  begin () const
+  begin () const noexcept
   {
     return p;
   }
 
-  peel_nothrow
   constexpr const T *
-  cbegin () const
+  cbegin () const noexcept
   {
     return p;
   }
 
-  peel_nothrow
   constexpr T *
-  end () const
+  end () const noexcept
   {
     return p + c;
   }
 
-  peel_nothrow
   constexpr const T *
-  cend () const
+  cend () const noexcept
   {
     return p + c;
   }

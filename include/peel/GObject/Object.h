@@ -112,18 +112,16 @@ private:
 protected:
   ~Object () = default;
 
-  peel_nothrow
   void
-  notify (const char *property_name)
+  notify (const char *property_name) noexcept
   {
     ::GObject *object = reinterpret_cast<::GObject *> (this);
     g_object_notify (object, property_name);
   }
 
   template<typename T>
-  peel_nothrow
   void
-  notify (Property<T> prop)
+  notify (Property<T> prop) noexcept
   {
     ::GObject *object = reinterpret_cast<::GObject *> (this);
     if (prop.pspec_ptr)
@@ -135,32 +133,29 @@ protected:
       g_object_notify (object, prop.name);
   }
 
-  peel_nothrow
   void
-  freeze_notify ()
+  freeze_notify () noexcept
   {
     ::GObject *object = reinterpret_cast<::GObject *> (this);
     g_object_freeze_notify (object);
   }
 
-  peel_nothrow
   void
-  thaw_notify ()
+  thaw_notify () noexcept
   {
     ::GObject *object = reinterpret_cast<::GObject *> (this);
     g_object_thaw_notify (object);
   }
 
   static void
-  _peel_chain_finalize (::GObject *obj)
+  _peel_chain_finalize (::GObject *obj) noexcept
   {
     reinterpret_cast<::GObjectClass *> (TypeClass::peek_static<Object> ())->finalize (obj);
   }
 
   template<typename DerivedClass>
-  peel_nothrow
   void
-  parent_vfunc_dispose ()
+  parent_vfunc_dispose () noexcept
   {
     ::GObjectClass *klass = reinterpret_cast<::GObjectClass *> (TypeClass::peek<DerivedClass> ()->peek_parent ());
     ::GObject *self = reinterpret_cast<::GObject *> (this);
@@ -168,9 +163,8 @@ protected:
   }
 
   template<typename DerivedClass>
-  peel_nothrow
   static RefPtr<Object>
-  parent_vfunc_constructor (Type type, size_t n_construct_params, ConstructParam params[])
+  parent_vfunc_constructor (Type type, size_t n_construct_params, ConstructParam params[]) noexcept
   {
     ::GObjectClass *klass = reinterpret_cast<::GObjectClass *> (TypeClass::peek<DerivedClass> ()->peek_parent ());
     ::GObjectConstructParam *peel_params = reinterpret_cast<::GObjectConstructParam *> (params);
@@ -179,9 +173,8 @@ protected:
   }
 
   template<typename DerivedClass>
-  peel_nothrow
   void
-  parent_vfunc_constructed ()
+  parent_vfunc_constructed () noexcept
   {
     ::GObjectClass *klass = reinterpret_cast<::GObjectClass *> (TypeClass::peek<DerivedClass> ()->peek_parent ());
     ::GObject *self = reinterpret_cast<::GObject *> (this);
@@ -202,9 +195,8 @@ public:
   };
 
   template<typename Class, typename... Args>
-  peel_nothrow
   static peel::enable_if_derived<Object, Class, typename Traits<Class>::CreateType>
-  create (Args &&...args)
+  create (Args &&...args) noexcept
   {
     static_assert (sizeof... (Args) % 2 == 0,
                    "Must pass property / value pairs");
@@ -214,9 +206,8 @@ public:
     return Traits<Class>::created (obj);
   }
 
-  peel_nothrow
   static RefPtr<Object>
-  create (Type tp, const char *first_prop_name, ...)
+  create (Type tp, const char *first_prop_name, ...) noexcept
   {
     va_list ap;
     va_start (ap, first_prop_name);
@@ -230,9 +221,8 @@ public:
     return RefPtr<Object>::adopt_ref (reinterpret_cast<Object *> (obj));
   }
 
-  peel_nothrow
   void
-  get_property (const char *name, Value *value)
+  get_property (const char *name, Value *value) noexcept
   {
     ::GObject *object = reinterpret_cast<::GObject *> (this);
     ::GValue *_peel_value = reinterpret_cast<::GValue *> (value);
@@ -241,16 +231,15 @@ public:
 
   template<typename T>
   typename Value::Traits<T>::UnownedType
-  get_property (Property<T> prop)
+  get_property (Property<T> prop) noexcept
   {
     Value value { Type::of<T> () };
     get_property (prop.name, &value);
     return value.get<T> ();
   }
 
-  peel_nothrow
   void
-  set_property (const char *name, const Value *value)
+  set_property (const char *name, const Value *value) noexcept
   {
     ::GObject *object = reinterpret_cast<::GObject *> (this);
     const ::GValue *_peel_value = reinterpret_cast<const ::GValue *> (value);
@@ -259,7 +248,7 @@ public:
 
   template<typename T, typename U>
   void
-  set_property (Property<T> prop, U &&v)
+  set_property (Property<T> prop, U &&v) noexcept
   {
     Value value { Type::of<T> () };
     value.set<T> (std::forward<U> (v));
@@ -269,14 +258,13 @@ public:
   // TODO: variadic get/set
 
   template<typename T1, typename T2, typename TransformTo = decltype (nullptr), typename TransformFrom = decltype (nullptr)>
-  peel_nothrow
   static Binding *
   bind_property (
     Object *source, Property<T1> source_property,
     Object *target, Property<T2> target_property,
     BindingFlags flags = BindingFlags (0),
     TransformTo &&transform_to = nullptr,
-    TransformFrom &&transform_from = nullptr)
+    TransformFrom &&transform_from = nullptr) noexcept
   {
     ::GBindingTransformFunc _peel_transform_to;
     ::GBindingTransformFunc _peel_transform_from;
@@ -417,17 +405,15 @@ public:
     return reinterpret_cast<Binding *> (raw_binding);
   }
 
-  peel_nothrow
   void
-  run_dispose ()
+  run_dispose () noexcept
   {
     g_object_run_dispose (reinterpret_cast<::GObject *> (this));
   }
 
   template<typename T, typename Handler>
-  peel_nothrow
   SignalConnection::Token
-  connect_notify (Property<T> prop, Handler &&handler, bool after = false)
+  connect_notify (Property<T> prop, Handler &&handler, bool after = false) noexcept
   {
     Signal<Object, void (ParamSpec *)> notify_signal = Signal<Object, void (ParamSpec *)>::lookup ("notify");
     ::GQuark quark = g_quark_from_string (prop.name);
@@ -435,16 +421,14 @@ public:
   }
 
   template<typename T, typename Handler>
-  peel_nothrow
   SignalConnection::Token
-  connect_notify (Handler &&handler, bool after = false)
+  connect_notify (Handler &&handler, bool after = false) noexcept
   {
     Signal<Object, void (ParamSpec *)> notify_signal = Signal<Object, void (ParamSpec *)>::lookup ("notify");
     return notify_signal.template connect<Handler> (this, static_cast<Handler &&> (handler), after);
   }
 
   template<typename T, typename HandlerObject>
-  peel_nothrow
   SignalConnection::Token
   connect_notify
   (
@@ -452,7 +436,7 @@ public:
     HandlerObject *object,
     void (HandlerObject::*handler_method) (Object *, ParamSpec *),
     bool after = false
-  )
+  ) noexcept
   {
     Signal<Object, void (ParamSpec *)> notify_signal = Signal<Object, void (ParamSpec *)>::lookup ("notify");
     ::GQuark quark = g_quark_from_string (prop.name);
@@ -460,23 +444,21 @@ public:
   }
 
   template<typename T, typename HandlerObject>
-  peel_nothrow
   SignalConnection::Token
   connect_notify
   (
     HandlerObject *object,
     void (HandlerObject::*handler_method) (Object *, ParamSpec *),
     bool after = false
-  )
+  ) noexcept
   {
     Signal<Object, void (ParamSpec *)> notify_signal = Signal<Object, void (ParamSpec *)>::lookup ("notify");
     return notify_signal.template connect<HandlerObject> (this, object, handler_method, after);
   }
 
   template<typename T>
-  peel_nothrow
   void
-  add_weak_pointer (T **weak_pointer_location)
+  add_weak_pointer (T **weak_pointer_location) noexcept
   {
     ::GObject *obj = reinterpret_cast<::GObject *> (this);
     gpointer *ptr = reinterpret_cast<gpointer *> (weak_pointer_location);
@@ -484,9 +466,8 @@ public:
   }
 
   template<typename T>
-  peel_nothrow
   void
-  remove_weak_pointer (T **weak_pointer_location)
+  remove_weak_pointer (T **weak_pointer_location) noexcept
   {
     ::GObject *obj = reinterpret_cast<::GObject *> (this);
     gpointer *ptr = reinterpret_cast<gpointer *> (weak_pointer_location);
@@ -495,49 +476,43 @@ public:
 
   // TODO: the generic add_weak_ref () API
 
-  peel_nothrow
   void *
-  get_data (const char *key)
+  get_data (const char *key) noexcept
   {
     ::GObject *obj = reinterpret_cast<::GObject *> (this);
     return g_object_get_data (obj, key);
   }
 
-  peel_nothrow
   void *
-  get_data (::GQuark quark)
+  get_data (::GQuark quark) noexcept
   {
     ::GObject *obj = reinterpret_cast<::GObject *> (this);
     return g_object_get_qdata (obj, quark);
   }
 
-  peel_nothrow
   void
-  set_data (const char *key, void *data, ::GDestroyNotify destroy_notify = nullptr)
+  set_data (const char *key, void *data, ::GDestroyNotify destroy_notify = nullptr) noexcept
   {
     ::GObject *obj = reinterpret_cast<::GObject *> (this);
     g_object_set_data_full (obj, key, data, destroy_notify);
   }
 
-  peel_nothrow
   void
-  set_data (::GQuark quark, void *data, ::GDestroyNotify destroy_notify = nullptr)
+  set_data (::GQuark quark, void *data, ::GDestroyNotify destroy_notify = nullptr) noexcept
   {
     ::GObject *obj = reinterpret_cast<::GObject *> (this);
     g_object_set_qdata_full (obj, quark, data, destroy_notify);
   }
 
-  peel_nothrow
   void *
-  steal_data (const char *key)
+  steal_data (const char *key) noexcept
   {
     ::GObject *obj = reinterpret_cast<::GObject *> (this);
     return g_object_steal_data (obj, key);
   }
 
-  peel_nothrow
   void *
-  steal_data (::GQuark quark)
+  steal_data (::GQuark quark) noexcept
   {
     ::GObject *obj = reinterpret_cast<::GObject *> (this);
     return g_object_steal_qdata (obj, quark);
@@ -554,9 +529,8 @@ public:
     unsigned char _placeholder[sizeof (::GObjectClass) - sizeof (TypeClass)] peel_no_warn_unused;
 
   public:
-    peel_nothrow
     ParamSpec *
-    find_property (const char *property_name)
+    find_property (const char *property_name) noexcept
     {
       ::GObjectClass *klass = reinterpret_cast<::GObjectClass *> (this);
       ::GParamSpec *pspec = g_object_class_find_property (klass, property_name);
@@ -572,9 +546,8 @@ public:
 
   protected:
     /* Don't call this if using the define_properties () mechanism */
-    peel_nothrow
     void
-    install_property (unsigned id, FloatPtr<ParamSpec> &&pspec)
+    install_property (unsigned id, FloatPtr<ParamSpec> &&pspec) noexcept
     {
       // The argument must be of type FloatPtr && (as opposed to a by-value
       // FloatPtr) to prevent trying to instantiate RefTraits<ParamSpec>
@@ -585,7 +558,6 @@ public:
     }
 
     template<typename DerivedClass>
-    peel_nothrow
     void
     override_vfunc_constructor ()
     {
@@ -601,7 +573,6 @@ public:
     }
 
     template<typename DerivedClass>
-    peel_nothrow
     void
     override_vfunc_constructed ()
     {
@@ -614,7 +585,6 @@ public:
     }
 
     template<typename DerivedClass>
-    peel_nothrow
     void
     override_vfunc_dispose ()
     {
@@ -650,9 +620,9 @@ struct Value::Traits<T, peel::enable_if_derived<Object, T, void>>
   typedef T *UnownedType;
   typedef RefPtr<T> OwnedType;
 
-  peel_nothrow G_GNUC_CONST
+  G_GNUC_CONST
   static T *
-  get (const ::GValue *value)
+  get (const ::GValue *value) noexcept
   {
     void *obj = g_value_get_object (value);
     if (std::is_same<T, Object>::value)
@@ -665,23 +635,20 @@ struct Value::Traits<T, peel::enable_if_derived<Object, T, void>>
 #endif
   }
 
-  peel_nothrow
   static void
-  set (::GValue *value, T *object)
+  set (::GValue *value, T *object) noexcept
   {
     g_value_set_object (value, object);
   }
 
-  peel_nothrow
   static void
-  take (::GValue *value, RefPtr<T> &&object)
+  take (::GValue *value, RefPtr<T> &&object) noexcept
   {
     g_value_take_object (value, std::move (object).release_ref ());
   }
 
-  peel_nothrow
   static void
-  set_sink (::GValue *value, FloatPtr<T> &&object)
+  set_sink (::GValue *value, FloatPtr<T> &&object) noexcept
   {
     T *obj = std::move (object).release_floating_ptr ();
     g_value_take_object (value, g_object_ref_sink (obj));
@@ -723,7 +690,7 @@ template<typename T, typename U, typename... Args>
 struct Object::PropsCollector<Property<T>, U, Args...>
 {
   static void
-  collect (const char **names, ::GValue *values, Property<T> prop, U &&prop_value, Args... args)
+  collect (const char **names, ::GValue *values, Property<T> prop, U &&prop_value, Args... args) noexcept
   {
     names[0] = prop.get_name ();
     g_value_init (&values[0], static_cast<::GType> (Type::of<T> ()));
@@ -733,9 +700,8 @@ struct Object::PropsCollector<Property<T>, U, Args...>
     Object::PropsCollector<Args...>::collect (names + 1, values + 1, std::forward<Args> (args)...);
   }
 
-  peel_nothrow
   static ::GObject *
-  create (::GType type, Property<T> prop, U &&prop_value, Args... args)
+  create (::GType type, Property<T> prop, U &&prop_value, Args... args) noexcept
   {
     constexpr int n = 1 + sizeof... (Args) / 2;
     const char *names[n];
@@ -795,9 +761,9 @@ using GObject::Object;
 #ifdef PEEL_USE_COMPAT_CONTROL_HACK
 /* Note: this function is very intentionally marked inline,
    but not static inline. */
-peel_always_inline peel_nothrow
+peel_always_inline
 void
-peel_sink_gobject_if_floating (void *object)
+peel_sink_gobject_if_floating (void *object) noexcept
 {
   static guint (*floating_flag_handler)(::GObject *, gint);
 

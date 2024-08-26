@@ -20,9 +20,9 @@ enum class SignalFlags : std::underlying_type<::GSignalFlags>::type;
 namespace internals
 {
 
-peel_nothrow G_GNUC_CONST
+G_GNUC_CONST
 static inline gpointer
-value_peek_pointer (const ::GValue *value)
+value_peek_pointer (const ::GValue *value) noexcept
 {
   return g_value_peek_pointer (value);
 }
@@ -190,9 +190,9 @@ struct SignalHelper1<Ret, Arg, Args...>
   typedef typename SignalTraits<Arg>::PlainCppType ArgPlainCppType;
 
   template<typename... UnpackedArgs>
-  peel_nothrow peel_always_inline
+  peel_always_inline
   static void
-  marshal (gpointer data1, gpointer data2, void *callback, ::GValue *return_value, const ::GValue *param_values, UnpackedArgs... args)
+  marshal (gpointer data1, gpointer data2, void *callback, ::GValue *return_value, const ::GValue *param_values, UnpackedArgs... args) noexcept
   {
     Arg arg_cpp = GObject::Value::Traits<ArgPlainCppType>::get (param_values);
     ArgCType arg_c = SignalTraits<Arg>::to_c (arg_cpp);
@@ -200,27 +200,27 @@ struct SignalHelper1<Ret, Arg, Args...>
   }
 
   template<typename... UnpackedArgs>
-  peel_nothrow peel_always_inline
+  peel_always_inline
   static void
-  marshal_va (gpointer data1, gpointer data2, void *callback, ::GValue *return_value, va_list va_args, UnpackedArgs... args)
+  marshal_va (gpointer data1, gpointer data2, void *callback, ::GValue *return_value, va_list va_args, UnpackedArgs... args) noexcept
   {
     ArgCType arg = va_arg (va_args, ArgCType);
     SignalHelper1<Ret, Args...>::template marshal_va<UnpackedArgs..., ArgCType> (data1, data2, callback, return_value, va_args, args..., arg);
   }
 
   template<typename Instance, typename Callback, typename... UnpackedArgs>
-  peel_nothrow peel_always_inline
+  peel_always_inline
   static void
-  marshal_cpp (Instance *instance, Callback &callback, ::GValue *return_value, const ::GValue *param_values, UnpackedArgs... args)
+  marshal_cpp (Instance *instance, Callback &callback, ::GValue *return_value, const ::GValue *param_values, UnpackedArgs... args) noexcept
   {
     Arg arg = GObject::Value::Traits<ArgPlainCppType>::get (param_values);
     SignalHelper1<Ret, Args...>::template marshal_cpp<Instance, Callback, UnpackedArgs..., Arg> (instance, callback, return_value, param_values + 1, args..., arg);
   }
 
   template<typename Instance, typename Callback, typename... UnpackedArgs>
-  peel_nothrow peel_always_inline
+  peel_always_inline
   static void
-  marshal_va_cpp (Instance *instance, Callback &callback, ::GValue *return_value, va_list va_args, UnpackedArgs... args)
+  marshal_va_cpp (Instance *instance, Callback &callback, ::GValue *return_value, va_list va_args, UnpackedArgs... args) noexcept
   {
     ArgCType arg_c = va_arg (va_args, ArgCType);
     Arg arg = SignalTraits<Arg>::from_c (arg_c);
@@ -232,36 +232,36 @@ template<typename Ret>
 struct SignalHelper1<Ret>
 {
   template<typename... UnpackedArgs>
-  peel_nothrow peel_always_inline
+  peel_always_inline
   static void
-  marshal (gpointer data1, gpointer data2, void *callback, ::GValue *return_value, const ::GValue *param_values, UnpackedArgs... args)
+  marshal (gpointer data1, gpointer data2, void *callback, ::GValue *return_value, const ::GValue *param_values, UnpackedArgs... args) noexcept
   {
     (void) param_values;
     SignalHelper2<Ret, UnpackedArgs...>::marshal (data1, data2, callback, return_value, args...);
   }
 
   template<typename... UnpackedArgs>
-  peel_nothrow peel_always_inline
+  peel_always_inline
   static void
-  marshal_va (gpointer data1, gpointer data2, void *callback, ::GValue *return_value, va_list va_args, UnpackedArgs... args)
+  marshal_va (gpointer data1, gpointer data2, void *callback, ::GValue *return_value, va_list va_args, UnpackedArgs... args) noexcept
   {
     (void) va_args;
     SignalHelper2<Ret, UnpackedArgs...>::marshal (data1, data2, callback, return_value, args...);
   }
 
   template<typename Instance, typename Callback, typename... UnpackedArgs>
-  peel_nothrow peel_always_inline
+  peel_always_inline
   static void
-  marshal_cpp (Instance *instance, Callback &callback, ::GValue *return_value, const ::GValue *param_values, UnpackedArgs... args)
+  marshal_cpp (Instance *instance, Callback &callback, ::GValue *return_value, const ::GValue *param_values, UnpackedArgs... args) noexcept
   {
     (void) param_values;
     SignalHelper2<Ret, UnpackedArgs...>::template marshal_cpp<Instance, Callback> (instance, callback, return_value, args...);
   }
 
   template<typename Instance, typename Callback, typename... UnpackedArgs>
-  peel_nothrow peel_always_inline
+  peel_always_inline
   static void
-  marshal_va_cpp (Instance *instance, Callback &callback, ::GValue *return_value, va_list va_args, UnpackedArgs... args)
+  marshal_va_cpp (Instance *instance, Callback &callback, ::GValue *return_value, va_list va_args, UnpackedArgs... args) noexcept
   {
     (void) va_args;
     SignalHelper2<Ret, UnpackedArgs...>::template marshal_cpp<Instance, Callback> (instance, callback, return_value, args...);
@@ -271,18 +271,18 @@ struct SignalHelper1<Ret>
 template<typename Ret, typename... Args>
 struct SignalHelper2
 {
-  peel_nothrow peel_always_inline
+  peel_always_inline
   static Ret
-  emit (void *instance, gint id, ::GQuark detail, Args... args)
+  emit (void *instance, gint id, ::GQuark detail, Args... args) noexcept
   {
     typename SignalTraits<Ret>::CType ret_c = 0;
     g_signal_emit (instance, id, detail, SignalTraits<Args>::to_c (args)..., &ret_c);
     return SignalTraits<Ret>::from_c (ret_c);
   }
 
-  peel_nothrow peel_always_inline
+  peel_always_inline
   static void
-  marshal (gpointer data1, gpointer data2, void *callback, ::GValue *return_value, Args... args)
+  marshal (gpointer data1, gpointer data2, void *callback, ::GValue *return_value, Args... args) noexcept
   {
     typedef typename SignalTraits<Ret>::CType (*CallbackType) (gpointer, Args..., gpointer);
     CallbackType cb = reinterpret_cast<CallbackType> (callback);
@@ -292,9 +292,9 @@ struct SignalHelper2
   }
 
   template<typename Instance, typename Callback>
-  peel_nothrow peel_always_inline
+  peel_always_inline
   static void
-  marshal_cpp (Instance *instance, Callback &callback, ::GValue *return_value, Args... args)
+  marshal_cpp (Instance *instance, Callback &callback, ::GValue *return_value, Args... args) noexcept
   {
     Ret ret = callback (instance, args...);
     typedef typename SignalTraits<Ret>::PlainCppType RetPlainCppType;
@@ -305,16 +305,16 @@ struct SignalHelper2
 template<typename... Args>
 struct SignalHelper2<void, Args...>
 {
-  peel_nothrow peel_always_inline
+  peel_always_inline
   static void
-  emit (void *instance, gint id, ::GQuark detail, Args... args)
+  emit (void *instance, gint id, ::GQuark detail, Args... args) noexcept
   {
     g_signal_emit (instance, id, detail, SignalTraits<Args>::to_c (args)...);
   }
 
-  peel_nothrow peel_always_inline
+  peel_always_inline
   static void
-  marshal (gpointer data1, gpointer data2, void *callback, ::GValue *return_value, Args... args)
+  marshal (gpointer data1, gpointer data2, void *callback, ::GValue *return_value, Args... args) noexcept
   {
     (void) return_value;
     typedef void (*CallbackType) (gpointer, Args..., gpointer);
@@ -323,9 +323,9 @@ struct SignalHelper2<void, Args...>
   }
 
   template<typename Instance, typename Callback>
-  peel_nothrow peel_always_inline
+  peel_always_inline
   static void
-  marshal_cpp (Instance *instance, Callback &callback, ::GValue *return_value, Args... args)
+  marshal_cpp (Instance *instance, Callback &callback, ::GValue *return_value, Args... args) noexcept
   {
     (void) return_value;
     callback (instance, args...);
@@ -374,18 +374,16 @@ private:
     return reinterpret_cast<Callback *> (&reinterpret_cast<::GClosure *> (this)->data);
   }
 
-  peel_nothrow
   static void
-  notify_func (gpointer unused, GClosure *g_closure)
+  notify_func (gpointer unused, GClosure *g_closure) noexcept
   {
     (void) unused;
     SignalClosure *closure = reinterpret_cast<SignalClosure *> (g_closure);
     closure->callback_ptr ()->~Callback ();
   }
 
-  peel_nothrow
   static void
-  marshal (::GClosure *closure, ::GValue *return_value, guint n_param_values, const ::GValue *param_values, gpointer invocation_hint, gpointer marshal_data)
+  marshal (::GClosure *closure, ::GValue *return_value, guint n_param_values, const ::GValue *param_values, gpointer invocation_hint, gpointer marshal_data) noexcept
   {
     g_return_if_fail (n_param_values == sizeof... (Args) + 1);
     (void) n_param_values;
@@ -398,9 +396,8 @@ private:
     SignalHelper1<Ret, Args...>::template marshal_cpp<Instance, Callback> (instance, callback, return_value, param_values + 1);
   }
 
-  peel_nothrow
   static void
-  marshal_va (::GClosure *closure, ::GValue *return_value, gpointer c_instance, va_list args, gpointer marshal_data, int n_params, ::GType *param_types)
+  marshal_va (::GClosure *closure, ::GValue *return_value, gpointer c_instance, va_list args, gpointer marshal_data, int n_params, ::GType *param_types) noexcept
   {
     g_return_if_fail (n_params == sizeof... (Args));
     (void) n_params;
@@ -421,9 +418,8 @@ private:
   }
 
 public:
-  peel_nothrow
   static SignalClosure *
-  make (Callback &&callback)
+  make (Callback &&callback) noexcept
   {
     ::GClosure *g_closure = g_closure_new_simple (sizeof (SignalClosure), nullptr);
     SignalClosure *closure = reinterpret_cast<SignalClosure *> (g_closure);
@@ -451,9 +447,8 @@ private:
   gulong id;
 
 public:
-  peel_nothrow
   void
-  unblock ()
+  unblock () noexcept
   {
     g_signal_handler_unblock (instance, id);
     id = 0;
@@ -515,9 +510,8 @@ public:
     id = 0;
   }
 
-  peel_nothrow
   void
-  disconnect ()
+  disconnect () noexcept
   {
     if (id > 0)
       {
@@ -570,9 +564,9 @@ public:
     return *this;
   }
 
-  peel_nodiscard ("immediately unblocks if leaked") peel_nothrow
+  peel_nodiscard ("immediately unblocks if leaked")
   SignalBlockGuard
-  block ()
+  block () noexcept
   {
     g_signal_handler_block (instance, id);
     return SignalBlockGuard { instance, id };
@@ -594,9 +588,8 @@ struct Signal<Instance, Ret (Args...)>
 private:
   guint id;
 
-  peel_nothrow
   static void
-  marshal (::GClosure *closure, ::GValue *return_value, guint n_param_values, const ::GValue *param_values, gpointer invocation_hint, gpointer marshal_data)
+  marshal (::GClosure *closure, ::GValue *return_value, guint n_param_values, const ::GValue *param_values, gpointer invocation_hint, gpointer marshal_data) noexcept
   {
     ::GCClosure *cc = reinterpret_cast<::GCClosure *> (closure);
     gpointer data1, data2;
@@ -620,9 +613,8 @@ private:
     internals::SignalHelper1<Ret, Args...>::template marshal<> (data1, data2, cb, return_value, param_values + 1);
   }
 
-  peel_nothrow
   static void
-  marshal_va (::GClosure *closure, ::GValue *return_value, gpointer instance, va_list args, gpointer marshal_data, int n_params, ::GType *param_types)
+  marshal_va (::GClosure *closure, ::GValue *return_value, gpointer instance, va_list args, gpointer marshal_data, int n_params, ::GType *param_types) noexcept
   {
     ::GCClosure *cc = reinterpret_cast<::GCClosure *> (closure);
     gpointer data1, data2;
@@ -654,9 +646,8 @@ private:
   }
 
 public:
-  peel_nothrow
   static Signal
-  create (const char *name, GObject::SignalFlags flags = static_cast<GObject::SignalFlags> (G_SIGNAL_RUN_LAST) /* TODO: class closure, accumulator */)
+  create (const char *name, GObject::SignalFlags flags = static_cast<GObject::SignalFlags> (G_SIGNAL_RUN_LAST) /* TODO: class closure, accumulator */) noexcept
   {
     ::GType instance_type = GObject::Type::of<Instance> ();
     ::GType return_type = GObject::Type::of<typename internals::SignalTraits<Ret>::PlainCppType> ();
@@ -670,9 +661,8 @@ public:
     return signal;
   }
 
-  peel_nothrow
   static Signal
-  lookup (const char *name)
+  lookup (const char *name) noexcept
   {
     ::GType instance_type = GObject::Type::of<Instance> ();
     Signal sig;
@@ -680,24 +670,21 @@ public:
     return sig;
   }
 
-  peel_nothrow
   Ret
-  emit (Instance *instance, ::GQuark detail, Args... args)
+  emit (Instance *instance, ::GQuark detail, Args... args) noexcept
   {
     return internals::SignalHelper2<Ret, Args...>::emit (instance, id, detail, args...);
   }
 
-  peel_nothrow
   Ret
-  emit (Instance *instance, Args... args)
+  emit (Instance *instance, Args... args) noexcept
   {
     return emit (instance, 0, args...);
   }
 
   template<typename Handler>
-  peel_nothrow
   SignalConnection::Token
-  connect (Instance *instance, ::GQuark detail, Handler &&handler, bool after = false)
+  connect (Instance *instance, ::GQuark detail, Handler &&handler, bool after = false) noexcept
   {
     typedef typename std::remove_reference<Handler>::type HandlerRR;
     typedef typename std::conditional<std::is_function<HandlerRR>::value, HandlerRR *, HandlerRR>::type HandlerType;
@@ -709,7 +696,6 @@ public:
   }
 
   template<typename HandlerObject>
-  peel_nothrow
   SignalConnection::Token
   connect
   (
@@ -718,7 +704,7 @@ public:
     HandlerObject *object,
     Ret (HandlerObject::*handler_method) (Instance *, Args...),
     bool after = false
-  )
+  ) noexcept
   {
     auto handler = [object, handler_method]
       (Instance *instance, Args... args) -> Ret
@@ -734,9 +720,8 @@ public:
   }
 
   template<typename Handler>
-  static peel_nothrow
-  SignalConnection::Token
-  _peel_connect_by_name (Instance *instance, const char *detailed_name, Handler &&handler, bool after = false)
+  static SignalConnection::Token
+  _peel_connect_by_name (Instance *instance, const char *detailed_name, Handler &&handler, bool after = false) noexcept
   {
     typedef typename std::remove_reference<Handler>::type HandlerRR;
     typedef typename std::conditional<std::is_function<HandlerRR>::value, HandlerRR *, HandlerRR>::type HandlerType;
@@ -748,8 +733,7 @@ public:
   }
 
   template<typename HandlerObject>
-  static peel_nothrow
-  SignalConnection::Token
+  static SignalConnection::Token
   _peel_connect_by_name
   (
     Instance *instance,
@@ -757,7 +741,7 @@ public:
     HandlerObject *object,
     Ret (HandlerObject::*handler_method) (Instance *, Args...),
     bool after = false
-  )
+  ) noexcept
   {
     auto handler = [object, handler_method]
       (Instance *instance, Args... args) -> Ret
@@ -777,17 +761,16 @@ public:
 
 #define PEEL_SIGNAL_CONNECT_METHOD(signal_name, signal_obj)                    \
   template<typename _SignalHandler>                                            \
-  peel_nothrow                                                                 \
   ::peel::SignalConnection::Token                                              \
   connect_ ## signal_name                                                      \
   (_SignalHandler &&signal_handler, ::GQuark detail = 0, bool after = false)   \
+  noexcept                                                                     \
   {                                                                            \
     return (signal_obj).connect (this, detail,                                 \
       static_cast<_SignalHandler &&> (signal_handler), after);                 \
   }                                                                            \
                                                                                \
   template<typename _HandlerObject, typename _HandlerMethod>                   \
-  peel_nothrow                                                                 \
   peel::enable_if_derived<                                                     \
     ::peel::GObject::Object,                                                   \
     _HandlerObject,                                                            \
@@ -799,7 +782,7 @@ public:
     _HandlerMethod _HandlerObject::*handler_method,                            \
     ::GQuark detail = 0,                                                       \
     bool after = false                                                         \
-  )                                                                            \
+  ) noexcept                                                                   \
   {                                                                            \
     return (signal_obj).connect (this, detail, object, handler_method, after); \
   }                                                                            \

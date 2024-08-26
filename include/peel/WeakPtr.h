@@ -17,18 +17,16 @@ class WeakPtr final
 private:
   T *ptr;
 
-  peel_nothrow
   void
-  add_weak_ptr ()
+  add_weak_ptr () noexcept
   {
     if (ptr)
       g_object_add_weak_pointer (reinterpret_cast<::GObject *> (ptr),
                                  reinterpret_cast<gpointer*> (&ptr));
   }
 
-  peel_nothrow
   void
-  remove_weak_ptr ()
+  remove_weak_ptr () noexcept
   {
     if (ptr)
       g_object_remove_weak_pointer (reinterpret_cast<::GObject *> (ptr),
@@ -36,33 +34,28 @@ private:
   }
 
 public:
-  peel_nothrow
-  constexpr WeakPtr ()
+  constexpr WeakPtr () noexcept
     : ptr (nullptr)
   { }
 
-  peel_nothrow
-  constexpr WeakPtr (decltype (nullptr))
+  constexpr WeakPtr (decltype (nullptr)) noexcept
     : ptr (nullptr)
   { }
 
-  peel_nothrow
-  WeakPtr (T *ptr)
+  WeakPtr (T *ptr) noexcept
     : ptr (ptr)
   {
     add_weak_ptr ();
   }
 
-  peel_nothrow
-  WeakPtr (const WeakPtr &other)
+  WeakPtr (const WeakPtr &other) noexcept
     : ptr (other.ptr)
   {
     add_weak_ptr ();
   }
 
   template<typename U, peel::enable_if_derived<T, U, int> = 0>
-  peel_nothrow
-  WeakPtr (const RefPtr<U> &ptr)
+  WeakPtr (const RefPtr<U> &ptr) noexcept
     : ptr (ptr)
   {
     add_weak_ptr ();
@@ -70,8 +63,7 @@ public:
 
   /* Upcast.  */
   template<typename U, peel::enable_if_derived<T, U, int> = 0>
-  peel_nothrow
-  WeakPtr (U *ptr)
+  WeakPtr (U *ptr) noexcept
     : ptr (ptr)
   {
     add_weak_ptr ();
@@ -79,22 +71,19 @@ public:
 
   /* Upcast.  */
   template<typename U, peel::enable_if_derived<T, U, int> = 0>
-  peel_nothrow
-  WeakPtr (const WeakPtr<U> &other)
+  WeakPtr (const WeakPtr<U> &other) noexcept
     : ptr (static_cast<U *> (other))
   {
     add_weak_ptr ();
   }
 
-  peel_nothrow
-  ~WeakPtr ()
+  ~WeakPtr () noexcept
   {
     remove_weak_ptr ();
   }
 
-  peel_nothrow
   WeakPtr &
-  operator = (T *ptr)
+  operator = (T *ptr) noexcept
   {
     if (ptr == this->ptr)
       return *this;
@@ -104,9 +93,8 @@ public:
     return *this;
   }
 
-  peel_nothrow
   WeakPtr &
-  operator = (const WeakPtr &other)
+  operator = (const WeakPtr &other) noexcept
   {
     if (ptr == other.ptr)
       return *this;
@@ -117,9 +105,8 @@ public:
   }
 
   template<typename U, peel::enable_if_derived<T, U, int> = 0>
-  peel_nothrow
   WeakPtr &
-  operator = (const RefPtr<U> &other)
+  operator = (const RefPtr<U> &other) noexcept
   {
     if (ptr == static_cast<U *> (other))
       return *this;
@@ -135,8 +122,7 @@ public:
     return ptr;
   }
 
-  peel_nothrow
-  operator T * () &&
+  operator T * () && noexcept
   {
     remove_weak_ptr ();
     T *p = ptr;
@@ -156,9 +142,8 @@ public:
     return ptr;
   }
 
-  peel_nothrow
   T *
-  operator -> () &&
+  operator -> () && noexcept
   {
     peel_assume (ptr);
     remove_weak_ptr ();

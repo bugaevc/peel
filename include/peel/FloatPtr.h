@@ -14,9 +14,9 @@ private:
 
   T *ptr;
 
-  peel_always_inline peel_nothrow
+  peel_always_inline
   void
-  do_dispose ()
+  do_dispose () noexcept
   {
     if (!ptr)
       return;
@@ -26,28 +26,23 @@ private:
   }
 
 public:
-  peel_nothrow
-  constexpr FloatPtr ()
+  constexpr FloatPtr () noexcept
     : ptr (nullptr)
   { }
 
-  peel_nothrow
-  constexpr FloatPtr (decltype (nullptr))
+  constexpr FloatPtr (decltype (nullptr)) noexcept
     : ptr (nullptr)
   { }
 
-  peel_nothrow
-  constexpr FloatPtr (T *ptr)
+  constexpr FloatPtr (T *ptr) noexcept
     : ptr (ptr)
   { }
 
-  peel_nothrow
-  constexpr FloatPtr (const FloatPtr &other)
+  constexpr FloatPtr (const FloatPtr &other) noexcept
     : ptr (other.ptr)
   { }
 
-  peel_nothrow
-  FloatPtr (FloatPtr &&other)
+  FloatPtr (FloatPtr &&other) noexcept
     : ptr (other.ptr)
   {
     other.ptr = nullptr;
@@ -55,22 +50,19 @@ public:
 
   /* Upcast.  */
   template<typename U, peel::enable_if_derived<T, U, int> = 0>
-  peel_nothrow
-  FloatPtr (FloatPtr<U> &&other)
+  FloatPtr (FloatPtr<U> &&other) noexcept
     : ptr (other.ptr)
   {
     other.ptr = nullptr;
   }
 
-  peel_nothrow
-  ~FloatPtr ()
+  ~FloatPtr () noexcept
   {
     do_dispose ();
   }
 
-  peel_nothrow
   FloatPtr &
-  operator = (T *ptr)
+  operator = (T *ptr) noexcept
   {
     if (this->ptr == ptr)
       return *this;
@@ -79,9 +71,8 @@ public:
     return *this;
   }
 
-  peel_nothrow
   FloatPtr &
-  operator = (const FloatPtr &other)
+  operator = (const FloatPtr &other) noexcept
   {
     if (ptr == other.ptr)
       return *this;
@@ -90,9 +81,8 @@ public:
     return *this;
   }
 
-  peel_nothrow
   FloatPtr &
-  operator = (FloatPtr &&other)
+  operator = (FloatPtr &&other) noexcept
   {
     if (ptr == other.ptr)
       return *this;
@@ -102,9 +92,8 @@ public:
     return *this;
   }
 
-  peel_nothrow
   RefPtr<T>
-  ref_sink () &&
+  ref_sink () && noexcept
   {
     if (!ptr)
       return nullptr;

@@ -20,9 +20,8 @@ protected:
   ~TypeInterface() { }
 
 public:
-  peel_nothrow
   TypeInterface *
-  peek_parent () const
+  peek_parent () const noexcept
   {
     gpointer iface = const_cast<TypeInterface *> (this);
     return reinterpret_cast<TypeInterface *> (g_type_interface_peek_parent (iface));

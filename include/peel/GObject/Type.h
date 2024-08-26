@@ -14,11 +14,11 @@ private:
   ::GType tp;
 
 public:
-  constexpr Type ()
+  constexpr Type () noexcept
     : tp (G_TYPE_INVALID)
   { }
 
-  constexpr Type (::GType tp)
+  constexpr Type (::GType tp) noexcept
     : tp (tp)
   { }
 
@@ -74,16 +74,14 @@ public:
     return tp != other.tp;
   }
 
-  peel_nothrow
   const char *
-  name () const
+  name () const noexcept
   {
     return g_type_name (tp);
   }
 
-  peel_nothrow
   static Type
-  from_name (const char *name)
+  from_name (const char *name) noexcept
   {
     return g_type_from_name (name);
   }
@@ -94,30 +92,26 @@ public:
     return G_TYPE_FUNDAMENTAL (tp);
   }
 
-  peel_nothrow
   Type
-  parent () const
+  parent () const noexcept
   {
     return g_type_parent (tp);
   }
 
-  peel_nothrow
   unsigned int
-  depth () const
+  depth () const noexcept
   {
     return g_type_depth (tp);
   }
 
-  peel_nothrow
   Type
-  next_base (Type base_type) const
+  next_base (Type base_type) const noexcept
   {
     return g_type_next_base (tp, base_type);
   }
 
-  peel_nothrow
   bool
-  is_a (Type other) const
+  is_a (Type other) const noexcept
   {
     return !!g_type_is_a (tp, other.tp);
   }
@@ -129,87 +123,75 @@ public:
     return is_a (of<T> ());
   }
 
-  peel_nothrow
   int
-  get_instance_count () const
+  get_instance_count () const noexcept
   {
     return g_type_get_instance_count (tp);
   }
 
-  peel_nothrow
   constexpr bool
-  is_fundamental () const
+  is_fundamental () const noexcept
   {
     return !!G_TYPE_IS_FUNDAMENTAL (tp);
   }
 
-  peel_nothrow
   constexpr bool
-  is_derived () const
+  is_derived () const noexcept
   {
     return !!G_TYPE_IS_DERIVED (tp);
   }
 
-  peel_nothrow
   bool
-  is_interface () const
+  is_interface () const noexcept
   {
     return !!G_TYPE_IS_INTERFACE (tp);
   }
 
-  peel_nothrow
   bool
-  is_classed () const
+  is_classed () const noexcept
   {
     return !!G_TYPE_IS_CLASSED (tp);
   }
 
-  peel_nothrow
   bool
-  is_instantiatable () const
+  is_instantiatable () const noexcept
   {
     return !!G_TYPE_IS_INSTANTIATABLE (tp);
   }
 
-  peel_nothrow
   bool
-  is_derivable () const
+  is_derivable () const noexcept
   {
     return !!G_TYPE_IS_DERIVABLE (tp);
   }
 
-  peel_nothrow
   bool
-  is_abstract () const
+  is_abstract () const noexcept
   {
     return !!G_TYPE_IS_ABSTRACT (tp);
   }
 
-  peel_nothrow
   bool
-  is_value_type () const
+  is_value_type () const noexcept
   {
     return !!G_TYPE_IS_VALUE_TYPE (tp);
   }
 
-  peel_nothrow
   bool
-  has_value_table () const
+  has_value_table () const noexcept
   {
     return !!G_TYPE_HAS_VALUE_TABLE (tp);
   }
 
-  peel_nothrow
   bool
-  is_final () const
+  is_final () const noexcept
   {
     return !!G_TYPE_IS_FINAL (tp);
   }
 
 #if defined (G_TYPE_IS_DEPRECATED)
-  peel_nothrow
   bool
-  is_deprecated () const
+  is_deprecated () const noexcept
   {
     return !!G_TYPE_IS_DEPRECATED (tp);
   }
@@ -221,23 +203,20 @@ public:
   }
 #endif
 
-  peel_nothrow
   bool
-  is_object () const
+  is_object () const noexcept
   {
     return !!G_TYPE_IS_OBJECT (tp);
   }
 
-  peel_nothrow
   bool
-  is_boxed () const
+  is_boxed () const noexcept
   {
     return !!G_TYPE_IS_BOXED (tp);
   }
 
-  peel_nothrow
   void
-  ensure () const
+  ensure () const noexcept
   {
 #ifdef __GNUC__
     __asm__ volatile ("" :: "rm" (tp));

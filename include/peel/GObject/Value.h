@@ -23,47 +23,42 @@ public:
   template<typename T, typename = void>
   struct Traits;
 
-  constexpr Value ()
+  constexpr Value () noexcept
     : value (G_VALUE_INIT)
   { }
 
-  peel_nothrow
-  Value (Type type)
+  Value (Type type) noexcept
     : value (G_VALUE_INIT)
   {
     g_value_init (&value, static_cast<::GType> (type));
   }
 
-  peel_nothrow
-  Value (const Value &other)
+  Value (const Value &other) noexcept
     : value (G_VALUE_INIT)
   {
     g_value_copy (&other.value, &value);
   }
 
-  Value (Value &&other)
+  Value (Value &&other) noexcept
   {
     memcpy (&value, &other.value, sizeof (value));
     memset (&other.value, 0, sizeof (value));
   }
 
-  peel_nothrow
-  ~Value ()
+  ~Value () noexcept
   {
     g_value_unset (&value);
   }
 
-  peel_nothrow
   Value &
-  operator = (const Value &other)
+  operator = (const Value &other) noexcept
   {
     g_value_copy (&other.value, &value);
     return *this;
   }
 
-  peel_nothrow
   Value &
-  operator = (Value &&other)
+  operator = (Value &&other) noexcept
   {
     g_value_unset (&value);
     memcpy (&value, &other.value, sizeof (value));
@@ -71,23 +66,22 @@ public:
     return *this;
   }
 
-  peel_nothrow
   void
-  reset ()
+  reset () noexcept
   {
     g_value_reset (&value);
   }
 
-  peel_nothrow G_GNUC_CONST
+  G_GNUC_CONST
   Type
-  get_type () const
+  get_type () const noexcept
   {
     return G_VALUE_TYPE (&value);
   }
 
-  peel_nothrow G_GNUC_CONST
+  G_GNUC_CONST
   bool
-  holds (Type type) const
+  holds (Type type) const noexcept
   {
     return !!G_VALUE_HOLDS (&value, static_cast<::GType> (type));
   }
@@ -99,57 +93,52 @@ public:
     return holds (Type::of<T> ());
   }
 
-  peel_nothrow G_GNUC_CONST
+  G_GNUC_CONST
   bool
-  is_interned_string () const
+  is_interned_string () const noexcept
   {
     return !!G_VALUE_IS_INTERNED_STRING (&value);
   }
 
   template<typename T>
-  peel_nothrow G_GNUC_CONST
+  G_GNUC_CONST
   typename Traits<T>::UnownedType
-  get () const
+  get () const noexcept
   {
     return Traits<T>::get (&this->value);
   }
 
   template<typename T>
-  peel_nothrow
   void
-  set (typename Traits<T>::UnownedType value)
+  set (typename Traits<T>::UnownedType value) noexcept
   {
     Traits<T>::set (&this->value, value);
   }
 
   template<typename T>
-  peel_nothrow
   void
-  set (typename Traits<T>::OwnedType &&value)
+  set (typename Traits<T>::OwnedType &&value) noexcept
   {
     Traits<T>::take (&this->value, std::move (value));
   }
 
   template<typename T, typename U>
-  peel_nothrow
   peel::void_t<decltype (&Traits<T>::set_sink)>
-  set (FloatPtr<U> &&value)
+  set (FloatPtr<U> &&value) noexcept
   {
     Traits<T>::set_sink (&this->value, std::move (value));
   }
 
   template<typename T>
-  peel_nothrow
   void
-  take (typename Traits<T>::OwnedType &&value)
+  take (typename Traits<T>::OwnedType &&value) noexcept
   {
     Traits<T>::take (&this->value, std::move (value));
   }
 
   template<typename T>
-  peel_nothrow
   static Value
-  make (typename Traits<T>::UnownedType value)
+  make (typename Traits<T>::UnownedType value) noexcept
   {
     Value v { Type::of<T> () };
     Traits<T>::set (&v.value, value);
@@ -157,9 +146,8 @@ public:
   }
 
   template<typename T>
-  peel_nothrow
   static Value
-  make (typename Traits<T>::OwnedType &&value)
+  make (typename Traits<T>::OwnedType &&value) noexcept
   {
     Value v { Type::of<T> () };
     Traits<T>::take (&v.value, std::move(value));
@@ -177,16 +165,15 @@ struct Value::Traits<signed char>
 {
   typedef signed char UnownedType;
 
-  peel_nothrow G_GNUC_CONST
+  G_GNUC_CONST
   static signed char
-  get (const ::GValue *value)
+  get (const ::GValue *value) noexcept
   {
     return g_value_get_schar (value);
   }
 
-  peel_nothrow
   static void
-  set (::GValue *value, signed char ch)
+  set (::GValue *value, signed char ch) noexcept
   {
     g_value_set_schar (value, ch);
   }
@@ -197,16 +184,15 @@ struct Value::Traits<unsigned char>
 {
   typedef unsigned char UnownedType;
 
-  peel_nothrow G_GNUC_CONST
+  G_GNUC_CONST
   static unsigned char
-  get (const ::GValue *value)
+  get (const ::GValue *value) noexcept
   {
     return g_value_get_uchar (value);
   }
 
-  peel_nothrow
   static void
-  set (::GValue *value, unsigned char ch)
+  set (::GValue *value, unsigned char ch) noexcept
   {
     g_value_set_uchar (value, ch);
   }
@@ -217,16 +203,15 @@ struct Value::Traits<bool>
 {
   typedef bool UnownedType;
 
-  peel_nothrow G_GNUC_CONST
+  G_GNUC_CONST
   static bool
-  get (const ::GValue *value)
+  get (const ::GValue *value) noexcept
   {
     return !!g_value_get_boolean (value);
   }
 
-  peel_nothrow
   static void
-  set (::GValue *value, bool b)
+  set (::GValue *value, bool b) noexcept
   {
     g_value_set_boolean (value, b);
   }
@@ -237,16 +222,15 @@ struct Value::Traits<int>
 {
   typedef int UnownedType;
 
-  peel_nothrow G_GNUC_CONST
+  G_GNUC_CONST
   static int
-  get (const ::GValue *value)
+  get (const ::GValue *value) noexcept
   {
     return g_value_get_int (value);
   }
 
-  peel_nothrow
   static void
-  set (::GValue *value, int i)
+  set (::GValue *value, int i) noexcept
   {
     g_value_set_int (value, i);
   }
@@ -257,16 +241,15 @@ struct Value::Traits<unsigned int>
 {
   typedef unsigned int UnownedType;
 
-  peel_nothrow G_GNUC_CONST
+  G_GNUC_CONST
   static unsigned int
-  get (const ::GValue *value)
+  get (const ::GValue *value) noexcept
   {
     return g_value_get_uint (value);
   }
 
-  peel_nothrow
   static void
-  set (::GValue *value, unsigned int i)
+  set (::GValue *value, unsigned int i) noexcept
   {
     g_value_set_uint (value, i);
   }
@@ -277,16 +260,15 @@ struct Value::Traits<float>
 {
   typedef float UnownedType;
 
-  peel_nothrow G_GNUC_CONST
+  G_GNUC_CONST
   static float
-  get (const ::GValue *value)
+  get (const ::GValue *value) noexcept
   {
     return g_value_get_float (value);
   }
 
-  peel_nothrow
   static void
-  set (::GValue *value, float f)
+  set (::GValue *value, float f) noexcept
   {
     g_value_set_float (value ,f);
   }
@@ -297,16 +279,15 @@ struct Value::Traits<double>
 {
   typedef double UnownedType;
 
-  peel_nothrow G_GNUC_CONST
+  G_GNUC_CONST
   static double
-  get (const ::GValue *value)
+  get (const ::GValue *value) noexcept
   {
     return g_value_get_double (value);
   }
 
-  peel_nothrow
   static void
-  set (::GValue *value, double d)
+  set (::GValue *value, double d) noexcept
   {
     g_value_set_double (value, d);
   }
@@ -320,16 +301,15 @@ struct Value::Traits<const char *>
   typedef const char *UnownedType;
   typedef char *OwnedType;
 
-  peel_nothrow G_GNUC_CONST
+  G_GNUC_CONST
   static const char *
-  get (const ::GValue *value)
+  get (const ::GValue *value) noexcept
   {
     return g_value_get_string (value);
   }
 
-  peel_nothrow
   static void
-  set (::GValue *value, const char *str)
+  set (::GValue *value, const char *str) noexcept
   {
 #ifdef __GNUC__
     if (__builtin_constant_p (__builtin_strlen (str)))
@@ -339,9 +319,8 @@ struct Value::Traits<const char *>
       g_value_set_string (value, str);
   }
 
-  peel_nothrow
   static void
-  take (::GValue *value, char *str)
+  take (::GValue *value, char *str) noexcept
   {
     g_value_take_string (value, str);
   }
@@ -352,16 +331,15 @@ struct Value::Traits<Type>
 {
   typedef Type UnownedType;
 
-  peel_nothrow G_GNUC_CONST
+  G_GNUC_CONST
   static Type
-  get (const ::GValue *value)
+  get (const ::GValue *value) noexcept
   {
     return g_value_get_gtype (value);
   }
 
-  peel_nothrow
   static void
-  set (::GValue *value, Type type)
+  set (::GValue *value, Type type) noexcept
   {
     g_value_set_gtype (value, type);
   }
@@ -372,16 +350,15 @@ struct Value::Traits<void *>
 {
   typedef void *UnownedType;
 
-  peel_nothrow G_GNUC_CONST
+  G_GNUC_CONST
   static void *
-  get (const ::GValue *value)
+  get (const ::GValue *value) noexcept
   {
     return g_value_get_pointer (value);
   }
 
-  peel_nothrow
   static void
-  set (::GValue *value, void *p)
+  set (::GValue *value, void *p) noexcept
   {
     g_value_set_pointer (value, p);
   }
@@ -392,16 +369,15 @@ struct Value::Traits<Value>
 {
   typedef Value *UnownedType;
 
-  peel_nothrow G_GNUC_CONST
+  G_GNUC_CONST
   static Value *
-  get (const ::GValue *value)
+  get (const ::GValue *value) noexcept
   {
     return reinterpret_cast<Value *> (g_value_get_boxed (value));
   }
 
-  peel_nothrow
   static void
-  set (::GValue *value, Value *v)
+  set (::GValue *value, Value *v) noexcept
   {
     g_value_set_boxed (value, reinterpret_cast<const void *> (v));
   }

@@ -37,33 +37,30 @@ private:
   ~Rec ();
 
 public:
-  peel_nothrow peel_arg_inout (2) peel_nonnull_args (2)
+  peel_arg_inout (2) peel_nonnull_args (2)
   void
-  pass_inout_int (int *i)
+  pass_inout_int (int *i) noexcept
   {
     ::TestRec * _peel_this = reinterpret_cast<::TestRec *> (this);
     test_rec_pass_inout_int (_peel_this, i);
   }
 
-  peel_nothrow
   void
-  const_self () const
+  const_self () const noexcept
   {
     const ::TestRec * _peel_this = reinterpret_cast<const ::TestRec *> (this);
     test_rec_const_self (_peel_this);
   }
 
-  peel_nothrow
   void
-  self_gconstpointer () const
+  self_gconstpointer () const noexcept
   {
     ::gconstpointer _peel_this = reinterpret_cast<::gconstpointer> (this);
     test_rec_self_gconstpointer (_peel_this);
   }
 
-  peel_nothrow
   void
-  self_gpointer ()
+  self_gpointer () noexcept
   {
     ::gpointer _peel_this = reinterpret_cast<::gpointer> (this);
     test_rec_self_gpointer (_peel_this);

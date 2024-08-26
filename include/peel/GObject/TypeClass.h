@@ -24,9 +24,8 @@ protected:
   ~TypeClass() { }
 
 public:
-  peel_nothrow
   bool
-  check_type (Type tp) const
+  check_type (Type tp) const noexcept
   {
     return !!G_TYPE_CHECK_CLASS_TYPE (this, static_cast<::GType> (tp));
   }
@@ -38,9 +37,8 @@ public:
     return check_type (Type::of<T> ());
   }
 
-  peel_nothrow
   void *
-  cast (Type tp)
+  cast (Type tp) noexcept
   {
 #if defined (G_DISABLE_CAST_CHECKS) || defined (__OPTIMIZE__)
     (void) tp;
@@ -61,24 +59,21 @@ public:
 #endif
   }
 
-  peel_nothrow
   Type
-  get_type () const
+  get_type () const noexcept
   {
     return G_TYPE_FROM_CLASS (this);
   }
 
-  peel_nothrow
   static RefPtr<TypeClass>
-  get (Type tp)
+  get (Type tp) noexcept
   {
     ::GType type = static_cast<::GType> (tp);
     return reinterpret_cast<TypeClass *> (g_type_class_ref (type));
   }
 
-  peel_nothrow
   static TypeClass *
-  peek (Type tp)
+  peek (Type tp) noexcept
   {
     ::GType type = static_cast<::GType> (tp);
     return reinterpret_cast<TypeClass *> (g_type_class_peek (type));
@@ -91,9 +86,8 @@ public:
     return reinterpret_cast<typename T::Class *> (peek (Type::of<T> ()));
   }
 
-  peel_nothrow
   static TypeClass *
-  peek_static (Type tp)
+  peek_static (Type tp) noexcept
   {
     ::GType type = static_cast<::GType> (tp);
     return reinterpret_cast<TypeClass *> (g_type_class_peek_static (type));
@@ -106,17 +100,15 @@ public:
     return reinterpret_cast<typename T::Class *> (peek_static (Type::of<T> ()));
   }
 
-  peel_nothrow
   TypeClass *
-  peek_parent () const
+  peek_parent () const noexcept
   {
     gpointer klass = const_cast<TypeClass *> (this);
     return reinterpret_cast<TypeClass *> (g_type_class_peek_parent (klass));
   }
 
-  peel_nothrow
   TypeInterface *
-  peek_interface (Type iface_type) const
+  peek_interface (Type iface_type) const noexcept
   {
     gpointer klass = const_cast<TypeClass *> (this);
     ::GType iface_tp = static_cast<::GType> (iface_type);

@@ -259,9 +259,8 @@ private:
 public:
   typedef typename GObject::Value::Traits<T>::UnownedType UnownedType;
 
-  peel_nothrow
   Getter &
-  get (UnownedType (Class::*getter) () const)
+  get (UnownedType (Class::*getter) () const) noexcept
   {
     if (!found_ptr)
       return *this;
@@ -271,9 +270,8 @@ public:
     return *this;
   }
 
-  peel_nothrow
   Getter &
-  get (UnownedType (Class::*getter) ())
+  get (UnownedType (Class::*getter) ()) noexcept
   {
     if (!found_ptr)
       return *this;
@@ -283,9 +281,8 @@ public:
     return *this;
   }
 
-  peel_nothrow
   Getter &
-  get (void (Class::*getter) (GObject::Value *value))
+  get (void (Class::*getter) (GObject::Value *value)) noexcept
   {
     if (!found_ptr)
       return *this;
@@ -294,9 +291,8 @@ public:
     return *this;
   }
 
-  peel_nothrow
   Getter &
-  get (void (Class::*getter) (GObject::Value *value) const)
+  get (void (Class::*getter) (GObject::Value *value) const) noexcept
   {
     if (!found_ptr)
       return *this;
@@ -305,9 +301,8 @@ public:
     return *this;
   }
 
-  peel_nothrow
   Getter &
-  set (...)
+  set (...) noexcept
   {
     return *this;
   }
@@ -380,16 +375,14 @@ private:
 public:
   typedef typename GObject::Value::Traits<T>::UnownedType UnownedType;
 
-  peel_nothrow
   Setter &
-  get (...)
+  get (...) noexcept
   {
     return *this;
   }
 
-  peel_nothrow
   Setter &
-  set (void (Class::*setter) (UnownedType))
+  set (void (Class::*setter) (UnownedType)) noexcept
   {
     if (!found_ptr)
       return *this;
@@ -400,9 +393,8 @@ public:
   }
 
   // template<typename = peel::enable_if_derived<GObject::Object, T>>
-  peel_nothrow
   Setter &
-  set (void (Class::*setter) (FloatPtr<T>))
+  set (void (Class::*setter) (FloatPtr<T>)) noexcept
   {
     if (!found_ptr)
       return *this;
@@ -484,8 +476,7 @@ public:
     basics.flags = ::GParamFlags (G_PARAM_STATIC_STRINGS | G_PARAM_EXPLICIT_NOTIFY);
   }
 
-  peel_nothrow
-  ~Installer ()
+  ~Installer () noexcept
   {
     ::GParamSpec *pspec = traits.create_pspec (basics);
     *pspec_ptr = reinterpret_cast<GObject::ParamSpec *> (pspec);
@@ -543,8 +534,7 @@ public:
     , id (id)
   { }
 
-  peel_nothrow
-  ~OverrideInstaller ()
+  ~OverrideInstaller () noexcept
   {
     g_object_class_override_property (klass, id, name);
   }

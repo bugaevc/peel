@@ -30,9 +30,8 @@ protected:
   ~TypeInstance () = default;
 
 public:
-  peel_nothrow
   bool
-  check_type (Type tp) const
+  check_type (Type tp) const noexcept
   {
     return !!G_TYPE_CHECK_INSTANCE_TYPE (this, static_cast<::GType> (tp));
   }
@@ -44,9 +43,8 @@ public:
     return check_type (Type::of<T> ());
   }
 
-  peel_nothrow
   bool
-  check_fundamental_type (Type tp) const
+  check_fundamental_type (Type tp) const noexcept
   {
     return !!G_TYPE_CHECK_INSTANCE_FUNDAMENTAL_TYPE (this, static_cast<::GType> (tp));
   }
@@ -58,9 +56,8 @@ public:
     return check_fundamental_type (Type::of<T> ());
   }
 
-  peel_nothrow
   void *
-  cast (Type tp)
+  cast (Type tp) noexcept
   {
 #if defined (G_DISABLE_CAST_CHECKS) || defined (__OPTIMIZE__)
     (void) tp;
@@ -81,47 +78,41 @@ public:
 #endif
   }
 
-  peel_nothrow
   TypeClass *
-  get_class () const
+  get_class () const noexcept
   {
     return G_TYPE_INSTANCE_GET_CLASS (this, this doesnt matter, TypeClass);
   }
 
-  peel_nothrow
   TypeInterface *
-  get_interface (Type tp) const
+  get_interface (Type tp) const noexcept
   {
     return G_TYPE_INSTANCE_GET_INTERFACE (this, static_cast<::GType> (tp), TypeInterface);
   }
 
   template<typename I>
-  peel_nothrow
   typename I::Iface *
-  get_interface () const
+  get_interface () const noexcept
   {
     return reinterpret_cast<typename I::Iface *> (get_interface (Type::of<I> ()));
   }
 
-  peel_nothrow
   Type
-  get_type () const
+  get_type () const noexcept
   {
     return G_TYPE_FROM_INSTANCE (this);
   }
 
-  peel_nothrow
   const char *
-  get_type_name () const
+  get_type_name () const noexcept
   {
     ::GTypeInstance *ti = reinterpret_cast<::GTypeInstance *> (const_cast<TypeInstance *> (this));
     return g_type_name_from_instance (ti);
   }
 
 protected:
-  peel_nothrow
   static TypeInstance *
-  create (Type tp)
+  create (Type tp) noexcept
   {
     ::GTypeInstance *ti = g_type_create_instance (static_cast<::GType> (tp));
     return reinterpret_cast<TypeInstance *> (ti);
@@ -134,9 +125,8 @@ protected:
     return reinterpret_cast<T *> (create (Type::of<T> ()));
   }
 
-  peel_nothrow
   void
-  free ()
+  free () noexcept
   {
     ::GTypeInstance *ti = reinterpret_cast<::GTypeInstance *> (this);
     g_type_free_instance (ti);

@@ -351,9 +351,8 @@ class Class(DefinedType):
         if self.is_gobject_derived and not self.sealed:
             visibility.switch('protected')
             l.extend([
-                '  peel_nothrow',
                 '  static void',
-                '  _peel_chain_finalize (::GObject *obj)',
+                '  _peel_chain_finalize (::GObject *obj) noexcept',
                 '  {',
                 '    ::GObjectClass *_peel_class = reinterpret_cast<::GObjectClass *> (GObject::TypeClass::peek_static<{}> ());'.format(self.own_name),
                 '    _peel_class->finalize (obj);',

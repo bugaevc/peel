@@ -66,10 +66,11 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
     l = []
     if templates:
         l.append(indent + 'template<{}>'.format(', '.join(templates)))
-    l.append(indent + 'peel_nothrow' + ''.join(' ' + attr for attr in attributes))
+    if attributes:
+        l.append(indent + ' '.join(attr for attr in attributes))
     fake_return_name = 'fake-return-name'
     rv_cpp_signature = rv.generate_cpp_type(name=fake_return_name, context=context)
-    params_signature = '{} ({})'.format(name, cpp_signature) + (' const' if is_const else '')
+    params_signature = '{} ({})'.format(name, cpp_signature) + (' const' if is_const else '') + ' noexcept'
     if rv_cpp_signature.endswith(fake_return_name):
         rv_cpp_type = rv_cpp_signature[:-len(fake_return_name)].strip()
         l.extend([
