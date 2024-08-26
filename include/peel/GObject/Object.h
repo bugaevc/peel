@@ -346,7 +346,7 @@ public:
           const Value *_peel_from_value = reinterpret_cast<const Value *> (from_value);
           Value *_peel_to_value = reinterpret_cast<Value *> (to_value);
           U u { data };
-          bool transformed = BindingTransformHelper<T1, T2, CTo>::transform (u.transform_to, _peel_from_value, _peel_to_value);
+          bool transformed = BindingTransformHelper<T1, T2, CTo>::transform (u.transform_to, _peel_binding, _peel_from_value, _peel_to_value);
           return static_cast<gboolean> (transformed);
         };
         _peel_transform_from = std::is_same<CFrom, decltype (nullptr)>::value ? nullptr : +[] (::GBinding *binding, const ::GValue *from_value, ::GValue *to_value, gpointer data) -> gboolean
@@ -364,7 +364,7 @@ public:
               memcpy (&u2.transform_from, &u.transform_to + 1, sizeof (CFrom));
               transform_from = &u2.transform_from;
             }
-          bool transformed = BindingTransformHelper<T2, T1, CFrom>::transform (*transform_from, _peel_from_value, _peel_to_value);
+          bool transformed = BindingTransformHelper<T2, T1, CFrom>::transform (*transform_from, _peel_binding, _peel_from_value, _peel_to_value);
           return static_cast<gboolean> (transformed);
         };
       }
@@ -392,7 +392,7 @@ public:
           const Value *_peel_from_value = reinterpret_cast<const Value *> (from_value);
           Value *_peel_to_value = reinterpret_cast<Value *> (to_value);
           TransformClosure *closure = reinterpret_cast<TransformClosure *> (data);
-          bool transformed = BindingTransformHelper<T1, T2, CTo>::transform (closure->transform_to, _peel_from_value, _peel_to_value);
+          bool transformed = BindingTransformHelper<T1, T2, CTo>::transform (closure->transform_to, _peel_binding, _peel_from_value, _peel_to_value);
           return static_cast<gboolean> (transformed);
         };
         _peel_transform_from = std::is_same<CFrom, decltype (nullptr)>::value ? nullptr : +[] (::GBinding *binding, const ::GValue *from_value, ::GValue *to_value, gpointer data) -> gboolean
@@ -401,7 +401,7 @@ public:
           const Value *_peel_from_value = reinterpret_cast<const Value *> (from_value);
           Value *_peel_to_value = reinterpret_cast<Value *> (to_value);
           TransformClosure *closure = reinterpret_cast<TransformClosure *> (data);
-          bool transformed = BindingTransformHelper<T2, T1, CFrom>::transform (closure->transform_from, _peel_from_value, _peel_to_value);
+          bool transformed = BindingTransformHelper<T2, T1, CFrom>::transform (closure->transform_from, _peel_binding, _peel_from_value, _peel_to_value);
           return static_cast<gboolean> (transformed);
         };
       }
@@ -757,9 +757,9 @@ template<typename T1, typename T2, typename C, typename>
 struct Object::BindingTransformHelper
 {
   static bool
-  transform (C &callback, const Value *from_value, Value *to_value)
+  transform (C &callback, Binding *binding, const Value *from_value, Value *to_value)
   {
-    return callback (from_value, to_value);
+    return callback (binding, from_value, to_value);
   }
 };
 
@@ -767,8 +767,9 @@ template<typename T1, typename T2, typename C>
 struct Object::BindingTransformHelper<T1, T2, C, decltype (std::declval<Value> ().set<T2> (std::declval<C> () (std::declval<typename Value::Traits<T1>::UnownedType> ())))>
 {
   static bool
-  transform (C &callback, const Value *from_value, Value *to_value)
+  transform (C &callback, Binding *binding, const Value *from_value, Value *to_value)
   {
+    (void) binding;
     to_value->set<T2> (callback (from_value->get<T1> ()));
     return true;
   }
