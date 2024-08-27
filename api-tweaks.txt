@@ -519,6 +519,17 @@ ifdef	g_dbus_proxy_call_with_unix_fd_list		G_OS_UNIX
 ifdef	g_dbus_proxy_call_with_unix_fd_list_finish	G_OS_UNIX
 ifdef	g_dbus_proxy_call_with_unix_fd_list_sync	G_OS_UNIX
 
+skip	g_registry_settings_backend_new	Gio
+skip	GWin32InputStream		Gio
+skip	GWin32OutputStream		Gio
+skip	GWin32NetworkMonitor		Gio
+opaque	GWin32NetworkMonitor
+skip	GWin32NetworkMonitorClass	Gio
+repo-skip gio-windows-2.0		Gio
+repo-skip gio/gwin32inputstream.h	Gio
+repo-skip gio/gwin32outputstream.h	Gio
+repo-skip gio/gregistrysettingsbackend.h Gio
+
 # cairo
 raw	cairo
 #skip	cairo_image_surface_create
