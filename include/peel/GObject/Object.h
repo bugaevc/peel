@@ -109,6 +109,13 @@ private:
   template<typename T1, typename T2, typename C, typename = void>
   struct BindingTransformHelper;
 
+  template<typename F>
+  constexpr static bool
+  is_effectively_empty ()
+  {
+    return std::is_same<F, decltype (nullptr)>::value || std::is_empty<F>::value;
+  }
+
 protected:
   ~Object () = default;
 
@@ -273,8 +280,8 @@ public:
 
     typedef typename std::remove_reference<TransformTo>::type CTo;
     typedef typename std::remove_reference<TransformFrom>::type CFrom;
-    constexpr size_t c_to_size = (std::is_same<CTo, decltype (nullptr)>::value || std::is_empty<CTo>::value) ? 0 : sizeof (CTo);
-    constexpr size_t c_from_size = (std::is_same<CFrom, decltype (nullptr)>::value || std::is_empty<CFrom>::value) ? 0 : sizeof (CFrom);
+    size_t c_to_size = is_effectively_empty<CTo> () ? 0 : sizeof (CTo);
+    size_t c_from_size = is_effectively_empty<CFrom> () ? 0 : sizeof (CFrom);
     if (c_to_size + c_from_size <= sizeof (gpointer))
       {
         union U
@@ -292,12 +299,12 @@ public:
           U2 () : storage { 0 } { }
           ~U2 () { }
         } u2;
-        if (c_to_size == 0)
+        if (is_effectively_empty<CTo> ())
           {
             new (&u.transform_to) CTo (static_cast<TransformTo &&> (transform_to));
             new (&u.transform_from) CFrom (static_cast<TransformFrom &&> (transform_from));
           }
-        else if (c_from_size == 0)
+        else if (is_effectively_empty<CFrom> ())
           {
             new (&u.transform_from) CFrom (static_cast<TransformFrom &&> (transform_from));
             new (&u.transform_to) CTo (static_cast<TransformTo &&> (transform_to));
@@ -315,7 +322,7 @@ public:
           _peel_notify = +[] (gpointer data)
           {
             U u { data };
-            if (c_to_size == 0 || c_from_size == 0)
+            if (is_effectively_empty<CTo> () || is_effectively_empty<CFrom> ())
               {
                 u.transform_from.~CFrom ();
                 u.transform_to.~CTo ();
@@ -345,7 +352,7 @@ public:
           U u { data };
           U2 u2;
           CFrom *transform_from;
-          if (c_to_size == 0 || c_from_size == 0)
+          if (is_effectively_empty<CTo> () || is_effectively_empty<CFrom> ())
             transform_from = &u.transform_from;
           else
             {
