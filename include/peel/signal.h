@@ -6,6 +6,7 @@
 #include <peel/RefPtr.h>
 #include <peel/UniquePtr.h>
 #include <peel/lang.h>
+#include <peel/callback.h>
 #include <new>
 #include <type_traits>
 #include <glib-object.h>
@@ -15,6 +16,7 @@ namespace peel
 namespace GObject
 {
 enum class SignalFlags : std::underlying_type<::GSignalFlags>::type;
+struct SignalInvocationHint;
 }
 
 namespace internals
@@ -646,15 +648,34 @@ private:
   }
 
 public:
+  template<typename Accumulator = decltype (nullptr)>
   static Signal
-  create (const char *name, GObject::SignalFlags flags = static_cast<GObject::SignalFlags> (G_SIGNAL_RUN_LAST) /* TODO: class closure, accumulator */) noexcept
+  create (
+    const char *name,
+    GObject::SignalFlags flags = static_cast<GObject::SignalFlags> (G_SIGNAL_RUN_LAST),
+    decltype (nullptr) class_closure = nullptr, /* TODO support this */
+    Accumulator &&accumulator = nullptr
+  ) noexcept
   {
+    (void) class_closure;
     ::GType instance_type = GObject::Type::of<Instance> ();
     ::GType return_type = GObject::Type::of<typename internals::SignalTraits<Ret>::PlainCppType> ();
     ::GType param_types[] = { GObject::Type::of<typename internals::SignalTraits<Args>::PlainCppType> ()..., G_TYPE_INVALID };
     Signal signal;
+    gpointer accu_data;
+    ::GSignalAccumulator _peel_accumulator = internals::CallbackHelper<gboolean, ::GSignalInvocationHint *, ::GValue *, const ::GValue *>::wrap_notified_callback (
+      static_cast<Accumulator &&> (accumulator),
+      [] (::GSignalInvocationHint *hint, ::GValue *return_accu, const ::GValue *handler_return, gpointer data) -> gboolean
+      {
+        GObject::SignalInvocationHint *_peel_hint = reinterpret_cast<GObject::SignalInvocationHint *> (hint);
+        GObject::Value *_peel_return_accu = reinterpret_cast<GObject::Value *> (return_accu);
+        const GObject::Value *_peel_handler_return = reinterpret_cast<const GObject::Value *> (handler_return);
+        Accumulator &_peel_accumulator = *reinterpret_cast<typename std::remove_reference<Accumulator>::type *> (data);
+        bool _peel_return = internals::invoke_if_nonnull<bool> (_peel_accumulator) (_peel_hint, _peel_return_accu, _peel_handler_return);
+        return static_cast<gboolean> (_peel_return);
+      }, &accu_data, nullptr);
     signal.id = g_signal_newv (name, instance_type, static_cast<::GSignalFlags> (flags),
-                               nullptr, nullptr, nullptr,
+                               nullptr, _peel_accumulator, accu_data,
                                marshal, return_type,
                                sizeof... (Args), param_types);
     g_signal_set_va_marshaller (signal.id, instance_type, marshal_va);
