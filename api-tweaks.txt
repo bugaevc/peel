@@ -722,6 +722,7 @@ pointer	GdkToplevelSize
 pointer	GdkDragSurfaceSize
 onstack	GdkRGBA
 onstack	GdkRectangle
+onstack	GdkTimeCoord
 
 # GdkX11
 skip	gdk_x11_display_text_property_to_text_list
