@@ -324,8 +324,18 @@ class Parameter(NodeHandler):
             # Even if we're normally passed by ref, inside arrays (or for record fields)
             # we're not behind an additional pointer. In this case ownership would apply
             # to the array, not the item.
-            if itp is not tp or self.is_record_field:
+            if itp is not tp:
                 return make_type(constness0 + type_name)
+            if self.is_record_field:
+                assert(self.ownership is None)
+                # Could be either by-value (inline), or by-pointer. Try to guess which
+                # one it is by interrogating the C type. extract_constness_from_c_type()
+                # has grokked the number of indirections in the C type, so if it's non-
+                # zero, we're looking at a by-pointer stored field.
+                if constness:
+                    return make_type(constness0 + add_asterisk(type_name) + constness1)
+                else:
+                    return make_type(type_name)
 
         if self.ownership == 'none' or self.ownership is None:
             return make_type(constness0 + add_asterisk(type_name) + constness1)

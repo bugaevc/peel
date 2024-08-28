@@ -659,6 +659,13 @@ onstack	PangoAttrString
 in	pango_font_get_features		len
 in	PangoFont::vfunc_get_features	len
 
+unowned	pango_script_iter_get_range	start
+unowned	pango_script_iter_get_range	end
+unowned	pango_scan_int			pos
+unowned	pango_scan_string		pos
+unowned	pango_scan_word			pos
+unowned	pango_skip_space		pos
+
 # TODO: conflicts with a field, rename the field
 skip	pango_layout_line_is_paragraph_start
 
