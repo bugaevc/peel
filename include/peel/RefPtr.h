@@ -121,8 +121,9 @@ public:
     return p;
   }
 
+  template<typename U, peel::enable_if_derived<T, U, int> = 0>
   RefPtr &
-  operator = (T *ptr) noexcept
+  operator = (U *ptr) noexcept
   {
     if (ptr)
       RefTraits<T>::ref (ptr);
@@ -143,6 +144,19 @@ public:
     return *this;
   }
 
+  /* upcast */
+  template<typename U, peel::enable_if_derived<T, U, int> = 0>
+  RefPtr &
+  operator = (const RefPtr<U> &other) noexcept
+  {
+    if (other.ptr)
+      RefTraits<T>::ref (other.ptr);
+    if (this->ptr)
+      RefTraits<T>::unref (this->ptr);
+    this->ptr = other.ptr;
+    return *this;
+  }
+
   RefPtr &
   operator = (RefPtr &&other) & noexcept
   {
@@ -150,6 +164,27 @@ public:
       RefTraits<T>::unref (ptr);
     ptr = other.ptr;
     other.ptr = nullptr;
+    return *this;
+  }
+
+  /* upcast */
+  template<typename U, peel::enable_if_derived<T, U, int> = 0>
+  RefPtr &
+  operator = (RefPtr<U> &&other) & noexcept
+  {
+    if (ptr)
+      RefTraits<T>::unref (ptr);
+    ptr = other.ptr;
+    other.ptr = nullptr;
+    return *this;
+  }
+
+  RefPtr &
+  operator = (decltype (nullptr)) noexcept
+  {
+    if (this->ptr)
+      RefTraits<T>::unref (this->ptr);
+    this->ptr = nullptr;
     return *this;
   }
 
