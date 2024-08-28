@@ -107,6 +107,9 @@ public:
 };
 
 template<typename T>
+class ArrayRef;
+
+template<typename T>
 class UniquePtr<T[]> final
 {
 private:
@@ -199,6 +202,9 @@ public:
     return ptr;
   }
 
+#ifdef peel_cpp_14
+  constexpr
+#endif
   T &
   operator [] (size_t index)
   {
@@ -210,6 +216,23 @@ public:
   {
     return ptr[index];
   }
+
+#ifdef peel_cpp_14
+  constexpr
+#endif
+  operator ArrayRef<T> () &
+  {
+    return ArrayRef<T> { ptr, c };
+  }
+
+  constexpr
+  operator ArrayRef<const T> () const &
+  {
+    return ArrayRef<const T> { ptr, c };
+  }
+
+  operator ArrayRef<T> () && = delete;
+  operator ArrayRef<const T> () && = delete;
 
   typedef T value_type;
   typedef T &reference;
