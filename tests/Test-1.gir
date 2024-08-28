@@ -718,6 +718,234 @@
           </parameter>
         </parameters>
       </virtual-method>
+      <method name="pass_array_transfer_full" c:identifier="test_testy_pass_array_transfer_full">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="objects"
+                     transfer-ownership="full">
+            <array length="1" c:type="GObject**">
+              <type name="GObject.Object"/>
+            </array>
+          </parameter>
+          <parameter name="count"
+                     transfer-ownership="full">
+            <type name="gsize" c:type="gsize"/>
+          </parameter>
+        </parameters>
+      </method>
+      <virtual-method name="pass_array_transfer_full">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="objects"
+                     transfer-ownership="full">
+            <array length="1" c:type="GObject**">
+              <type name="GObject.Object"/>
+            </array>
+          </parameter>
+          <parameter name="count"
+                     transfer-ownership="full">
+            <type name="gsize" c:type="gsize"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <method name="pass_array_transfer_container" c:identifier="test_testy_pass_array_transfer_container">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="objects"
+                     transfer-ownership="container">
+            <array length="1" c:type="GObject**">
+              <type name="GObject.Object"/>
+            </array>
+          </parameter>
+          <parameter name="count"
+                     transfer-ownership="full">
+            <type name="gsize" c:type="gsize"/>
+          </parameter>
+        </parameters>
+      </method>
+      <virtual-method name="pass_array_transfer_container">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="objects"
+                     transfer-ownership="container">
+            <array length="1" c:type="GObject**">
+              <type name="GObject.Object"/>
+            </array>
+          </parameter>
+          <parameter name="count"
+                     transfer-ownership="full">
+            <type name="gsize" c:type="gsize"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <method name="pass_array_transfer_none" c:identifier="test_testy_pass_array_transfer_none">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="objects"
+                     transfer-ownership="none">
+            <array length="1" c:type="GObject**">
+              <type name="GObject.Object"/>
+            </array>
+          </parameter>
+          <parameter name="count"
+                     transfer-ownership="full">
+            <type name="gsize" c:type="gsize"/>
+          </parameter>
+        </parameters>
+      </method>
+      <virtual-method name="pass_array_transfer_none">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="objects"
+                     transfer-ownership="none">
+            <array length="1" c:type="GObject**">
+              <type name="GObject.Object"/>
+            </array>
+          </parameter>
+          <parameter name="count"
+                     transfer-ownership="full">
+            <type name="gsize" c:type="gsize"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <method name="return_array_transfer_full" c:identifier="test_testy_return_array_transfer_full">
+        <return-value transfer-ownership="full">
+            <array length="0" c:type="GObject**">
+              <type name="GObject.Object"/>
+            </array>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="count"
+                     direction="out"
+                     transfer-ownership="full"
+                     optional="1">
+            <type name="gsize" c:type="gsize*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <virtual-method name="return_array_transfer_full">
+        <return-value transfer-ownership="full">
+            <array length="0" c:type="GObject**">
+              <type name="GObject.Object"/>
+            </array>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="count"
+                     direction="out"
+                     transfer-ownership="full"
+                     optional="1">
+            <type name="gsize" c:type="gsize*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <method name="return_array_transfer_container" c:identifier="test_testy_return_array_transfer_container">
+        <return-value transfer-ownership="container">
+            <array length="0" c:type="GObject**">
+              <type name="GObject.Object"/>
+            </array>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="count"
+                     direction="out"
+                     transfer-ownership="full"
+                     optional="1">
+            <type name="gsize" c:type="gsize*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <virtual-method name="return_array_transfer_container">
+        <return-value transfer-ownership="full">
+            <array length="0" c:type="GObject**">
+              <type name="GObject.Object"/>
+            </array>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="count"
+                     direction="out"
+                     transfer-ownership="full"
+                     optional="1">
+            <type name="gsize" c:type="gsize*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <method name="return_array_transfer_none" c:identifier="test_testy_return_array_transfer_none">
+        <return-value transfer-ownership="none">
+            <array length="0" c:type="GObject**">
+              <type name="GObject.Object"/>
+            </array>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="count"
+                     direction="out"
+                     transfer-ownership="full"
+                     optional="1">
+            <type name="gsize" c:type="gsize*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <virtual-method name="return_array_transfer_none">
+        <return-value transfer-ownership="none">
+            <array length="0" c:type="GObject**">
+              <type name="GObject.Object"/>
+            </array>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="count"
+                     direction="out"
+                     transfer-ownership="full"
+                     optional="1">
+            <type name="gsize" c:type="gsize*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
     </class>
     <record name="TestyClass"
             c:type="TestTestyClass"

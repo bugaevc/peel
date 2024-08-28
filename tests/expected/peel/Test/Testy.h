@@ -299,6 +299,63 @@ public:
     *buffer = peel::ArrayRef<uint8_t> (reinterpret_cast<uint8_t *> (_peel_buffer), _peel_buffer_size);
   }
 
+  void
+  pass_array_transfer_full (peel::UniquePtr<peel::RefPtr<GObject::Object>[]> objects) noexcept
+  {
+    gsize _peel_count;
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    ::GObject ** _peel_objects = (_peel_count = objects.size (), reinterpret_cast<::GObject **> (std::move (objects).release_ref ()));
+    test_testy_pass_array_transfer_full (_peel_this, _peel_objects, _peel_count);
+  }
+
+  void
+  pass_array_transfer_container (peel::UniquePtr<GObject::Object *[]> objects) noexcept
+  {
+    gsize _peel_count;
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    ::GObject ** _peel_objects = (_peel_count = objects.size (), reinterpret_cast<::GObject **> (std::move (objects).release_ref ()));
+    test_testy_pass_array_transfer_container (_peel_this, _peel_objects, _peel_count);
+  }
+
+  void
+  pass_array_transfer_none (peel::ArrayRef<GObject::Object *> objects) noexcept
+  {
+    gsize _peel_count;
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    ::GObject ** _peel_objects = (_peel_count = objects.size (), reinterpret_cast<::GObject **> (objects.ptr ()));
+    test_testy_pass_array_transfer_none (_peel_this, _peel_objects, _peel_count);
+  }
+
+  peel::UniquePtr<peel::RefPtr<GObject::Object>[]>
+  return_array_transfer_full () noexcept
+  {
+    gsize _peel_count;
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    ::GObject ** _peel_return = test_testy_return_array_transfer_full (_peel_this, &_peel_count);
+    peel_assume (_peel_return);
+    return peel::UniquePtr<peel::RefPtr<GObject::Object>[]>::adopt_ref (reinterpret_cast<peel::RefPtr<GObject::Object> *> (_peel_return), _peel_count);
+  }
+
+  peel::UniquePtr<GObject::Object *[]>
+  return_array_transfer_container () noexcept
+  {
+    gsize _peel_count;
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    ::GObject ** _peel_return = test_testy_return_array_transfer_container (_peel_this, &_peel_count);
+    peel_assume (_peel_return);
+    return peel::UniquePtr<GObject::Object *[]>::adopt_ref (reinterpret_cast<GObject::Object **> (_peel_return), _peel_count);
+  }
+
+  peel::ArrayRef<GObject::Object *>
+  return_array_transfer_none () noexcept
+  {
+    gsize _peel_count;
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    ::GObject ** _peel_return = test_testy_return_array_transfer_none (_peel_this, &_peel_count);
+    peel_assume (_peel_return);
+    return peel::ArrayRef<GObject::Object *> (reinterpret_cast<GObject::Object **> (_peel_return), _peel_count);
+  }
+
 protected:
   template<typename DerivedClass>
   int
@@ -519,6 +576,75 @@ protected:
     void * _peel_buffer;
     _peel_class->read_out (_peel_this, &_peel_buffer, &_peel_buffer_size);
     *buffer = peel::ArrayRef<uint8_t> (reinterpret_cast<uint8_t *> (_peel_buffer), _peel_buffer_size);
+  }
+
+  template<typename DerivedClass>
+  void
+  parent_vfunc_pass_array_transfer_full (peel::UniquePtr<peel::RefPtr<GObject::Object>[]> objects) noexcept
+  {
+    ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    gsize _peel_count;
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    ::GObject ** _peel_objects = (_peel_count = objects.size (), reinterpret_cast<::GObject **> (std::move (objects).release_ref ()));
+    _peel_class->pass_array_transfer_full (_peel_this, _peel_objects, _peel_count);
+  }
+
+  template<typename DerivedClass>
+  void
+  parent_vfunc_pass_array_transfer_container (peel::UniquePtr<GObject::Object *[]> objects) noexcept
+  {
+    ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    gsize _peel_count;
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    ::GObject ** _peel_objects = (_peel_count = objects.size (), reinterpret_cast<::GObject **> (std::move (objects).release_ref ()));
+    _peel_class->pass_array_transfer_container (_peel_this, _peel_objects, _peel_count);
+  }
+
+  template<typename DerivedClass>
+  void
+  parent_vfunc_pass_array_transfer_none (peel::ArrayRef<GObject::Object *> objects) noexcept
+  {
+    ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    gsize _peel_count;
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    ::GObject ** _peel_objects = (_peel_count = objects.size (), reinterpret_cast<::GObject **> (objects.ptr ()));
+    _peel_class->pass_array_transfer_none (_peel_this, _peel_objects, _peel_count);
+  }
+
+  template<typename DerivedClass>
+  peel::UniquePtr<peel::RefPtr<GObject::Object>[]>
+  parent_vfunc_return_array_transfer_full () noexcept
+  {
+    ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    gsize _peel_count;
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    ::GObject ** _peel_return = _peel_class->return_array_transfer_full (_peel_this, &_peel_count);
+    peel_assume (_peel_return);
+    return peel::UniquePtr<peel::RefPtr<GObject::Object>[]>::adopt_ref (reinterpret_cast<peel::RefPtr<GObject::Object> *> (_peel_return), _peel_count);
+  }
+
+  template<typename DerivedClass>
+  peel::UniquePtr<peel::RefPtr<GObject::Object>[]>
+  parent_vfunc_return_array_transfer_container () noexcept
+  {
+    ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    gsize _peel_count;
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    ::GObject ** _peel_return = _peel_class->return_array_transfer_container (_peel_this, &_peel_count);
+    peel_assume (_peel_return);
+    return peel::UniquePtr<peel::RefPtr<GObject::Object>[]>::adopt_ref (reinterpret_cast<peel::RefPtr<GObject::Object> *> (_peel_return), _peel_count);
+  }
+
+  template<typename DerivedClass>
+  peel::ArrayRef<GObject::Object *>
+  parent_vfunc_return_array_transfer_none () noexcept
+  {
+    ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    gsize _peel_count;
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    ::GObject ** _peel_return = _peel_class->return_array_transfer_none (_peel_this, &_peel_count);
+    peel_assume (_peel_return);
+    return peel::ArrayRef<GObject::Object *> (reinterpret_cast<GObject::Object **> (_peel_return), _peel_count);
   }
 
 public:
@@ -785,6 +911,84 @@ public:
         peel::ArrayRef<uint8_t> _peel_buffer;
         _peel_this->DerivedClass::vfunc_read_out (&_peel_buffer);
         *buffer = (*buffer_size = _peel_buffer.size (), reinterpret_cast<void *> (_peel_buffer.ptr ()));
+      };
+    }
+
+    template<typename DerivedClass>
+    void
+    override_vfunc_pass_array_transfer_full ()
+    {
+      ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
+      klass->pass_array_transfer_full = +[] (::TestTesty *self, ::GObject **objects, gsize count) -> void
+      {
+        DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
+        peel::UniquePtr<peel::RefPtr<GObject::Object>[]> _peel_objects = peel::UniquePtr<peel::RefPtr<GObject::Object>[]>::adopt_ref (reinterpret_cast<peel::RefPtr<GObject::Object> *> (objects), count);
+        _peel_this->DerivedClass::vfunc_pass_array_transfer_full (std::move (_peel_objects));
+      };
+    }
+
+    template<typename DerivedClass>
+    void
+    override_vfunc_pass_array_transfer_container ()
+    {
+      ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
+      klass->pass_array_transfer_container = +[] (::TestTesty *self, ::GObject **objects, gsize count) -> void
+      {
+        DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
+        peel::UniquePtr<GObject::Object *[]> _peel_objects = peel::UniquePtr<GObject::Object *[]>::adopt_ref (reinterpret_cast<GObject::Object **> (objects), count);
+        _peel_this->DerivedClass::vfunc_pass_array_transfer_container (std::move (_peel_objects));
+      };
+    }
+
+    template<typename DerivedClass>
+    void
+    override_vfunc_pass_array_transfer_none ()
+    {
+      ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
+      klass->pass_array_transfer_none = +[] (::TestTesty *self, ::GObject **objects, gsize count) -> void
+      {
+        DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
+        peel::ArrayRef<GObject::Object *> _peel_objects = peel::ArrayRef<GObject::Object *> (reinterpret_cast<GObject::Object **> (objects), count);
+        _peel_this->DerivedClass::vfunc_pass_array_transfer_none (_peel_objects);
+      };
+    }
+
+    template<typename DerivedClass>
+    void
+    override_vfunc_return_array_transfer_full ()
+    {
+      ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
+      klass->return_array_transfer_full = +[] (::TestTesty *self, gsize *count) -> ::GObject **
+      {
+        DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
+        peel::UniquePtr<peel::RefPtr<GObject::Object>[]> _peel_return = _peel_this->DerivedClass::vfunc_return_array_transfer_full ();
+        return ((count ? (*count = _peel_return.size ()) : 0), reinterpret_cast<::GObject **> (std::move (_peel_return).release_ref ()));
+      };
+    }
+
+    template<typename DerivedClass>
+    void
+    override_vfunc_return_array_transfer_container ()
+    {
+      ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
+      klass->return_array_transfer_container = +[] (::TestTesty *self, gsize *count) -> ::GObject **
+      {
+        DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
+        peel::UniquePtr<peel::RefPtr<GObject::Object>[]> _peel_return = _peel_this->DerivedClass::vfunc_return_array_transfer_container ();
+        return ((count ? (*count = _peel_return.size ()) : 0), reinterpret_cast<::GObject **> (std::move (_peel_return).release_ref ()));
+      };
+    }
+
+    template<typename DerivedClass>
+    void
+    override_vfunc_return_array_transfer_none ()
+    {
+      ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
+      klass->return_array_transfer_none = +[] (::TestTesty *self, gsize *count) -> ::GObject **
+      {
+        DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
+        peel::ArrayRef<GObject::Object *> _peel_return = _peel_this->DerivedClass::vfunc_return_array_transfer_none ();
+        return ((count ? (*count = _peel_return.size ()) : 0), reinterpret_cast<::GObject **> (_peel_return.ptr ()));
       };
     }
   };

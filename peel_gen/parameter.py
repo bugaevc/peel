@@ -328,7 +328,7 @@ class Parameter(NodeHandler):
             return make_type('peel::FloatPtr<{}{}>'.format(constness0, type_name))
         elif self.ownership == 'container':
             if itp is not tp:
-                make_type(constness0 + add_asterisk(type_name) + constness1)
+                return make_type(constness0 + add_asterisk(type_name) + constness1)
             raise UnsupportedForNowException('non-array transfer container')
         else:
             if itp.is_refcounted:
