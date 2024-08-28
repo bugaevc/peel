@@ -124,6 +124,12 @@ private:
         for (size_t i = 0; i < c; i++)
           ptr[i].~T();
       }
+#ifdef __GNUC__
+    /* It is safe to call g_free (nullptr), so don't emit an extra
+       runtime check.  But also don't call g_free (nullptr) when we
+       know at compile time that it's nullptr that we're dealing with. */
+    if (!__builtin_constant_p (ptr == nullptr) || (ptr != nullptr))
+#endif
     g_free (reinterpret_cast<gpointer> (ptr));
     ptr = nullptr;
     c = 0;
