@@ -946,6 +946,50 @@
           </parameter>
         </parameters>
       </virtual-method>
+      <method name="inout_value_array" c:identifier="test_testy_inout_value_array">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="values"
+                     transfer-ownership="full"
+                     direction="inout">
+            <array length="1" c:type="GValue**">
+              <type name="GObject.Value"/>
+            </array>
+          </parameter>
+          <parameter name="count"
+                     direction="inout"
+                     transfer-ownership="full">
+            <type name="gsize" c:type="gsize*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <virtual-method name="inout_value_array">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="values"
+                     transfer-ownership="full"
+                     direction="inout">
+            <array length="1" c:type="GValue**">
+              <type name="GObject.Value"/>
+            </array>
+          </parameter>
+          <parameter name="count"
+                     direction="inout"
+                     transfer-ownership="full">
+            <type name="gsize" c:type="gsize*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
     </class>
     <record name="TestyClass"
             c:type="TestTestyClass"

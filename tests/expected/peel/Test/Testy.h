@@ -356,6 +356,16 @@ public:
     return peel::ArrayRef<GObject::Object *> (reinterpret_cast<GObject::Object **> (_peel_return), _peel_count);
   }
 
+  void
+  inout_value_array (peel::UniquePtr<GObject::Value[]> *values) noexcept
+  {
+    gsize _peel_count;
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    ::GValue * _peel_values = (_peel_count = values->size (), reinterpret_cast<::GValue *> (std::move (*values).release_ref ()));
+    test_testy_inout_value_array (_peel_this, &_peel_values, &_peel_count);
+    *values = peel::UniquePtr<GObject::Value[]>::adopt_ref (reinterpret_cast<GObject::Value *> (_peel_values), _peel_count);
+  }
+
 protected:
   template<typename DerivedClass>
   int
@@ -645,6 +655,18 @@ protected:
     ::GObject ** _peel_return = _peel_class->return_array_transfer_none (_peel_this, &_peel_count);
     peel_assume (_peel_return);
     return peel::ArrayRef<GObject::Object *> (reinterpret_cast<GObject::Object **> (_peel_return), _peel_count);
+  }
+
+  template<typename DerivedClass>
+  void
+  parent_vfunc_inout_value_array (peel::UniquePtr<GObject::Value[]> *values) noexcept
+  {
+    ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    gsize _peel_count;
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    ::GValue * _peel_values = (_peel_count = values->size (), reinterpret_cast<::GValue *> (std::move (*values).release_ref ()));
+    _peel_class->inout_value_array (_peel_this, &_peel_values, &_peel_count);
+    *values = peel::UniquePtr<GObject::Value[]>::adopt_ref (reinterpret_cast<GObject::Value *> (_peel_values), _peel_count);
   }
 
 public:
@@ -991,6 +1013,20 @@ public:
         return ((count ? (*count = _peel_return.size ()) : 0), reinterpret_cast<::GObject **> (_peel_return.ptr ()));
       };
     }
+
+    template<typename DerivedClass>
+    void
+    override_vfunc_inout_value_array ()
+    {
+      ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
+      klass->inout_value_array = +[] (::TestTesty *self, ::GValue **values, gsize *count) -> void
+      {
+        DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
+        peel::UniquePtr<GObject::Value[]> _peel_values = peel::UniquePtr<GObject::Value[]>::adopt_ref (reinterpret_cast<GObject::Value *> (*values), *count);
+        _peel_this->DerivedClass::vfunc_inout_value_array (&_peel_values);
+        *values = (*count = _peel_values.size (), reinterpret_cast<::GValue *> (std::move (_peel_values).release_ref ()));
+      };
+    }
   };
 
   static_assert (sizeof (Class) == sizeof (::TestTestyClass),
@@ -1005,3 +1041,4 @@ public:
 G_GNUC_END_IGNORE_DEPRECATIONS
 
 #include <peel/GObject/Binding.h>
+#include <peel/GObject/Value.h>

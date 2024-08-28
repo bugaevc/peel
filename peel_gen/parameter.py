@@ -319,9 +319,15 @@ class Parameter(NodeHandler):
         if strip_refs and itp is tp:
             strip_refs -= 1
             return make_type(constness0 + type_name)
-        if self.ownership == 'none' or self.ownership is None:
-            if (itp is not tp or self.is_record_field) and itp.can_be_allocated_by_value():
+
+        if itp.can_be_allocated_by_value():
+            # Even if we're normally passed by ref, inside arrays (or for record fields)
+            # we're not behind an additional pointer. In this case ownership would apply
+            # to the array, not the item.
+            if itp is not tp or self.is_record_field:
                 return make_type(constness0 + type_name)
+
+        if self.ownership == 'none' or self.ownership is None:
             return make_type(constness0 + add_asterisk(type_name) + constness1)
         elif self.ownership == 'floating':
             assert(itp is tp)
