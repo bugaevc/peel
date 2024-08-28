@@ -17,7 +17,7 @@ invoke_if_nonnull (F &&f)
 
 template<typename Ret>
 Ret
-(*invoke_if_nonnull (decltype (nullptr) &&)) (...)
+(*invoke_if_nonnull (decltype (nullptr))) (...)
 {
   peel_unreachable;
   return nullptr;

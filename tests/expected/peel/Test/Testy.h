@@ -227,7 +227,7 @@ public:
       static_cast<CoolCallback &&> (callback),
       [] (gboolean *b, gpointer user_data) -> ::TestTesty *
       {
-        CoolCallback &_peel_captured_callback = *reinterpret_cast<CoolCallback *> (user_data);
+        CoolCallback &_peel_captured_callback = *reinterpret_cast<typename std::remove_reference<CoolCallback>::type *> (user_data);
         bool _peel_b;
         peel::RefPtr<Testy> _peel_return = static_cast<CoolCallback &&> (_peel_captured_callback) (&_peel_b);
         *b = static_cast<gboolean> (_peel_b);
@@ -506,7 +506,7 @@ protected:
       static_cast<CoolCallback &&> (callback),
       [] (gboolean *b, gpointer user_data) -> ::TestTesty *
       {
-        CoolCallback &_peel_captured_callback = *reinterpret_cast<CoolCallback *> (user_data);
+        CoolCallback &_peel_captured_callback = *reinterpret_cast<typename std::remove_reference<CoolCallback>::type *> (user_data);
         bool _peel_b;
         peel::RefPtr<Testy> _peel_return = static_cast<CoolCallback &&> (_peel_captured_callback) (&_peel_b);
         *b = static_cast<gboolean> (_peel_b);
@@ -847,7 +847,7 @@ public:
       static_cast<decltype (_peel_return) &&> (_peel_return),
       [] (gboolean *b, gpointer user_data) -> ::TestTesty *
       {
-        decltype (_peel_return) &_peel_captured__peel_return = *reinterpret_cast<decltype (_peel_return) *> (user_data);
+        decltype (_peel_return) &_peel_captured__peel_return = *reinterpret_cast<typename std::remove_reference<decltype (_peel_return)>::type *> (user_data);
         bool _peel_b;
         peel::RefPtr<Testy> _peel_return = static_cast<decltype (_peel_return) &&> (_peel_captured__peel_return) (&_peel_b);
         *b = static_cast<gboolean> (_peel_b);
