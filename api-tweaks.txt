@@ -348,13 +348,26 @@ vararg	g_task_return_new_error		format
 vararg	g_task_return_prefixed_error	format
 vararg	g_simple_async_result_new_error	format
 vararg	g_simple_async_result_set_error	format
+owned	g_simple_async_result_new_take_error	error
 vararg	g_subprocess_launcher_spawn	argv
+owned	g_subprocess_launcher_spawn	error
+out	g_subprocess_launcher_spawn	error
+optional g_subprocess_launcher_spawn	error
 vararg	g_subprocess_new		argv
+owned	g_subprocess_new		error
+out	g_subprocess_new		error
+optional g_subprocess_new		error
 # Not actually argv, but close enough:
 vararg	g_file_new_build_filename	argv
 vararg	g_settings_get			variant-get
 vararg	g_settings_set			variant-new
 vararg	g_output_stream_printf		format
+owned	g_output_stream_printf		error
+out	g_output_stream_printf		error
+optional g_output_stream_printf		error
+owned	g_output_stream_vprintf		error
+out	g_output_stream_vprintf		error
+optional g_output_stream_vprintf	error
 vararg	g_menu_item_get_attribute	variant-get
 vararg	g_menu_item_set_attribute	variant-new
 vararg	g_menu_model_get_item_attribute	variant-get
@@ -791,7 +804,7 @@ vararg	gtk_actionable_set_action_target	variant-new
 vararg	gtk_message_dialog_new				format
 vararg	gtk_message_dialog_new_with_markup		format
 vararg	gtk_message_dialog_format_secondary_markup	format
-vararg	format_secondary_text				format
+vararg	gtk_message_dialog_format_secondary_text	format
 
 onstack	GtkRequestedSize
 onstack	GtkRequisition
