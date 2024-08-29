@@ -177,6 +177,12 @@ struct Value::Traits<signed char>
   {
     g_value_set_schar (value, ch);
   }
+
+  static void
+  set_marshal_return (::GValue *value, signed char ch) noexcept
+  {
+    return set (value, ch);
+  }
 };
 
 template<>
@@ -195,6 +201,12 @@ struct Value::Traits<unsigned char>
   set (::GValue *value, unsigned char ch) noexcept
   {
     g_value_set_uchar (value, ch);
+  }
+
+  static void
+  set_marshal_return (::GValue *value, unsigned char ch) noexcept
+  {
+    return set (value, ch);
   }
 };
 
@@ -215,6 +227,12 @@ struct Value::Traits<bool>
   {
     g_value_set_boolean (value, b);
   }
+
+  static void
+  set_marshal_return (::GValue *value, bool b) noexcept
+  {
+    return set (value, b);
+  }
 };
 
 template<>
@@ -233,6 +251,12 @@ struct Value::Traits<int>
   set (::GValue *value, int i) noexcept
   {
     g_value_set_int (value, i);
+  }
+
+  static void
+  set_marshal_return (::GValue *value, signed char ch) noexcept
+  {
+    return set (value, ch);
   }
 };
 
@@ -253,6 +277,12 @@ struct Value::Traits<unsigned int>
   {
     g_value_set_uint (value, i);
   }
+
+  static void
+  set_marshal_return (::GValue *value, unsigned int i) noexcept
+  {
+    return set (value, i);
+  }
 };
 
 template<>
@@ -272,6 +302,12 @@ struct Value::Traits<float>
   {
     g_value_set_float (value ,f);
   }
+
+  static void
+  set_marshal_return (::GValue *value, float f) noexcept
+  {
+    set (value, f);
+  }
 };
 
 template<>
@@ -290,6 +326,12 @@ struct Value::Traits<double>
   set (::GValue *value, double d) noexcept
   {
     g_value_set_double (value, d);
+  }
+
+  static void
+  set_marshal_return (::GValue *value, double d) noexcept
+  {
+    set (value, d);
   }
 };
 
@@ -324,6 +366,23 @@ struct Value::Traits<const char *>
   {
     g_value_take_string (value, str);
   }
+
+  static void
+  set_marshal_return (::GValue *value, char *str) noexcept
+  {
+    g_value_take_string (value, str);
+  }
+
+/*
+  TODO: This is bound to break. Unlike with objects, I don't think
+  any signal is actually doing this?
+
+  static void
+  set_marshal_return (::GValue *value, const char *str) noexcept
+  {
+    g_value_take_string (value, const_cast<char *> (str));
+  }
+*/
 };
 
 template<>
@@ -343,6 +402,12 @@ struct Value::Traits<Type>
   {
     g_value_set_gtype (value, type);
   }
+
+  static void
+  set_marshal_return (::GValue *value, Type type) noexcept
+  {
+    set (value, type);
+  }
 };
 
 template<>
@@ -361,6 +426,12 @@ struct Value::Traits<void *>
   set (::GValue *value, void *p) noexcept
   {
     g_value_set_pointer (value, p);
+  }
+
+  static void
+  set_marshal_return (::GValue *value, void *p) noexcept
+  {
+    set (value, p);
   }
 };
 

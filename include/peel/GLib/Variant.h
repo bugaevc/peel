@@ -521,6 +521,19 @@ struct GObject::Value::Traits<GLib::Variant>
     ::GVariant *raw = reinterpret_cast<::GVariant *> (std::move (v).release_ref ());
     g_value_take_variant (value, raw);
   }
+
+  static void
+  set_marshal_return (::GValue *value, GLib::Variant *v) noexcept
+  {
+    /* Pretend to have a reference.  */
+    g_value_take_variant (value, reinterpret_cast<::GVariant *> (v));
+  }
+
+  static void
+  set_marshal_return (::GValue *value, RefPtr<GLib::Variant> &&v) noexcept
+  {
+    take (value, std::move (v));
+  }
 };
 
 template<>

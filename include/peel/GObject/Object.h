@@ -660,6 +660,19 @@ struct Value::Traits<T, peel::enable_if_derived<Object, T, void>>
     T *obj = std::move (object).release_floating_ptr ();
     g_value_take_object (value, g_object_ref_sink (obj));
   }
+
+  static void
+  set_marshal_return (::GValue *value, RefPtr<T> &&object) noexcept
+  {
+    g_value_take_object (value, std::move (object).release_ref ());
+  }
+
+  static void
+  set_marshal_return (::GValue *value, T *object) noexcept
+  {
+    /* Pretend to have a reference.  */
+    g_value_take_object (value, object);
+  }
 };
 
 class InitiallyUnowned;

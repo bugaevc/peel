@@ -290,7 +290,7 @@ struct SignalHelper2
     CallbackType cb = reinterpret_cast<CallbackType> (callback);
     typename SignalTraits<Ret>::CType ret = cb (data1, args..., data2);
     typedef typename SignalTraits<Ret>::PlainCppType RetPlainCppType;
-    reinterpret_cast<GObject::Value *> (return_value)->set<RetPlainCppType> (SignalTraits<Ret>::from_c (ret));
+    GObject::Value::Traits<RetPlainCppType>::set_marshal_return (return_value, SignalTraits<Ret>::from_c (ret));
   }
 
   template<typename Instance, typename Callback>
@@ -300,7 +300,7 @@ struct SignalHelper2
   {
     Ret ret = callback (instance, args...);
     typedef typename SignalTraits<Ret>::PlainCppType RetPlainCppType;
-    reinterpret_cast<GObject::Value *> (return_value)->set<RetPlainCppType> (static_cast<Ret &&> (ret));
+    GObject::Value::Traits<RetPlainCppType>::set_marshal_return (return_value, static_cast<Ret &&> (ret));
   }
 };
 
