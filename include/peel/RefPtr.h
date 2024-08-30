@@ -72,7 +72,15 @@ public:
     : RefPtr (static_cast<FloatPtr<T> &&> (f).ref_sink ())
   { }
 
-  /* Upcast.  */
+  /* FIXME: This causes weird compilation errors w/ libdex
+   * due to trying to evaluate
+   * peel::enable_if_derived<peel::Dex::Future, ::DexFuture>
+   * for some unclear reason, where struct _DexFuture is only
+   * forward-declared.  Was this constructor even useful for
+   * anything, given that raw pointers upcast automatically?
+   * As a better overload resolution candidate compared to
+   * something else perhaps?
+
   template<typename U, peel::enable_if_derived<T, U, int> = 0>
   RefPtr (U *ptr) noexcept
     : ptr (ptr)
@@ -80,6 +88,7 @@ public:
     if (ptr)
       RefTraits<T>::ref (ptr);
   }
+  */
 
   /* Upcast.  */
   template<typename U, peel::enable_if_derived<T, U, int> = 0>
