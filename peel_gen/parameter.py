@@ -305,6 +305,9 @@ class Parameter(NodeHandler):
             elif isinstance(itp, PlainType):
                 if self.is_record_field and not itp.corresponds_exactly:
                     return make_type(self.c_type)
+                # See below. This matters for e.g. GLib::Hook.
+                if self.is_record_field and itp is tp and constness and itp.stdname not in ('void *', 'const void *'):
+                    return make_type(constness0 + add_asterisk(itp.stdname) + constness1)
                 return make_type(constness0 + itp.stdname)
             elif isinstance(itp, StrType):
                 if self.ownership == 'full':
