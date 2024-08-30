@@ -673,7 +673,7 @@ public:
         Accumulator &_peel_accumulator = *reinterpret_cast<typename std::remove_reference<Accumulator>::type *> (data);
         bool _peel_return = internals::invoke_if_nonnull<bool> (_peel_accumulator) (_peel_hint, _peel_return_accu, _peel_handler_return);
         return static_cast<gboolean> (_peel_return);
-      }, &accu_data, nullptr);
+      }, &accu_data, nullptr, internals::is_const_invocable<Accumulator, void, GObject::SignalInvocationHint *, GObject::Value *, const GObject::Value *>::value);
     signal.id = g_signal_newv (name, instance_type, static_cast<::GSignalFlags> (flags),
                                nullptr, _peel_accumulator, accu_data,
                                marshal, return_type,

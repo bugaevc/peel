@@ -483,18 +483,22 @@ class Parameter(NodeHandler):
             callback_helper_type = 'peel::internals::CallbackHelper<{}>'.format(', '.join(
                 p.generate_c_type() for p in [tp.rv] + tp.params.params if p is not user_data_param
             ))
+            is_const_invocable_expr = 'peel::internals::is_const_invocable<{}, void{}>::value'.format(
+                plain_closure_type,
+                ''.join(', ' + p.generate_cpp_type(name=None, context=context) for p in tp.params.params if p is not user_data_param),
+            )
             if self.scope == 'notified':
                 wrap_method_name = 'wrap_notified_callback'
-                misc_args = ', &{}'.format(self.destroy_param.generate_casted_name())
+                misc_args = ', &{}, {}'.format(self.destroy_param.generate_casted_name(), is_const_invocable_expr)
             elif self.scope == 'forever':
                 wrap_method_name = 'wrap_notified_callback'
-                misc_args = ', nullptr'
+                misc_args = ', nullptr, {}'.format(is_const_invocable_expr)
             elif self.scope == 'async':
                 wrap_method_name = 'wrap_async_callback'
                 misc_args = ''
             elif self.scope == 'GSourceFunc':
                 wrap_method_name = 'wrap_gsourcefunc_callback'
-                misc_args = ''
+                misc_args = ', ' + is_const_invocable_expr
             elif self.scope in ('call', None):
                 return '({} = reinterpret_cast<gpointer> (&{}), +[] {})'.format(
                     closure_param_place,

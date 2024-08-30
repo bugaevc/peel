@@ -1,6 +1,7 @@
 #pragma once
 
 #include <peel/lang.h>
+#include <utility>
 #include <glib.h>
 
 namespace peel
@@ -23,6 +24,18 @@ Ret
   return nullptr;
 }
 
+template<typename F, typename, typename... Args>
+struct is_const_invocable
+{
+  static constexpr bool value = false;
+};
+
+template<typename F, typename... Args>
+struct is_const_invocable<F, void_t<decltype (std::declval<const typename std::remove_reference<F>::type &> () (std::declval<Args> ()...))>, Args...>
+{
+  static constexpr bool value = true;
+};
+
 template<typename Ret, typename... Args>
 class CallbackHelper
 {
@@ -31,7 +44,7 @@ public:
 
   template<typename F, typename F2>
   static CallbackType
-  wrap_notified_callback (F &&f, F2 &&, gpointer *out_data, GDestroyNotify *out_notify)
+  wrap_notified_callback (F &&f, F2 &&, gpointer *out_data, GDestroyNotify *out_notify, bool const_invocable)
   {
     typedef typename std::remove_reference<F>::type C;
     if (std::is_same<C, decltype (nullptr)>::value)
@@ -41,7 +54,7 @@ public:
         *out_data = nullptr;
         return nullptr;
       }
-    if (sizeof (C) <= sizeof (gpointer))
+    if (sizeof (C) <= sizeof (gpointer) && const_invocable)
       {
         union U
           {
@@ -159,7 +172,7 @@ public:
 
   template<typename F, typename F2>
   static CallbackType
-  wrap_gsourcefunc_callback (F &&f, F2 &&, gpointer *out_data)
+  wrap_gsourcefunc_callback (F &&f, F2 &&, gpointer *out_data, bool const_invocable)
   {
     typedef typename std::remove_reference<F>::type C;
     if (std::is_same<C, decltype (nullptr)>::value)
@@ -167,7 +180,7 @@ public:
         *out_data = nullptr;
         return nullptr;
       }
-    if (sizeof (C) <= sizeof (gpointer))
+    if (sizeof (C) <= sizeof (gpointer) && const_invocable)
       {
         union U
           {
@@ -224,7 +237,7 @@ public:
 
   template<typename F, typename F2>
   static CallbackType
-  wrap_notified_callback (F &&f, F2 &&, gpointer *out_data, GDestroyNotify *out_notify)
+  wrap_notified_callback (F &&f, F2 &&, gpointer *out_data, GDestroyNotify *out_notify, bool const_invocable)
   {
     typedef typename std::remove_reference<F>::type C;
     if (std::is_same<C, decltype (nullptr)>::value)
@@ -234,7 +247,7 @@ public:
         *out_data = nullptr;
         return nullptr;
       }
-    if (sizeof (C) <= sizeof (gpointer))
+    if (sizeof (C) <= sizeof (gpointer) && const_invocable)
       {
         union U
           {
