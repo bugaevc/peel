@@ -154,6 +154,32 @@
           </parameter>
         </parameters>
       </virtual-method>
+      <method name="get_out_bool_throws" c:identifier="test_testy_get_out_bool_throws" throws="1">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="b" direction="out">
+            <type name="gboolean" c:type="gboolean*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <virtual-method name="get_out_bool_throws" throws="1">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="b" direction="out">
+            <type name="gboolean" c:type="gboolean*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
       <method name="get_out_gtype" c:identifier="test_testy_get_out_gtype">
         <return-value>
           <type name="none" c:type="void"/>

@@ -93,7 +93,7 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
     if extra_decls:
         l.append(extra_decls)
     args = []
-    have_local_copies = False
+    num_local_copies = 0
     if params is not None:
         # First, declare the skip params.
         for p in params.params:
@@ -129,7 +129,7 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
                 break
             needs_local_copy = p.needs_local_copy()
             if needs_local_copy:
-                have_local_copies = True
+                num_local_copies += 1
             if not needs_local_copy or p.direction == 'inout':
                 if p.is_cpp_this():
                     cpp_name = 'this'
@@ -172,8 +172,13 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
 
     if throws:
         l.append(indent + '  ::GError *_peel_error = nullptr;')
-        args.append('error ? &_peel_error : nullptr')
-        have_local_copies = True
+        if num_local_copies != 0:
+            # If we have local copies, we always need to know whether
+            # an error has happened, even if our caller doesn't.
+            args.append('&_peel_error')
+        else:
+            args.append('error ? &_peel_error : nullptr')
+        num_local_copies += 1
     call = '{} ({})'.format(c_callee if typed_tweak_callee is None else typed_tweak_callee, ', '.join(args))
     if rv.c_type != 'void':
         casted_name = rv.generate_casted_name()
@@ -183,7 +188,7 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
             for_local_copy=False,
             skip_params_casted=True,
         )
-        if cast_from_c is None and not have_local_copies and not have_post_call_assumes:
+        if cast_from_c is None and num_local_copies == 0 and not have_post_call_assumes:
             rv_expr = call
         else:
             l.append(indent + '  {} {} = {};'.format(rv.generate_c_type(for_local_copy=False), casted_name, call))
@@ -194,6 +199,29 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
     else:
         l.append(indent + '  {};'.format(call))
         rv_expr = None
+
+    tmp_indent = indent
+    if throws:
+        if num_local_copies == 1:
+            l.extend([
+                indent + '  if (error)',
+                indent + '    *error = peel::UniquePtr<GLib::Error>::adopt_ref (reinterpret_cast<GLib::Error *> (_peel_error));',
+            ])
+        else:
+            l.extend([
+                indent + '  if (_peel_error)',
+                indent + '    {',
+                indent + '      if (error)',
+                indent + '        *error = peel::UniquePtr<GLib::Error>::adopt_ref (reinterpret_cast<GLib::Error *> (_peel_error));',
+                indent + '      else',
+                indent + '        g_error_free (_peel_error);',
+                indent + '    }',
+                indent + '  else',
+                indent + '    {',
+                indent + '      if (error)',
+                indent + '        *error = nullptr;',
+            ])
+            tmp_indent = indent + '    '
 
     if params is not None:
         for p in params.params:
@@ -210,18 +238,17 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
             )
             if p.optional:
                 l.extend([
-                    indent + '  if ({})'.format(p.name),
-                    indent + '    *{} = {};'.format(p.name, cast_from_c),
+                    tmp_indent + '  if ({})'.format(p.name),
+                    tmp_indent + '    *{} = {};'.format(p.name, cast_from_c),
                 ])
             else:
-                l.append(indent + '  *{} = {};'.format(p.name, cast_from_c))
-    if throws:
-        l.extend([
-            indent + '  if (error)',
-            indent + '    *error = peel::UniquePtr<GLib::Error>::adopt_ref (reinterpret_cast<GLib::Error *> (_peel_error));',
-        ])
-        # TODO: post call assumes
-    elif post_call_assumes_non_thrown:
+                l.append(tmp_indent + '  *{} = {};'.format(p.name, cast_from_c))
+
+    if tmp_indent != indent:
+        assert(throws)
+        assert(num_local_copies > 1)
+        l.append(indent + '    }')
+    elif not throws and post_call_assumes_non_thrown:
         for pc_assume in post_call_assumes_non_thrown:
             l.append(indent + '  ' + pc_assume)
 

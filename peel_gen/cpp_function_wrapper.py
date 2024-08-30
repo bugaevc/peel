@@ -25,14 +25,14 @@ def generate(cpp_callee, context, rv, params, throws, indent, extra_decls=None, 
         l.append(extra_decls)
     args = []
     cpp_this_arg = None
-    have_local_copies = False
+    num_local_copies = 0
     if params is not None:
         for p in params.params:
             if p in params.skip_params:
                 continue
             needs_local_copy = p.needs_local_copy()
             if needs_local_copy:
-                have_local_copies = True
+                num_local_copies += 1
             if not needs_local_copy or p.direction == 'inout':
                 cast_from_c = p.generate_cast_from_c(
                     c_name=p.name if not needs_local_copy else '*' + p.name,
@@ -84,8 +84,13 @@ def generate(cpp_callee, context, rv, params, throws, indent, extra_decls=None, 
                     args.append('{} ? &{} : nullptr'.format(p.name, casted_name))
     if throws:
         l.append(indent + '  peel::UniquePtr<GLib::Error> _peel_error;')
-        args.append('error ? &_peel_error : nullptr')
-        have_local_copies = True
+        if num_local_copies != 0:
+            # If we have local copies, we always need to know whether
+            # an error has happened, even if our caller doesn't.
+            args.append('&_peel_error')
+        else:
+            args.append('error ? &_peel_error : nullptr')
+        num_local_copies += 1
     call = '{} ({})'.format(cpp_callee, ', '.join(args))
     if cpp_this_arg:
         call = '{}->{}'.format(cpp_this_arg, call)
@@ -97,7 +102,7 @@ def generate(cpp_callee, context, rv, params, throws, indent, extra_decls=None, 
             for_local_copy=False,
             skip_params_casted=False,
         )
-        if cast_to_c is None and not have_local_copies:
+        if cast_to_c is None and num_local_copies == 0:
             rv_expr = call
         else:
             l.append(indent + '  {} = {};'.format(rv.generate_cpp_type(name=casted_name, context=context), call))
@@ -108,6 +113,27 @@ def generate(cpp_callee, context, rv, params, throws, indent, extra_decls=None, 
     else:
         l.append(indent + '  {};'.format(call))
         rv_expr = None
+
+    tmp_indent = indent
+    if throws:
+        if num_local_copies == 1:
+            l.extend([
+                indent + '  if (error)',
+                indent + '    *error = reinterpret_cast<::GError *> (std::move (_peel_error).release_ref ());',
+            ])
+        else:
+            l.extend([
+                indent + '  if (_peel_error)',
+                indent + '    {',
+                indent + '      if (error)',
+                indent + '        *error = reinterpret_cast<::GError *> (std::move (_peel_error).release_ref ());',
+                indent + '    }',
+                indent + '  else',
+                indent + '    {',
+                # indent + '      if (error)',
+                # indent + '        *error = nullptr;'
+            ])
+            tmp_indent = indent + '    '
 
     if params is not None:
         for p in params.params:
@@ -124,14 +150,16 @@ def generate(cpp_callee, context, rv, params, throws, indent, extra_decls=None, 
                 cast_from_c = p.name
             if p.optional:
                 l.extend([
-                    indent + '  if ({})'.format(p.name),
-                    indent + '    *{} = {};'.format(p.name, cast_from_c),
+                    tmp_indent + '  if ({})'.format(p.name),
+                    tmp_indent + '    *{} = {};'.format(p.name, cast_from_c),
                 ])
             else:
-                l.append(indent + '  *{} = {};'.format(p.name, cast_from_c))
-    if throws:
-        l.append(indent + '  if (error)')
-        l.append(indent + '    *error = reinterpret_cast<::GError *> (std::move (_peel_error).release_ref ());')
+                l.append(tmp_indent + '  *{} = {};'.format(p.name, cast_from_c))
+
+    if tmp_indent != indent:
+        assert(throws)
+        assert(num_local_copies > 1)
+        l.append(indent + '    }')
 
     if rv_expr is not None:
         l.append(indent + '  return {};'.format(rv_expr))

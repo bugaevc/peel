@@ -23,6 +23,11 @@ G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 
 namespace peel
 {
+namespace GLib
+{
+struct Error;
+} /* namespace GLib */
+
 namespace GObject
 {
 class Binding;
@@ -114,6 +119,29 @@ public:
     gboolean _peel_b;
     test_testy_get_out_bool (_peel_this, &_peel_b);
     *b = !!_peel_b;
+  }
+
+  peel_arg_out (2) peel_nonnull_args (2)
+  void
+  get_out_bool_throws (bool *b, peel::UniquePtr<GLib::Error> *error) noexcept
+  {
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    gboolean _peel_b;
+    ::GError *_peel_error = nullptr;
+    test_testy_get_out_bool_throws (_peel_this, &_peel_b, &_peel_error);
+    if (_peel_error)
+      {
+        if (error)
+          *error = peel::UniquePtr<GLib::Error>::adopt_ref (reinterpret_cast<GLib::Error *> (_peel_error));
+        else
+          g_error_free (_peel_error);
+      }
+    else
+      {
+        if (error)
+          *error = nullptr;
+        *b = !!_peel_b;
+      }
   }
 
   peel_arg_out (2) peel_nonnull_args (2)
@@ -406,6 +434,31 @@ protected:
     gboolean _peel_b;
     _peel_class->get_out_bool (_peel_this, &_peel_b);
     *b = !!_peel_b;
+  }
+
+  template<typename DerivedClass>
+  peel_arg_out (2) peel_nonnull_args (2)
+  void
+  parent_vfunc_get_out_bool_throws (bool *b, peel::UniquePtr<GLib::Error> *error) noexcept
+  {
+    ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    gboolean _peel_b;
+    ::GError *_peel_error = nullptr;
+    _peel_class->get_out_bool_throws (_peel_this, &_peel_b, &_peel_error);
+    if (_peel_error)
+      {
+        if (error)
+          *error = peel::UniquePtr<GLib::Error>::adopt_ref (reinterpret_cast<GLib::Error *> (_peel_error));
+        else
+          g_error_free (_peel_error);
+      }
+    else
+      {
+        if (error)
+          *error = nullptr;
+        *b = !!_peel_b;
+      }
   }
 
   template<typename DerivedClass>
@@ -732,6 +785,29 @@ public:
 
     template<typename DerivedClass>
     void
+    override_vfunc_get_out_bool_throws ()
+    {
+      ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
+      klass->get_out_bool_throws = +[] (::TestTesty *self, gboolean *b, ::GError **error) -> void
+      {
+        DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
+        bool _peel_b;
+        peel::UniquePtr<GLib::Error> _peel_error;
+        _peel_this->DerivedClass::vfunc_get_out_bool_throws (&_peel_b, &_peel_error);
+        if (_peel_error)
+          {
+            if (error)
+              *error = reinterpret_cast<::GError *> (std::move (_peel_error).release_ref ());
+          }
+        else
+          {
+            *b = static_cast<gboolean> (_peel_b);
+          }
+      };
+    }
+
+    template<typename DerivedClass>
+    void
     override_vfunc_get_out_object ()
     {
       ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
@@ -1040,5 +1116,6 @@ public:
 
 G_GNUC_END_IGNORE_DEPRECATIONS
 
+#include <peel/GLib/Error.h>
 #include <peel/GObject/Binding.h>
 #include <peel/GObject/Value.h>
