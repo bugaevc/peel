@@ -22,7 +22,7 @@ using namespace peel;
 static RefPtr<Dex::Scheduler> thread_pool;
 
 static RefPtr<Dex::Future>
-socket_connection_fiber (RefPtr<Gio::SocketConnection> connection)
+socket_connection_fiber (Gio::SocketConnection *connection)
 {
   Gio::InputStream *input = connection->get_input_stream ();
   Gio::OutputStream *output = connection->get_output_stream ();
@@ -50,7 +50,7 @@ socket_connection_fiber (RefPtr<Gio::SocketConnection> connection)
 }
 
 static RefPtr<Dex::Future>
-socket_listener_fiber (RefPtr<Gio::SocketListener> socket_listener)
+socket_listener_fiber (Gio::SocketListener *socket_listener)
 {
   while (true)
     {
