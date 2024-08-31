@@ -1095,3 +1095,8 @@ skip	gst_pad_set_link_function_full
 skip	gst_pad_set_query_function_full
 skip	gst_pad_set_unlink_function_full
 scope	gst_bus_add_watch		func	forever
+
+# Json (json-glib)
+no-autofree JsonNode
+nest	JsonNodeType			Node::Type
+nest	JsonObjectIter			Object::Iter
