@@ -208,33 +208,16 @@ public:
     return ptr;
   }
 
-#ifdef peel_cpp_14
-  constexpr
-#endif
-  T &
-  operator [] (size_t index)
-  {
-    return ptr[index];
-  }
-
-  constexpr const T &
+  constexpr T &
   operator [] (size_t index) const
   {
     return ptr[index];
   }
 
-#ifdef peel_cpp_14
   constexpr
-#endif
-  operator ArrayRef<T> () &
+  operator ArrayRef<T> () const &
   {
     return ArrayRef<T> { ptr, c };
-  }
-
-  constexpr
-  operator ArrayRef<const T> () const &
-  {
-    return ArrayRef<const T> { ptr, c };
   }
 
   operator ArrayRef<T> () && = delete;

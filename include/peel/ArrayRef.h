@@ -52,16 +52,16 @@ public:
     return p;
   }
 
-  T &
-  operator [] (size_t index) noexcept
+  constexpr T &
+  operator [] (size_t index) const noexcept
   {
     return p[index];
   }
 
-  constexpr const T &
-  operator [] (size_t index) const noexcept
+  constexpr ArrayRef
+  slice (size_t start, size_t length) const noexcept
   {
-    return p[index];
+    return ArrayRef { p + start, length };
   }
 
   typedef T value_type;
