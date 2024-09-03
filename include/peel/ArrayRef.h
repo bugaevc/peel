@@ -49,13 +49,19 @@ public:
   explicit constexpr
   operator bool () const noexcept
   {
-    return p;
+    return p && c;
   }
 
   constexpr T &
   operator [] (size_t index) const noexcept
   {
     return p[index];
+  }
+
+  constexpr
+  operator ArrayRef<const T> () const noexcept
+  {
+    return ArrayRef<const T> { p, c };
   }
 
   constexpr ArrayRef

@@ -4,14 +4,6 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later
  */
 
-/* Workaround for dex-object.h not being fully C++-safe at the moment */
-#include <glib-object.h>
-#define DEX_INSIDE
-#define __GI_SCANNER__
-#include <dex-object.h>
-#undef __GI_SCANNER__
-#undef DEX_INSIDE
-
 #include <peel/Dex/Dex.h>
 #include <peel/Gio/Gio.h>
 #include <peel/GLib/Error.h>
@@ -29,20 +21,22 @@ socket_connection_fiber (Gio::SocketConnection *connection)
   UniquePtr<GLib::Error> error;
   unsigned char buffer[1024];
 
-  while (true)
+  while (!error)
     {
-      RefPtr<Dex::Future> future = Dex::input_stream_read (input, buffer, sizeof (buffer), G_PRIORITY_DEFAULT);
+      RefPtr<Dex::Future> future = Dex::input_stream_read (input, buffer, G_PRIORITY_DEFAULT);
       gssize n_read = Dex::Future::await_int64 (std::move (future), &error);
       if (n_read == 0 || error)
         break;
 
-      for (gssize to_write = n_read; to_write > 0;)
+      ArrayRef<unsigned char> to_write { buffer, static_cast<size_t> (n_read) };
+
+      while (to_write)
         {
-          RefPtr<Dex::Future> future = Dex::output_stream_write (output, &buffer[n_read-to_write], to_write, G_PRIORITY_HIGH);
+          RefPtr<Dex::Future> future = Dex::output_stream_write (output, to_write, G_PRIORITY_HIGH);
           gssize n_written = Dex::Future::await_int64 (std::move (future), &error);
           if (n_written == 0 || error)
             break;
-          to_write -= n_written;
+          to_write = to_write.slice (n_written, to_write.size () - n_written);
         }
     }
 
