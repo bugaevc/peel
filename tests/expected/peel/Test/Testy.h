@@ -240,7 +240,7 @@ public:
   {
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     ::GObjectConstructParam * _peel_construct_param = reinterpret_cast<::GObjectConstructParam *> (construct_param);
-    ::GObjectBindingFlags _peel_binding_flags = static_cast<::GObjectBindingFlags> (binding_flags);
+    ::GBindingFlags _peel_binding_flags = static_cast<::GBindingFlags> (binding_flags);
     test_testy_nested_types (_peel_this, _peel_construct_param, _peel_binding_flags);
   }
 

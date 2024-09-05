@@ -29,6 +29,7 @@
     </callback>
     <class name="Testy"
            c:type="TestTesty"
+           c:symbol-prefix="testy"
            parent="GObject.Object"
            glib:get-type="test_testy_get_type"
            glib:type-struct="TestyClass">
@@ -420,7 +421,7 @@
             <type name="GObject.ObjectConstructParam" c:type="GObjectConstructParam*"/>
           </parameter>
           <parameter name="binding_flags">
-            <type name="GObject.BindingFlags" c:type="GObjectBindingFlags"/>
+            <type name="GObject.BindingFlags" c:type="GBindingFlags"/>
           </parameter>
         </parameters>
       </method>
@@ -1033,7 +1034,7 @@
         <type name="gsize" c:type="gsize"/>
       </field>
     </record>
-    <record name="Rec" c:type="RestRec">
+    <record name="Rec" c:type="TestRec">
       <method name="pass_inout_int" c:identifier="test_rec_pass_inout_int">
         <return-value>
           <type name="none" c:type="void"/>
