@@ -427,12 +427,12 @@ public:
     return notify_signal.template connect<Handler> (this, quark, static_cast<Handler &&> (handler), after);
   }
 
-  template<typename T, typename Handler>
+  template<typename Handler>
   SignalConnection::Token
   connect_notify (Handler &&handler, bool after = false) noexcept
   {
     Signal<Object, void (ParamSpec *)> notify_signal = Signal<Object, void (ParamSpec *)>::lookup ("notify");
-    return notify_signal.template connect<Handler> (this, static_cast<Handler &&> (handler), after);
+    return notify_signal.template connect<Handler> (this, 0, static_cast<Handler &&> (handler), after);
   }
 
   template<typename T, typename HandlerObject>
@@ -450,7 +450,7 @@ public:
     return notify_signal.template connect<HandlerObject> (this, quark, object, handler_method, after);
   }
 
-  template<typename T, typename HandlerObject>
+  template<typename HandlerObject>
   SignalConnection::Token
   connect_notify
   (
@@ -460,7 +460,7 @@ public:
   ) noexcept
   {
     Signal<Object, void (ParamSpec *)> notify_signal = Signal<Object, void (ParamSpec *)>::lookup ("notify");
-    return notify_signal.template connect<HandlerObject> (this, object, handler_method, after);
+    return notify_signal.template connect<HandlerObject> (this, 0, object, handler_method, after);
   }
 
   template<typename T>
