@@ -3,6 +3,7 @@ inc = include_directories('.')
 static_headers = files(
   'peel/lang.h',
   'peel/class.h',
+  'peel/enum.h',
   'peel/property.h',
   'peel/signal.h',
   'peel/callback.h',
