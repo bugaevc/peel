@@ -253,6 +253,7 @@ class Record(DefinedType):
                 'r',
                 'reinterpret_cast<{} *> (g_value_get_pointer (value))'.format(full_name),
                 'g_value_set_pointer (value, reinterpret_cast<void *> (r))',
+                support_set_marshal_return=True,
             )
             s += '\n\n' + '\n'.join([
                 'template<>',
@@ -276,6 +277,7 @@ class Record(DefinedType):
                 'r',
                 'reinterpret_cast<{} *> (g_value_get_boxed (value))'.format(full_name),
                 'g_value_set_boxed (value, reinterpret_cast<const void *> (r))',
+                support_set_marshal_return=False, # TODO
             )
             s += '\n\n' + '\n'.join([
                 'template<>',

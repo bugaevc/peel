@@ -460,17 +460,34 @@ class Class(DefinedType):
                 '    ::{} *_peel_object = reinterpret_cast<::{} *> (object);'.format(self.c_type, self.c_type),
                 '    {} (value, _peel_object);'.format(self.set_value_func),
                 '  }',
+                '',
             ])
             if self.take_value_func is not None:
                 l.extend([
-                    '',
                     '  static void',
                     '  take (::GValue *value, RefPtr<T> &&object)',
                     '  {',
                     '    ::{} *_peel_object = reinterpret_cast<::{} *> (std::move (object).release_ref ());'.format(self.c_type, self.c_type),
                     '    {} (value, _peel_object);'.format(self.take_value_func),
                     '  }',
+                    '',
+                    '  static void',
+                    '  set_marshal_return (::GValue *value, RefPtr<T> &&object)',
+                    '  {',
+                    '    take (value, std::move (object));',
+                    '  }',
+                    '',
+                    '  static void',
+                    '  set_marshal_return (::GValue *value, T *object)',
+                    '  {',
+                    '    ::{} *_peel_object = reinterpret_cast<::{} *> (object);'.format(self.c_type, self.c_type),
+                    '    /* Pretend to have a reference.  */',
+                    '    {} (value, _peel_object);'.format(self.take_value_func),
+                    '  }',
                 ])
+            else:
+                # TODO: set_marshal_return
+                pass
             l.append('};')
             s += '\n'.join(l)
         if self.ref_func or self.unref_func:

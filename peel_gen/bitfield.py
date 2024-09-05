@@ -118,6 +118,7 @@ class Bitfield(DefinedType):
             'flags',
             'static_cast<{}> (g_value_get_flags (value))'.format(type_name),
             'g_value_set_flags (value, static_cast<::{}> (flags))'.format(self.c_type),
+            support_set_marshal_return=True,
         )]
         if self.get_type:
             l.append(generate_get_type_specialization(type_name, self.get_type + ' ()'))
