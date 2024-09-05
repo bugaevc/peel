@@ -378,6 +378,8 @@ vararg	g_notification_set_default_action_and_target variant-new
 
 onstack	GInputVector
 onstack	GOutputVector
+onstack	GInputMessage
+onstack	GOutputMessage
 onstack	GActionEntry
 
 nest	GApplicationFlags		Application::Flags
@@ -765,6 +767,7 @@ opaque	GskPathPoint
 onstack	GskColorStop
 onstack	GskRoundedRect
 onstack	GskPathPoint
+onstack	GskShadow
 
 take-value GskRenderNode		gsk_value_take_render_node
 
@@ -811,6 +814,7 @@ onstack	GtkRequisition
 onstack	GtkAllocation
 onstack	GtkTreeIter
 onstack	GtkTextIter
+onstack	GtkPadActionEntry
 nest	GtkBitsetIter			Bitset::Iter
 onstack	GtkBitsetIter
 onstack	GtkBorder
