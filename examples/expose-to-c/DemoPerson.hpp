@@ -9,7 +9,7 @@
 namespace Demo
 {
 
-class Person : public peel::Object
+class Person final : public peel::Object
 {
   PEEL_SIMPLE_CLASS (Person, peel::Object)
 

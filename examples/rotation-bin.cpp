@@ -37,7 +37,7 @@ PEEL_ENUM_IMPL (Demo::Rotation, "DemoRotation",
 namespace Demo
 {
 
-class RotationBin : public Gtk::Widget
+class RotationBin final : public Gtk::Widget
 {
   PEEL_SIMPLE_CLASS (RotationBin, Gtk::Widget)
   friend class Gtk::Widget;

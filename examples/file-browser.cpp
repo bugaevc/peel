@@ -22,14 +22,14 @@ class MainColumnCell final : public Gtk::Widget
   init (Class *);
 
 public:
-    static FloatPtr<MainColumnCell>
-    create ()
-    {
-        return Object::create<MainColumnCell> ();
-    }
+  static FloatPtr<MainColumnCell>
+  create ()
+  {
+    return Object::create<MainColumnCell> ();
+  }
 
-    void
-    set_tree_list_row (Gtk::TreeListRow *row);
+  void
+  set_tree_list_row (Gtk::TreeListRow *row);
 };
 
 PEEL_CLASS_IMPL (MainColumnCell, "MainColumnCell", Gtk::Widget)
@@ -37,7 +37,7 @@ PEEL_CLASS_IMPL (MainColumnCell, "MainColumnCell", Gtk::Widget)
 inline void
 MainColumnCell::init (Class *)
 {
-  // Our main colun cell contains the following widgetry:
+  // Our main column cell contains the following widgetry:
   //
   // Gtk::TreeExpander {
   //   Gtk::Box {
