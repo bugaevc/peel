@@ -62,7 +62,11 @@ main ()
           if (error)
             text = g_strdup_printf ("Failed to pick a file: %s", error->message);
           else
-            text = g_strdup_printf ("Picked %s", file->get_path ());
+            {
+              char *path = file->get_path ();
+              text = g_strdup_printf ("Picked %s", path);
+              g_free (path);
+            }
           label->set_label (text);
           g_free (text);
         });
