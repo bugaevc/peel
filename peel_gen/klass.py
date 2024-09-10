@@ -31,6 +31,7 @@ class Class(DefinedType):
         self.props = []
         self.hidden_members = []
         self.parent_gir_name = attrs.get('parent', None)
+        self.final = attrs.get('final', None) == '1'
         self.sealed = True  # Will be set to false if we see any fields
         self.fields = []
         self.type_struct_name = attrs.get('glib:type-struct', None)
@@ -50,8 +51,7 @@ class Class(DefinedType):
             self.parent = None
         if self.parent is not None:
             self.parent.resolve_stuff()
-            # sealed doesn't imply final
-            # assert(not self.parent.sealed)
+            assert(not self.parent.final)
             self.is_initially_floating = self.parent.is_initially_floating
             self.is_initially_fully_unowned = self.parent.is_initially_fully_unowned
             self.is_gobject_derived = self.parent.is_gobject_derived
@@ -235,7 +235,7 @@ class Class(DefinedType):
         else:
             cpp_base_type_emit_name = 'GObject::TypeInstance'
         l += [
-            'class ' + self.emit_def_name + ' : public ' + cpp_base_type_emit_name,
+            'class ' + self.emit_def_name + (' final' if self.final else '') + ' : public ' + cpp_base_type_emit_name,
             '{',
             'private:',
         ]
@@ -245,7 +245,7 @@ class Class(DefinedType):
             ) + ' */')
         if self.cpp_base_type is not self.parent and self.parent is not None:
             l.insert(1, '/* extends {} */'.format(self.parent.emit_name_for_context(self)))
-        if self.sealed:
+        if self.sealed or self.final:
             l.insert(1, '/* non-derivable */')
         if self.should_emit_placeholder_member():
             s = api_tweaks.ifdef_for_non_opaque(self.c_type)
@@ -348,7 +348,7 @@ class Class(DefinedType):
         s = api_tweaks.ifdef_for_non_opaque(self.c_type)
         if s:
             l.append(s)
-        if self.is_gobject_derived and not self.sealed:
+        if self.is_gobject_derived and not self.sealed and not self.final:
             visibility.switch('protected')
             l.extend([
                 '  static void',
