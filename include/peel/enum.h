@@ -2,6 +2,8 @@
 
 #include <peel/GObject/Type.h>
 #include <peel/GObject/Value.h>
+#include <peel/property.h>
+#include <peel/class.h>
 #include <peel/lang.h>
 #include <type_traits>
 #include <glib-object.h>
