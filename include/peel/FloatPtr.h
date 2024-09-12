@@ -38,9 +38,16 @@ public:
     : ptr (ptr)
   { }
 
-  constexpr FloatPtr (const FloatPtr &other) noexcept
-    : ptr (other.ptr)
-  { }
+  /* Deny copying FloatPtr; please move them instead.
+   * Otherwise, it's way too easy to deallocate the initial
+   * floating reference, leading to a use-after-free.
+   * If you know what you're doing and still want to copy
+   * FloatPtr's, roundtrip through a plain (T *).
+   */
+  FloatPtr (const FloatPtr &) = delete;
+
+  template<typename U>
+  FloatPtr (const FloatPtr<U> &) = delete;
 
   FloatPtr (FloatPtr &&other) noexcept
     : ptr (other.ptr)
