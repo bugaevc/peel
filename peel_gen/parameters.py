@@ -125,7 +125,7 @@ class Parameters(NodeHandler):
         if p.is_cpp_this():
             return False
         if p.ownership is not None and p.ownership != 'none':
-            # Cannot use p_nonnull_args () on smart pointers
+            # Cannot use peel_nonnull_args () on smart pointers
             return False
         if p.direction == 'in':
             if not tp.is_passed_by_ref():
@@ -140,7 +140,7 @@ class Parameters(NodeHandler):
         if p.direction != 'in':
             return False
         if p.ownership is not None and p.ownership != 'none':
-            # Cannot use p_in_arg () on smart pointers
+            # Cannot use peel_in_arg () on smart pointers
             return False
         from peel_gen.record import Record
         return isinstance(tp, Record)
