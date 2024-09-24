@@ -378,7 +378,7 @@ class Parameter(NodeHandler):
             elif self.vararg_mode == 'argv':
                 return '{}..., nullptr'.format(cpp_name)
             elif self.vararg_mode == 'variant-new':
-                return 'GLib::Variant::Traits<Args>::cast_for_create (std::forward<Args> ({}))...'.format(cpp_name)
+                return 'GLib::Variant::Traits<typename std::decay<Args>::type>::cast_for_create (std::forward<Args> ({}))...'.format(cpp_name)
             else:
                 raise UnsupportedForNowException('unimplemented vararg mode ' + self.vararg_mode)
 

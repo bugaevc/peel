@@ -73,7 +73,7 @@ public:
   static peel::FloatPtr<Variant>
   create (const char *format_string, Args &&...args) noexcept
   {
-    ::GVariant *_peel_return = g_variant_new (format_string, Traits<Args>::cast_for_create (std::forward<Args> (args))...);
+    ::GVariant *_peel_return = g_variant_new (format_string, Traits<typename std::decay<Args>::type>::cast_for_create (std::forward<Args> (args))...);
     peel_assume (_peel_return);
     return peel::FloatPtr<Variant> (reinterpret_cast<Variant *> (_peel_return));
   }
@@ -92,7 +92,7 @@ public:
   static peel::FloatPtr<Variant>
   create_parsed (const char *format_string, Args &&...args) noexcept
   {
-    ::GVariant *_peel_return = g_variant_new_parsed (format_string, Traits<Args>::cast_for_create (std::forward<Args> (args))...);
+    ::GVariant *_peel_return = g_variant_new_parsed (format_string, Traits<typename std::decay<Args>::type>::cast_for_create (std::forward<Args> (args))...);
     peel_assume (_peel_return);
     return peel::FloatPtr<Variant> (reinterpret_cast<Variant *> (_peel_return));
   }
