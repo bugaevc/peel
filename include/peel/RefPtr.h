@@ -64,14 +64,6 @@ public:
     other.ptr = nullptr;
   }
 
-  RefPtr (const FloatPtr<T> &f) noexcept
-    : RefPtr ((T *) f)
-  { }
-
-  RefPtr (FloatPtr<T> &&f) noexcept
-    : RefPtr (static_cast<FloatPtr<T> &&> (f).ref_sink ())
-  { }
-
   /* FIXME: This causes weird compilation errors w/ libdex
    * due to trying to evaluate
    * peel::enable_if_derived<peel::Dex::Future, ::DexFuture>
@@ -106,6 +98,16 @@ public:
   {
     other.ptr = nullptr;
   }
+
+  template<typename U, peel::enable_if_derived<T, U, int> = 0>
+  RefPtr (const FloatPtr<U> &f) noexcept
+    : RefPtr ((T *) (U *) f)
+  { }
+
+  template<typename U, peel::enable_if_derived<T, U, int> = 0>
+  RefPtr (FloatPtr<U> &&f) noexcept
+    : RefPtr (static_cast<FloatPtr<U> &&> (f).ref_sink ())
+  { }
 
   ~RefPtr () noexcept
   {
@@ -185,6 +187,22 @@ public:
       RefTraits<T>::unref (ptr);
     ptr = other.ptr;
     other.ptr = nullptr;
+    return *this;
+  }
+
+  template<typename U, peel::enable_if_derived<T, U, int> = 0>
+  RefPtr &
+  operator = (FloatPtr<U> &other) & noexcept
+  {
+    *this = (T *) (U *) other;
+    return *this;
+  }
+
+  template<typename U, peel::enable_if_derived<T, U, int> = 0>
+  RefPtr &
+  operator = (FloatPtr<U> &&other) & noexcept
+  {
+    *this = static_cast<FloatPtr<U> &&> (other).ref_sink ();
     return *this;
   }
 
