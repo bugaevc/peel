@@ -10,15 +10,24 @@ subdir('cmake')
 
 peel_dep = declare_dependency(include_directories: inc)
 
+if meson.is_subproject()
+  conf = {
+    'module_path': meson.current_source_dir(),
+    'api_tweaks_path': meson.current_source_dir() / 'api-tweaks.txt',
+  }
+else
+  conf = {
+    'module_path': py.get_install_dir(),
+    'api_tweaks_path': get_option('prefix') / get_option('datadir') / 'peel' / 'api-tweaks.txt',
+  }
+endif
+
 peel_gen = configure_file(
   input: 'peel-gen.py',
   output: 'peel-gen',
   install: not meson.is_subproject(),
   install_dir: get_option('bindir'),
-  configuration: {
-    'module_path': py.get_install_dir(),
-    'api_tweaks_path': get_option('prefix') / get_option('datadir') / 'peel' / 'api-tweaks.txt',
-  },
+  configuration: conf,
 )
 
 if meson.is_subproject()
