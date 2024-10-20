@@ -22,6 +22,7 @@ peel_gen = configure_file(
 )
 
 if meson.is_subproject()
+  meson.override_dependency('peel', peel_dep)
   meson.override_find_program('peel-gen', peel_gen)
 else
   py.install_sources(peel_gen_files, subdir: 'peel_gen')
