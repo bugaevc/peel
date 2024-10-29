@@ -180,6 +180,25 @@ struct SignalTraits<T * /*, peel::enable_if_derived<GObject::TypeInstance, T, vo
   }
 };
 
+template<>
+struct SignalTraits<void *>
+{
+  typedef void *CType;
+  typedef void *PlainCppType;
+
+  static void *
+  to_c (void *ptr)
+  {
+    return ptr;
+  }
+
+  static void *
+  from_c (void *ptr)
+  {
+    return ptr;
+  }
+};
+
 template<typename Ret, typename... Args>
 struct SignalHelper1;
 template<typename Ret, typename... Args>
