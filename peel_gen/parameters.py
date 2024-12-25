@@ -100,10 +100,12 @@ class Parameters(NodeHandler):
             if p in self.skip_params:
                 continue
             if p.name == '...':
+                assert(p is self.params[-1])
+                if has_typed_tweak:
+                    break
                 if p.vararg_mode is None:
                     raise UnsupportedForNowException('varargs')
                 l.append('typename... Args')
-                assert(p is self.params[-1])
                 break
             tp = chase_type_aliases(p.type)
             if not isinstance(tp, Callback):
