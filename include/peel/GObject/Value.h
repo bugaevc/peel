@@ -254,9 +254,9 @@ struct Value::Traits<int>
   }
 
   static void
-  set_marshal_return (::GValue *value, signed char ch) noexcept
+  set_marshal_return (::GValue *value, int i) noexcept
   {
-    return set (value, ch);
+    return set (value, i);
   }
 };
 
