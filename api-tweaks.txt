@@ -173,8 +173,20 @@ skip	GVariant			GLib		manual
 inout	g_time_zone_adjust_time		time_
 
 vararg	g_error_new			format
+vararg	g_set_error			format
 vararg	g_string_printf			format
 vararg	g_string_append_printf		format
+
+vararg	g_log				format
+vararg	g_prefix_error			format
+vararg	g_print				format
+vararg	g_printerr			format
+#vararg	printf				format
+#vararg	fprintf				format
+
+# Not actually argv, but close enough:
+vararg	g_build_filename		argv
+vararg	g_build_path			argv
 
 #ifdef	GUnixFDSourceFunc		G_OS_UNIX
 #ifdef	GUnixPipe			G_OS_UNIX
