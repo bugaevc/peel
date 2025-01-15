@@ -1,0 +1,14 @@
+[book]
+authors = ["Sergey Bugaev"]
+language = "en"
+multilingual = false
+src = "src"
+title = "peel documentation"
+
+[output.html]
+smart-punctuation = true
+git-repository-url = "https://gitlab.gnome.org/bugaevc/peel"
+git-repository-icon = "gitlab"
+
+[output.html.code]
+hidelines = { cpp = "~", python = "~" }
