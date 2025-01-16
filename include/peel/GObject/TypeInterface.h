@@ -17,7 +17,7 @@ class TypeInterface
   ::GTypeInterface ti peel_no_warn_unused;
 
 protected:
-  ~TypeInterface() { }
+  ~TypeInterface () { }
 
 public:
   TypeInterface *

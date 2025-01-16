@@ -514,7 +514,7 @@ public:
   Installer &
   flags (GObject::ParamFlags flags)
   {
-    basics.flags = ::GParamFlags(basics.flags | static_cast<::GParamFlags> (flags));
+    basics.flags = ::GParamFlags (basics.flags | static_cast<::GParamFlags> (flags));
     return *this;
   }
 };

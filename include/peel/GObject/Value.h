@@ -150,7 +150,7 @@ public:
   make (typename Traits<T>::OwnedType &&value) noexcept
   {
     Value v { Type::of<T> () };
-    Traits<T>::take (&v.value, std::move(value));
+    Traits<T>::take (&v.value, std::move (value));
     return v;
   }
 };

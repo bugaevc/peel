@@ -43,7 +43,7 @@ struct peel::internals::PspecTraits<Enum>                                      \
 {                                                                              \
   Enum default_value;                                                          \
                                                                                \
-  constexpr PspecTraits(Enum default_value)                                    \
+  constexpr PspecTraits (Enum default_value)                                   \
     : default_value (default_value)                                            \
   { }                                                                          \
                                                                                \

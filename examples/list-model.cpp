@@ -48,7 +48,7 @@ class Model final : public Gio::ListModel
   unsigned
   vfunc_get_n_items ()
   {
-    return sizeof (items) / sizeof(items[0]);
+    return G_N_ELEMENTS (items);
   }
 
   RefPtr<Object>

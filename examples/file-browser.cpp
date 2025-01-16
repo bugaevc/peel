@@ -102,7 +102,7 @@ main ()
   RefPtr<Gtk::DirectoryList> root_directory_model = Gtk::DirectoryList::create (QUERY_ATTRS, root_file);
 
   RefPtr<Gtk::TreeListModel> tree_model = Gtk::TreeListModel::create (
-    std::move(root_directory_model), false, false,
+    std::move (root_directory_model), false, false,
     [] (Object *item_obj) -> RefPtr<Gio::ListModel>
     {
       Gio::FileInfo *file_info = item_obj->cast<Gio::FileInfo> ();

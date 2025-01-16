@@ -21,7 +21,7 @@ private:
   ::GTypeClass tc peel_no_warn_unused;
 
 protected:
-  ~TypeClass() { }
+  ~TypeClass () { }
 
 public:
   bool
