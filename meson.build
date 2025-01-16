@@ -1,7 +1,7 @@
 project('peel', version: '0.1.0')
 
 pkg = import('pkgconfig')
-py = import('python').find_installation('python3')
+py = import('python').find_installation()
 
 subdir('include')
 subdir('peel_gen')
