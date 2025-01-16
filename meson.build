@@ -10,14 +10,15 @@ subdir('cmake')
 
 peel_dep = declare_dependency(include_directories: inc)
 
+# The unary join_paths() is to force forward slashes even on Windows.
 if meson.is_subproject()
   conf = {
-    'module_path': meson.current_source_dir(),
+    'module_path': join_paths(meson.current_source_dir()),
     'api_tweaks_path': meson.current_source_dir() / 'api-tweaks.txt',
   }
 else
   conf = {
-    'module_path': py.get_install_dir(),
+    'module_path': join_paths(py.get_install_dir()),
     'api_tweaks_path': get_option('prefix') / get_option('datadir') / 'peel' / 'api-tweaks.txt',
   }
 endif

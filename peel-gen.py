@@ -5,8 +5,8 @@ from argparse import ArgumentParser
 from pathlib import Path
 
 # These will be set by Meson in the installed file.
-peel_gen_module_path = '@module_path@'
-builtin_api_tweaks_path = '@api_tweaks_path@'
+peel_gen_module_path = r'@module_path@'
+builtin_api_tweaks_path = r'@api_tweaks_path@'
 
 if peel_gen_module_path == '@' + 'module_path' + '@':
     # Running uninstalled from the source tree.
