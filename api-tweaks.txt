@@ -63,8 +63,10 @@ skip	g_mkdtemp
 skip	g_mkdtemp_full
 skip	g_mkstemp
 skip	g_mkstemp_full
+skip	g_once_init_enter
 skip	g_once_init_enter_impl
 skip	g_once_init_enter_pointer
+skip	g_once_init_leave
 skip	g_once_init_leave_pointer
 skip	g_pointer_bit_lock
 skip	g_pointer_bit_trylock
@@ -130,6 +132,8 @@ skip	g_utf16_to_utf8
 out	g_unichar_get_mirror_char	mirrored_ch
 skip	GUnixPipeEnd
 skip	GUnixPipe
+skip	GHook
+skip	GHookList
 unowned	g_variant_type_string_scan	endptr
 unowned	g_bytes_new_static		data
 unowned	g_mapped_file_get_contents	return
@@ -166,6 +170,12 @@ opaque	GSource
 onstack	GHashTableIter
 opaque	GHashTableIter
 nest	GHashTableIter			HashTable::Iter
+
+# These are deprecated, and don't work yet since GStaticMutex is a union
+skip	GStaticMutex
+skip	GStaticRecMutex
+skip	GStaticRWLock
+skip	GStaticPrivate
 
 # Should have explicit bindings
 skip	GVariant			GLib		manual
