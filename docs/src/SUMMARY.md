@@ -5,6 +5,7 @@
 - [Build Setup](build-setup.md)
     - [Using peel with CMake](using-peel-with-cmake.md)
     - [Using peel with Meson](using-peel-with-meson.md)
+- [The Basics](the-basics.md)
 - [Smart Pointers]()
     - [RefPtr](ref-ptr.md)
     - [UniquePtr](unique-ptr.md)
