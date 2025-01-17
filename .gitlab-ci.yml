@@ -5,13 +5,15 @@ pages:
     CARGO_HOME: $CI_PROJECT_DIR/cargo
   before_script:
     - export PATH="$PATH:$CARGO_HOME/bin"
-    - mdbook --version || cargo install --debug mdbook
+    - mdbook --version || cargo install mdbook
   script:
     - mdbook build docs/
     - mv docs/book public
   artifacts:
     paths:
       - public
-  only:
-  - tmp
-
+  cache:
+    paths:
+      - $CARGO_HOME/bin
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
