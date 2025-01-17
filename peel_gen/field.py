@@ -6,6 +6,7 @@ class Field(NodeHandler):
         self.cpp_record = cpp_record
         self.name = attrs['name']
         self.private = attrs.get('private', None) == '1'
+        self.bits = attrs.get('bits', None)
         self.param = Parameter({ 'name': self.name }, ns=self.cpp_record.ns)
         self.param.is_record_field = True
         self.we_support_this = True
@@ -43,5 +44,7 @@ class Field(NodeHandler):
     def generate(self):
         assert(self.we_support_this)
         s = self.param.generate_cpp_type(name=self.name, context=self.cpp_record)
+        if self.bits is not None:
+            s = '{} : {}'.format(s, self.bits)
         return '  {};'.format(s)
 
