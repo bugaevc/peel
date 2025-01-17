@@ -31,6 +31,7 @@ public:
   class Type;
   struct Builder;
   typedef VariantIter Iter;
+  enum class Class : std::underlying_type<::GVariantClass>::type;
 
   const Variant::Type *
   get_type () noexcept
