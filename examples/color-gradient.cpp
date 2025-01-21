@@ -83,10 +83,12 @@ Gradient::vfunc_snapshot (Gtk::Snapshot *snapshot)
     { 1.0, end_color }
   };
 
+  bool rtl = get_direction () == Gtk::TextDirection::RTL;
+
   snapshot->append_linear_gradient (
     &bounds,
-    &top_left,
-    &top_right,
+    rtl ? &top_right : &top_left,
+    rtl ? &top_left : &top_right,
     color_stops);
 }
 
