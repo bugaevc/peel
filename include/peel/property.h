@@ -247,57 +247,55 @@ struct Getter : public GSBase<Getter<Class, T>>
 
 private:
   Class *instance;
-  ::GValue *value;
+  GObject::Value *value;
   bool *found_ptr;
 
   Getter (Class *instance, ::GValue *value, bool *found_ptr)
     : instance (instance)
-    , value (value)
+    , value (reinterpret_cast<GObject::Value *> (value))
     , found_ptr (found_ptr)
   { }
 
 public:
-  typedef typename GObject::Value::Traits<T>::UnownedType UnownedType;
-
+  template<typename ReturnType>
   Getter &
-  get (UnownedType (Class::*getter) () const) noexcept
+  get (ReturnType (Class::*getter) () const) noexcept
   {
     if (!found_ptr)
       return *this;
     *found_ptr = true;
-    UnownedType v = (instance->*getter) ();
-    GObject::Value::Traits<T>::set (value, v);
+    value->set<T> ((instance->*getter) ());
+    return *this;
+  }
+
+  template<typename ReturnType>
+  Getter &
+  get (ReturnType (Class::*getter) ()) noexcept
+  {
+    if (!found_ptr)
+      return *this;
+    *found_ptr = true;
+    value->set<T> ((instance->*getter) ());
     return *this;
   }
 
   Getter &
-  get (UnownedType (Class::*getter) ()) noexcept
+  get (void (Class::*getter) (GObject::Value *)) noexcept
   {
     if (!found_ptr)
       return *this;
     *found_ptr = true;
-    UnownedType v = (instance->*getter) ();
-    GObject::Value::Traits<T>::set (value, v);
+    (instance->*getter) (value);
     return *this;
   }
 
   Getter &
-  get (void (Class::*getter) (GObject::Value *value)) noexcept
+  get (void (Class::*getter) (GObject::Value *) const) noexcept
   {
     if (!found_ptr)
       return *this;
     *found_ptr = true;
-    (instance->*getter) (reinterpret_cast<GObject::Value *> (value));
-    return *this;
-  }
-
-  Getter &
-  get (void (Class::*getter) (GObject::Value *value) const) noexcept
-  {
-    if (!found_ptr)
-      return *this;
-    *found_ptr = true;
-    (instance->*getter) (reinterpret_cast<GObject::Value *> (value));
+    (instance->*getter) (value);
     return *this;
   }
 

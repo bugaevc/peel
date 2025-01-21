@@ -19,9 +19,6 @@ class Person final : public peel::Object
   std::string first_name;
   std::string last_name;
 
-  void
-  get_full_name (peel::Value *);
-
   template<typename F>
   static void
   define_properties (F &f)
@@ -58,6 +55,9 @@ public:
   set_last_name (const char *);
 
   PEEL_PROPERTY (const char *, last_name, "last-name")
+
+  /* owned */ char *
+  get_full_name ();
 
   PEEL_PROPERTY (const char *, full_name, "full-name")
 

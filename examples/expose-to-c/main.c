@@ -1,4 +1,4 @@
-// This is a C file that uses DemoPerson.
+/* This is a C file that uses DemoPerson. */
 #include "DemoPerson.h"
 
 int
@@ -12,7 +12,7 @@ main ()
     demo_person_get_first_name (person1));
   g_object_unref (person1);
 
-  DemoPerson *person2 = g_object_new (DEMO_TYPE_PERSON,
+  DemoPerson *person2 = (DemoPerson *) g_object_new (DEMO_TYPE_PERSON,
     "first-name", "Jane",
     "last-name", "Doe",
     NULL);

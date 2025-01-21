@@ -38,11 +38,10 @@ Person::set_last_name (const char *name)
   notify (prop_full_name ());
 }
 
-void
-Person::get_full_name (peel::Value *value)
+/* owned */ char *
+Person::get_full_name ()
 {
-  std::string full_name = first_name + " " + last_name;
-  value->set<const char *> (full_name.c_str ());
+  return g_strdup_printf ("%s %s", first_name.c_str (), last_name.c_str ());
 }
 
 peel::RefPtr<Person>
