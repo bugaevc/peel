@@ -16,7 +16,7 @@ This will look for the file named `peel-config.cmake`, which peel installs into
 have peel installed into a non-standard prefix, you can tell CMake to look
 there by passing it as `CMAKE_PREFIX_PATH` value at project configuration time.
 See the [CMake Using Dependencies Guide] for more details about how
-`find_package()` can be used, and where CMake looks for packages.
+`find_package` can be used, and where CMake looks for packages.
 
 The `peel` CMake package defines the `peel::peel` [imported target], which you
 can use when defining another target to add peel's own (non-generated) header
@@ -29,7 +29,7 @@ add_executable (my-app main.cpp)
 target_link_libraries (my-app PRIVATE peel::peel)
 ```
 
-To run the bindings generator, use the `peel_generate()` function:
+To run the bindings generator, use the `peel_generate` function:
 
 ```python
 find_package (peel REQUIRED)
