@@ -93,7 +93,7 @@ class MyWidget : public Gtk::Widget
 
   /* template children */
   Gtk::Button *m_button;
-  Gtk::GestureClick m_gesture_click;
+  Gtk::GestureClick *m_gesture_click;
 };
 
 inline void
@@ -107,6 +107,11 @@ MyWidget::Class::init ()
   PEEL_WIDGET_TEMPLATE_BIND_CHILD (MyWidget, m_gesture_click, "gesture-click");
 }
 ```
+
+Note that binding a template child only works when the data member is a
+**plain pointer**, not a `RefPtr` or another smart pointer type! This is fine,
+however, since each widget already keeps internal references to all child
+objects bound this way.
 
 [widget templates]: https://developer.gnome.org/documentation/tutorials/widget-templates.html
 [Blueprint]: https://jwestman.pages.gitlab.gnome.org/blueprint-compiler/
