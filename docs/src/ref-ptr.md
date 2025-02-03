@@ -22,13 +22,24 @@ RefPtr<Gtk::Widget> widget = nullptr;
 widget = my_button;
 ```
 
+A `RefPtr` can be dereferenced with `->` just like a plain pointer:
+
+```cpp
+~#include <peel/Gtk/Gtk.h>
+~
+~using namespace peel;
+~
+RefPtr<Gtk::Button> button = /* ... */;
+button->set_label ("My Button");
+```
+
 ## RefPtr compared to std::shared_ptr
 
 `RefPtr` is in many ways similar to [`std::shared_ptr`]. There is however an
 important difference:
 * `std::shared_ptr` adds *its own layer of reference counting* around a type
   that itself doesn't implement reference-counting (so it is possible to use
-  e.g. `std::shared_ptr<int>`);
+  `std::shared_ptr<int>` for example);
 * `RefPtr` expects the object type to implement *its own reference counting
   mechanism* (for `GObject::Object` subclasses, these are [`g_object_ref`]
   and [`g_object_unref`]), and wraps that mechanism into a C++ smart pointer
@@ -52,7 +63,7 @@ operations involving plain pointers and `RefPtr`s (and other peel pointer
 types like `FloatPtr` and `WeakPtr`) "just work" and manage the reference
 count of the object automatically and correctly.
 
-For example, assume there are two functions one of which accepts an object by
+For example, assume there are two functions, one of which accepts an object by
 a plain pointer, and another by `RefPtr`. You can just call both of them
 whether you have a plain pointer or a `RefPtr`:
 
@@ -67,7 +78,7 @@ void takes_ref_ptr (RefPtr<Object> object);
 Object *my_plain_ptr = /* ... */;
 RefPtr<Object> my_ref_ptr = /* ... */;
 
-// All of these work:
+/* All of these work: */
 takes_plain_ptr (my_plain_ptr);
 takes_plain_ptr (my_ref_ptr);
 takes_ref_ptr (my_plain_ptr);
@@ -75,9 +86,18 @@ takes_ref_ptr (my_ref_ptr);
 takes_ref_ptr (std::move (my_ref_ptr));
 ```
 
-When a `RefPtr` is used on an API boundary, meaning it passed as an argument
+When a `RefPtr` is used on an API boundary, meaning it is passed as an argument
 to a function or returned from one, it signifies transfer of ownership, also
-known as `trasnfer full` in GObject world.
+known as `trasnfer full` in GObject world. For instance,
+[`Gio::ListModel::get_object`] returns an owned reference to an object, and has
+the following signature in peel:
+
+```cpp
+RefPtr<GObject::Object>
+Gio::ListModel::get_object (unsigned position) noexcept;
+```
+
+[`Gio::ListModel::get_object`]: https://docs.gtk.org/gio/method.ListModel.get_object.html
 
 Sometimes, it makes sense to create temporary `RefPtr`s in order to make sure
 an object is kept alive over some manipulation. For example, here's how you
@@ -91,14 +111,15 @@ would move a button between two boxes:
 Gtk::Box *box1 = /* ... */;
 Gtk::Box *box2 = /* ... */;
 Gtk::Button *button = /* ... */;
-// button is a child of box1, to be moved into box2.
+/* button is a child of box1, to be moved into box2 */
 
 RefPtr<Gtk::Button> button_ref = button;
 box1->remove(button);
-// box1 has dropped its reference on button here!
+/* box1 has dropped its reference on button here! */
 box2->append(button);
-// box2 has added a reference on button,
-// so our RefPtr can be safely dropped.
+/* box2 has added a reference on button,
+ * so our RefPtr can be safely dropped.
+ */
 ```
 
 A much more common pattern is keeping a `RefPtr` as a member variable in a
@@ -116,14 +137,14 @@ class MyWidget : public Gtk::Widget
   /* ... */
 
 private:
-  RefPtr<Gio::Model> model;
+  RefPtr<Gio::ListModel> model;
   RefPtr<Gtk::Adjustment> h_adjustment, v_adjustment;
 };
 ```
 
 [class]: custom-gobject-classes.md
 
-## Copy amd move semantics
+## Copy and move semantics
 
 Note that copy and move semantics apply to `RefPtr` as usual in C++. Passing a
 `RefPtr` into a function by copy, like here:
@@ -164,6 +185,49 @@ call, and there will be no extra `g_object_ref`/`g_object_unref` calls at
 runtime.
 
 [`std::move`]: https://en.cppreference.com/w/cpp/utility/move
+
+## Casting
+
+**Upcasting** means converting a pointer to a derived type into a pointer to
+its base type.
+
+Upcasting should for the most part "just work" with `RefPtr`. In particular, it
+should be possible to pass an instance of `RefPtr<DerivedType>` (or a plain
+`DerivedType *` pointer) in places where an instance of `RefPtr<BaseType>` is
+expected.
+
+**Dowcasting** means converting a pointer to a base type into a pointer to its
+derived type, when we know that the dynamic type of the object it points to
+actually matches the derived type.
+
+The usual way to perform downcasting in peel is with the
+`GObject::TypeInstance::cast` method, like this:
+
+```cpp
+~#include <peel/Gtk/Gtk.h>
+~
+~using namespace peel;
+~
+Gtk::Widget *widget = /* ... */;
+/* We know that it's actually a button */
+Gtk::Button *button = widget->cast<Gtk::Button> ();
+```
+
+When used with a `RefPtr`, this will dereference the `RefPtr` and call the
+usual `cast` method, which will return the plain pointer. To downcast the
+`RefPtr` itself (moving it), use the `RefPtr::cast` method. This method is
+defined on `RefPtr` itself rather than on the type it references, so in order
+to call it, make sure to use a dot (`.`) and not an arrow (`->`):
+
+```cpp
+~#include <peel/Gtk/Gtk.h>
+~
+~using namespace peel;
+~
+RefPtr<Gtk::Widget> widget = /* ... */;
+/* We know that it's actually a button */
+RefPtr<Gtk::Button> button = std::move (widget).cast<Gtk::Button> ();
+```
 
 ## Non object-derived types
 
@@ -242,7 +306,7 @@ button = reinterpret_cast<Gtk::Button *> (c_button);
 
 For `trasnfer full` pointers, use the `RefPtr::adopt_ref` static method and the
 `release_ref` method. (Note that `release_ref` must be called on an rvalue,
-e.g. the result of `std::move`).
+for example the result of `std::move`).
 
 ```cpp
 /**
