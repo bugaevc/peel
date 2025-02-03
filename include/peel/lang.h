@@ -87,6 +87,8 @@
 #define _peel_diagnostic_pop
 #endif
 
+#define peel_macro_overload_23(_1, _2, _3, macro, ...) macro
+
 #ifndef _Bool
 #define _Bool bool
 #endif

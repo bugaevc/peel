@@ -3,10 +3,13 @@
 A common way to implement composite GTK widgets is by using [widget templates].
 
 To start using widget templates, you should:
+
 1. Write the template in a `.ui` file (perhaps using [Blueprint]),
-2. Call [`Gtk::Widget::Class::set_template_from_resource`] in your widget's `Class::init`,
+2. Call [`Gtk::Widget::Class::set_template_from_resource`] in your widget's
+   `Class::init`,
 3. Call [`Gtk::Widget::init_template`] in your widget's `init`,
-4. Call [`Gtk::Widget::dispose_template`] with your widget's type in your widget's `vfunc_dispose`.
+4. Call [`Gtk::Widget::dispose_template`] with your widget's type in your
+   widget's `vfunc_dispose`.
 
 Here's how it might look:
 
@@ -73,8 +76,37 @@ MyWidget::Class::init ()
 The first macro argument must be the widget class (commonly just a name, but it
 could be namespaced, or referenced through a typedef). The second argument must
 be a name of an instance data member (for `BIND_CHILD`) or a method (for
-`BIND_CALLBACK`) with a matching type. The name must also match that used in
-the template.
+`BIND_CALLBACK`) with a matching type.
+
+When using the two-argument versions of the macros, the name of the C++ member
+must match the ID/name used in the template. There are also three-argument
+versions that let you pass a name explicitly. This can be useful when your C++
+code follows one naming convention (such as prefixing all data member names
+with `m_`) and your `.ui` files follow a different one:
+
+```cpp
+#include <peel/widget-template.h>
+
+class MyWidget : public Gtk::Widget
+{
+  /* ... */
+
+  /* template children */
+  Gtk::Button *m_button;
+  Gtk::GestureClick m_gesture_click;
+};
+
+inline void
+MyWidget::Class::init ()
+{
+  override_vfunc_dispose<MyWidget> ();
+
+  set_template_from_resource ("/org/example/my-widget.ui");
+
+  PEEL_WIDGET_TEMPLATE_BIND_CHILD (MyWidget, m_button, "button");
+  PEEL_WIDGET_TEMPLATE_BIND_CHILD (MyWidget, m_gesture_click, "gesture-click");
+}
+```
 
 [widget templates]: https://developer.gnome.org/documentation/tutorials/widget-templates.html
 [Blueprint]: https://jwestman.pages.gitlab.gnome.org/blueprint-compiler/
