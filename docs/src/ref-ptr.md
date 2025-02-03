@@ -196,9 +196,9 @@ should be possible to pass an instance of `RefPtr<DerivedType>` (or a plain
 `DerivedType *` pointer) in places where an instance of `RefPtr<BaseType>` is
 expected.
 
-**Dowcasting** means converting a pointer to a base type into a pointer to its
-derived type, when we know that the dynamic type of the object it points to
-actually matches the derived type.
+**Downcasting** means converting a pointer to a base type into a pointer to a
+derived type, when we know that the dynamic type of the object te pointer
+points to actually matches the derived type.
 
 The usual way to perform downcasting in peel is with the
 `GObject::TypeInstance::cast` method, like this:
@@ -214,7 +214,7 @@ Gtk::Button *button = widget->cast<Gtk::Button> ();
 ```
 
 When used with a `RefPtr`, this will dereference the `RefPtr` and call the
-usual `cast` method, which will return the plain pointer. To downcast the
+usual `cast` method, which will return a plain pointer. To downcast the
 `RefPtr` itself (moving it), use the `RefPtr::cast` method. This method is
 defined on `RefPtr` itself rather than on the type it references, so in order
 to call it, make sure to use a dot (`.`) and not an arrow (`->`):
