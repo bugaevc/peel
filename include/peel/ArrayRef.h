@@ -29,13 +29,13 @@ public:
     , c (C)
   { }
 
-  constexpr ArrayRef (T *ptr, size_t size) noexcept
-    : p (ptr)
+  constexpr ArrayRef (T *data, size_t size) noexcept
+    : p (data)
     , c (size)
   { }
 
   constexpr T *
-  ptr () const noexcept
+  data () const noexcept
   {
     return p;
   }

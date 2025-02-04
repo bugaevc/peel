@@ -526,7 +526,7 @@ class Parameter(NodeHandler):
                     return '{}.{}'.format(cpp_name, call)
 
                 if self.ownership == 'none' or self.ownership is None:
-                    ptr_expr = make_call('ptr ()')
+                    ptr_expr = make_call('data ()')
                 else:
                     ptr_expr = 'std::move ({}).release_ref ()'.format(cpp_name)
 

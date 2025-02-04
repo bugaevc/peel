@@ -129,7 +129,7 @@ public:
   static peel::FloatPtr<Variant>
   create_tuple (peel::ArrayRef<Variant * const> children) noexcept
   {
-    ::GVariant * const *_peel_children = reinterpret_cast<::GVariant * const *> (children.ptr ());
+    ::GVariant * const *_peel_children = reinterpret_cast<::GVariant * const *> (children.data ());
     gsize _peel_n_children = children.size ();
     ::GVariant *_peel_return = g_variant_new_tuple (_peel_children, _peel_n_children);
     peel_assume (_peel_return);

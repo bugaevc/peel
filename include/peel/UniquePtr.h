@@ -196,8 +196,14 @@ public:
     return p;
   }
 
+  constexpr T *
+  data () const noexcept
+  {
+    return ptr;
+  }
+
   constexpr size_t
-  size () const
+  size () const noexcept
   {
     return c;
   }
@@ -205,7 +211,7 @@ public:
   explicit constexpr
   operator bool () const
   {
-    return ptr;
+    return ptr && c;
   }
 
   constexpr T &
