@@ -37,28 +37,42 @@ function (peel_generate GIR_NAME GIR_VERSION)
     endif ()
   endforeach ()
 
+  if (${PEEL_GENERATE_RECURSIVE})
+    set (recursive_arg "--recursive")
+  else ()
+    set (recursive_arg)
+  endif ()
+
   set (gen_dir "${CMAKE_CURRENT_BINARY_DIR}/peel-generated")
   file (MAKE_DIRECTORY "${gen_dir}")
+
   if (${CMAKE_VERSION} VERSION_LESS "3.27")
     set (depends_explicit_only)
   else ()
     set (depends_explicit_only DEPENDS_EXPLICIT_ONLY)
   endif ()
-  add_custom_command (OUTPUT "${gen_dir}/peel"
+  if (${CMAKE_VERSION} VERSION_LESS "3.31")
+    set (codegen_arg)
+  else ()
+    set (codegen_arg CODEGEN)
+  endif ()
+
+  add_custom_command (OUTPUT "${gen_dir}/peel/${GIR_NAME}"
     COMMAND "${CMAKE_COMMAND}"
     ARGS
       "-E" "env" "GI_GIR_PATH=${gi_gir_path}"
       "${Python3_EXECUTABLE}" "${PEEL_GEN_MODULE}"
-      "--recursive" "${GIR_NAME}" "${GIR_VERSION}"
+      ${recursive_arg} "${GIR_NAME}" "${GIR_VERSION}"
     DEPENDS "${PEEL_GEN_MODULE}"
     WORKING_DIRECTORY "${gen_dir}"
-    VERBATIM ${depends_explicit_only})
+    VERBATIM ${depends_explicit_only} ${codegen_arg})
 
-  add_custom_target (peel_generate_${GIR_NAME} DEPENDS "${gen_dir}/peel")
+  add_custom_target (peel_generate_${GIR_NAME} DEPENDS "${gen_dir}/peel/${GIR_NAME}")
 
   add_library (peel::${GIR_NAME} INTERFACE IMPORTED)
   target_link_libraries (peel::${GIR_NAME} INTERFACE peel::peel)
   add_dependencies (peel::${GIR_NAME} peel_generate_${GIR_NAME})
 
   set_property (TARGET peel::${GIR_NAME} APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${gen_dir}")
+  set_property (TARGET peel::${GIR_NAME} APPEND PROPERTY ADDITIONAL_CLEAN_FILES "${gen_dir}")
 endfunction (peel_generate)
