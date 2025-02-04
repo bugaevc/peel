@@ -1,3 +1,12 @@
+test:
+  stage: test
+  image: "debian:12"
+  before_script:
+    - apt update && apt install -y meson libgirepository1.0-dev python3
+  script:
+    - meson setup build
+    - meson test -C build
+
 pages:
   stage: deploy
   image: "rust:latest"
