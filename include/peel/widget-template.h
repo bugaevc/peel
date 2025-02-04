@@ -72,15 +72,15 @@ while (0)                                                                      \
   peel_widget_template_bind_callback_impl (WidgetClass, method, #method)
 
 #define PEEL_WIDGET_TEMPLATE_BIND_CHILD(...)                                   \
-  peel_macro_overload_23 (                                                     \
+  peel_expand_for_msvc (peel_macro_overload_23 (                               \
     __VA_ARGS__,                                                               \
     peel_widget_template_bind_child_impl,                                      \
-    peel_widget_template_bind_child_impl2) (__VA_ARGS__)                       \
+    peel_widget_template_bind_child_impl2) (__VA_ARGS__))                      \
 /* end of PEEL_WIDGET_TEMPLATE_BIND_CHILD */
 
 #define PEEL_WIDGET_TEMPLATE_BIND_CALLBACK(...)                                \
-  peel_macro_overload_23 (                                                     \
+  peel_expand_for_msvc (peel_macro_overload_23 (                               \
     __VA_ARGS__,                                                               \
     peel_widget_template_bind_callback_impl,                                   \
-    peel_widget_template_bind_callback_impl2) (__VA_ARGS__)                    \
+    peel_widget_template_bind_callback_impl2) (__VA_ARGS__))                   \
 /* end of PEEL_WIDGET_TEMPLATE_BIND_CHILD */

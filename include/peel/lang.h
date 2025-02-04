@@ -88,6 +88,7 @@
 #endif
 
 #define peel_macro_overload_23(_1, _2, _3, macro, ...) macro
+#define peel_expand_for_msvc(x) x
 
 #ifndef _Bool
 #define _Bool bool
