@@ -1,7 +1,7 @@
 # ArrayRef
 
 `ArrayRef<T>` references an array of a dynamic size. It is a simple non-owning
-pointer that contains a base pointer of type `T *` and size. `ArrayRef` is
+pointer that contains a base pointer of type `T *` and a size. `ArrayRef` is
 analogous to C++20 [`std::span`], or a [Rust slice].
 
 [`std::span`]: https://en.cppreference.com/w/cpp/container/span
