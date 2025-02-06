@@ -114,10 +114,11 @@ See [`examples/libdex.cpp`] in the peel repository for an example of using
 
 ## Fixed size arrays
 
-`ArrayRef` is used for arrays whose size is only known dynamically. For fixed-
-size arrays, peel instead uses C++ references to C arrays[^note]. For example,
-[`Gsk::BorderNode::create`] accepts two arrays, both of them having fixed size
-of four, and the [`Gsk::BorderNode::get_widths`] getter returns the widths:
+`ArrayRef` is used for arrays whose size is only known dynamically. For
+fixed-size arrays, peel instead uses C++ references to C arrays[^note]. For
+example, [`Gsk::BorderNode::create`] accepts two arrays, both of them having
+fixed size of four, and the [`Gsk::BorderNode::get_widths`] getter returns the
+widths:
 
 [`Gsk::BorderNode::create`]: https://docs.gtk.org/gsk4/ctor.BorderNode.new.html
 [`Gsk::BorderNode::get_widths`]: https://docs.gtk.org/gsk4/method.BorderNode.get_widths.html
