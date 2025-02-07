@@ -41,9 +41,8 @@ important difference:
   that itself doesn't implement reference-counting (so it is possible to use
   `std::shared_ptr<int>` for example);
 * `RefPtr` expects the object type to implement *its own reference counting
-  mechanism* (for `GObject::Object` subclasses, these are [`g_object_ref`]
-  and [`g_object_unref`]), and wraps that mechanism into a C++ smart pointer
-  type.
+  mechanism* (for `GObject::Object` subclasses, that is [`g_object_ref`] and
+  [`g_object_unref`]), and wraps that mechanism into a C++ smart pointer type.
 
 [`std::shared_ptr`]: https://en.cppreference.com/w/cpp/memory/shared_ptr
 [`g_object_ref`]: https://docs.gtk.org/gobject/method.Object.ref.html
@@ -114,9 +113,9 @@ Gtk::Button *button = /* ... */;
 /* button is a child of box1, to be moved into box2 */
 
 RefPtr<Gtk::Button> button_ref = button;
-box1->remove(button);
+box1->remove (button);
 /* box1 has dropped its reference on button here! */
-box2->append(button);
+box2->append (button);
 /* box2 has added a reference on button,
  * so our RefPtr can be safely dropped.
  */
@@ -125,6 +124,8 @@ box2->append(button);
 A much more common pattern is keeping a `RefPtr` as a member variable in a
 [class], in order to make sure that the referenced object stays alive for as
 long as an instance of this class does:
+
+[class]: custom-gobject-classes.md
 
 ```cpp
 ~#include <peel/Gtk/Gtk.h>
@@ -141,8 +142,6 @@ private:
   RefPtr<Gtk::Adjustment> h_adjustment, v_adjustment;
 };
 ```
-
-[class]: custom-gobject-classes.md
 
 ## Copy and move semantics
 
