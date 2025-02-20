@@ -59,6 +59,8 @@ skip	g_io_channel_read_line_string
 skip	g_io_channel_write
 out	g_io_channel_get_line_term	length
 skip	g_slice_get_config_state
+skip	g_main_context_pusher_new
+skip	g_main_context_pusher_free
 skip	g_mkdtemp
 skip	g_mkdtemp_full
 skip	g_mkstemp
@@ -830,6 +832,7 @@ vararg	gtk_message_dialog_new				format
 vararg	gtk_message_dialog_new_with_markup		format
 vararg	gtk_message_dialog_format_secondary_markup	format
 vararg	gtk_message_dialog_format_secondary_text	format
+vararg	gtk_alert_dialog_new				format
 
 onstack	GtkRequestedSize
 onstack	GtkRequisition

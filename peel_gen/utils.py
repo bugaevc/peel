@@ -56,6 +56,7 @@ def escape_cpp_name(name):
         'IN',
         'OUT',
         'OVERFLOW',
+        'OPTIONAL',
         'UNDERFLOW',
         'DIFFERENCE',
         'FAR',
