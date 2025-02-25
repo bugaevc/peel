@@ -17,6 +17,7 @@ template<>                                                                     \
 struct peel::GObject::Value::Traits<Enum>                                      \
 {                                                                              \
   typedef Enum UnownedType;                                                    \
+  typedef typename std::underlying_type<Enum>::type UnderlyingType;            \
                                                                                \
   static Enum                                                                  \
   get (const ::GValue *value) noexcept                                         \
@@ -27,8 +28,7 @@ struct peel::GObject::Value::Traits<Enum>                                      \
   static void                                                                  \
   set (::GValue *value, Enum m) noexcept                                       \
   {                                                                            \
-    g_value_set_enum (value,                                                   \
-                      static_cast<std::underlying_type<Enum>::type> (m));      \
+    g_value_set_enum (value, static_cast<UnderlyingType> (m));                 \
   }                                                                            \
                                                                                \
   static void                                                                  \
@@ -94,6 +94,7 @@ template<>                                                                     \
 struct peel::GObject::Value::Traits<Flags>                                     \
 {                                                                              \
   typedef Flags UnownedType;                                                   \
+  typedef typename std::underlying_type<Flags>::type UnderlyingType;           \
                                                                                \
   static Flags                                                                 \
   get (const ::GValue *value) noexcept                                         \
@@ -104,8 +105,7 @@ struct peel::GObject::Value::Traits<Flags>                                     \
   static void                                                                  \
   set (::GValue *value, Flags m) noexcept                                      \
   {                                                                            \
-    g_value_set_flags (value,                                                  \
-                      static_cast<std::underlying_type<Flags>::type> (m));     \
+    g_value_set_flags (value, static_cast<UnderlyingType> (m));                \
   }                                                                            \
                                                                                \
   static void                                                                  \
