@@ -517,6 +517,13 @@ struct GObject::Value::Traits<GLib::Variant>
   }
 
   static void
+  set_sink (::GValue *value, FloatPtr<GLib::Variant> &&v) noexcept
+  {
+    GLib::Variant *vv = std::move (v).release_floating_ptr ();
+    g_value_set_variant (value, reinterpret_cast<::GVariant *> (vv));
+  }
+
+  static void
   take (::GValue *value, RefPtr<GLib::Variant> &&v)
   {
     ::GVariant *raw = reinterpret_cast<::GVariant *> (std::move (v).release_ref ());
