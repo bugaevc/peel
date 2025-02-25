@@ -183,6 +183,12 @@ struct Value::Traits<signed char>
   {
     return set (value, ch);
   }
+
+  static signed char
+  cast_for_create (signed char ch) noexcept
+  {
+     return ch;
+  }
 };
 
 template<>
@@ -207,6 +213,12 @@ struct Value::Traits<unsigned char>
   set_marshal_return (::GValue *value, unsigned char ch) noexcept
   {
     return set (value, ch);
+  }
+
+  static unsigned char
+  cast_for_create (unsigned char ch) noexcept
+  {
+    return ch;
   }
 };
 
@@ -233,6 +245,12 @@ struct Value::Traits<bool>
   {
     return set (value, b);
   }
+
+  static gboolean
+  cast_for_create (bool b) noexcept
+  {
+     return b;
+  }
 };
 
 template<>
@@ -257,6 +275,12 @@ struct Value::Traits<int>
   set_marshal_return (::GValue *value, int i) noexcept
   {
     return set (value, i);
+  }
+
+  static gint
+  cast_for_create (int i) noexcept
+  {
+    return i;
   }
 };
 
@@ -283,6 +307,12 @@ struct Value::Traits<unsigned int>
   {
     return set (value, i);
   }
+
+  static guint
+  cast_for_create (unsigned int i) noexcept
+  {
+    return i;
+  }
 };
 
 template<>
@@ -308,6 +338,12 @@ struct Value::Traits<float>
   {
     set (value, f);
   }
+
+  static gfloat
+  cast_for_create (float f) noexcept
+  {
+    return f;
+  }
 };
 
 template<>
@@ -332,6 +368,12 @@ struct Value::Traits<double>
   set_marshal_return (::GValue *value, double d) noexcept
   {
     set (value, d);
+  }
+
+  static gdouble
+  cast_for_create (double d) noexcept
+  {
+    return d;
   }
 };
 
@@ -383,6 +425,15 @@ struct Value::Traits<const char *>
     g_value_take_string (value, const_cast<char *> (str));
   }
 */
+
+  static const char *
+  cast_for_create (const char *c) noexcept
+  {
+    return c;
+  }
+
+  static const char *
+  cast_for_create (char *) = delete;
 };
 
 template<>
@@ -407,6 +458,12 @@ struct Value::Traits<Type>
   set_marshal_return (::GValue *value, Type type) noexcept
   {
     set (value, type);
+  }
+
+  static ::GType
+  cast_for_create (Type type) noexcept
+  {
+    return type;
   }
 };
 
@@ -433,6 +490,12 @@ struct Value::Traits<void *>
   {
     set (value, p);
   }
+
+  static gpointer
+  cast_for_create (void *p) noexcept
+  {
+    return p;
+  }
 };
 
 template<>
@@ -451,6 +514,12 @@ struct Value::Traits<Value>
   set (::GValue *value, const Value *v) noexcept
   {
     g_value_set_boxed (value, reinterpret_cast<const void *> (v));
+  }
+
+  static const ::GValue *
+  cast_for_create (const Value *v) noexcept
+  {
+    return reinterpret_cast<const ::GValue *> (v);
   }
 };
 

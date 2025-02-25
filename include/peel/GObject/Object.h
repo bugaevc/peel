@@ -673,6 +673,12 @@ struct Value::Traits<T, peel::enable_if_derived<Object, T, void>>
     /* Pretend to have a reference.  */
     g_value_take_object (value, object);
   }
+
+  static ::GObject *
+  cast_for_create (T *object) noexcept
+  {
+    return reinterpret_cast<::GObject *> (object);
+  }
 };
 
 class InitiallyUnowned;
@@ -833,5 +839,42 @@ struct RefTraits<T, peel::enable_if_derived<GObject::Object, T, void>>
 #endif
   }
 };
+
+namespace internals
+{
+template<typename...>
+struct ObjectCreateHelper;
+
+template<>
+struct ObjectCreateHelper<>
+{
+  template<typename Ret, typename CCalleeType, typename... UnpackedArgs>
+  peel_always_inline
+  static Ret
+  invoke (CCalleeType c_callee, UnpackedArgs... unpacked_args) noexcept
+  {
+    return c_callee (unpacked_args..., nullptr);
+  }
+};
+
+template<typename T, typename U, typename... Args>
+struct ObjectCreateHelper<Property<T>, U, Args...>
+{
+  template<typename Ret, typename CCalleeType, typename... UnpackedArgs>
+  peel_always_inline
+  static Ret
+  invoke (CCalleeType c_callee, UnpackedArgs... unpacked_args, Property<T> prop, U &&value, Args &&...args) noexcept
+  {
+    typedef decltype (GObject::Value::Traits<T>::cast_for_create (std::forward<U> (value))) CArg;
+    return ObjectCreateHelper<Args...>::template invoke<
+      Ret, CCalleeType, UnpackedArgs..., const char *, CArg> (
+        c_callee,
+        unpacked_args..., prop.get_name (),
+        GObject::Value::Traits<T>::cast_for_create (std::forward<U> (value)),
+        std::forward<Args> (args)...);
+  }
+};
+
+} /* namespace internals */
 
 } /* namespace peel */

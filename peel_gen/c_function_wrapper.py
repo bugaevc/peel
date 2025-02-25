@@ -8,6 +8,10 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
     """
     if attributes is None:
         attributes = []
+    object_new = False
+    for tweak in api_tweaks.lookup(c_callee, 'vararg'):
+       if tweak[1] == 'object-new':
+           object_new = True
     typed_tweak_callee = None
     for tweak in api_tweaks.lookup(c_callee, 'typed'):
         typed_tweak_callee = tweak[1]
@@ -179,7 +183,21 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
         else:
             args.append('error ? &_peel_error : nullptr')
         num_local_copies += 1
-    call = '{} ({})'.format(c_callee if typed_tweak_callee is None else typed_tweak_callee, ', '.join(args))
+
+    callee_expr = c_callee
+    if typed_tweak_callee:
+        callee_expr = typed_tweak_callee
+    elif object_new:
+        # TODO: unhardcode the name Args...
+        assert('typename... Args' in templates)
+        invoke_template_params = [
+            rv.generate_c_type(for_local_copy=False),
+            'decltype ({}) *'.format(c_callee),
+        ] + [p.generate_c_type(for_local_copy=False) for p in params.params[:-2]]
+        callee_expr = 'peel::internals::ObjectCreateHelper<Args...>::template invoke<{}>'.format(', '.join(invoke_template_params))
+        args = [c_callee] + args
+        args.pop(-2)
+    call = '{} ({})'.format(callee_expr, ', '.join(args))
     if rv.c_type != 'void':
         casted_name = rv.generate_casted_name()
         cast_from_c = rv.generate_cast_from_c(

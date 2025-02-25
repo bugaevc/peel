@@ -109,6 +109,12 @@ def generate_value_traits_specialization(cpp_type, unowned_type, arg_name, get_e
             '  }',
         ])
     l.extend([
+        '',
+        '  static {}'.format(unowned_type),
+        '  cast_for_create ({} {}) noexcept'.format(unowned_type, arg_name),
+        '  {',
+        '    return {};'.format(arg_name),
+        '  }',
         '};'
     ])
     return '\n'.join(l)

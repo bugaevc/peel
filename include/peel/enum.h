@@ -36,6 +36,12 @@ struct peel::GObject::Value::Traits<Enum>                                      \
   {                                                                            \
     set (value, m);                                                            \
   }                                                                            \
+                                                                               \
+  static UnderlyingType                                                        \
+  cast_for_create (Enum m) noexcept                                            \
+  {                                                                            \
+    return static_cast<UnderlyingType> (m);                                    \
+  }                                                                            \
 };                                                                             \
                                                                                \
 template<>                                                                     \
@@ -112,6 +118,12 @@ struct peel::GObject::Value::Traits<Flags>                                     \
   set_marshal_return (::GValue *value, Flags m)                                \
   {                                                                            \
     set (value, m);                                                            \
+  }                                                                            \
+                                                                               \
+  static UnderlyingType                                                        \
+  cast_for_create (Flags m) noexcept                                           \
+  {                                                                            \
+    return static_cast<UnderlyingType> (m);                                    \
   }                                                                            \
 };                                                                             \
                                                                                \

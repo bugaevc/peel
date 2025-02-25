@@ -398,7 +398,8 @@ vararg	g_menu_model_get_item_attribute	variant-get
 vararg	g_menu_item_set_action_and_target	variant-new
 vararg	g_notification_add_button_with_target	variant-new
 vararg	g_notification_set_default_action_and_target variant-new
-
+vararg	g_initable_new			object-new
+vararg	g_async_initable_new_async	object-new
 
 onstack	GInputVector
 onstack	GOutputVector
@@ -821,6 +822,7 @@ out	GtkEntryBuffer::vfunc_get_text	n_bytes
 vararg	gtk_snapshot_push_debug		format
 vararg	gtk_media_stream_error		format
 vararg	gtk_show_about_dialog		object-new
+vararg	gtk_text_buffer_create_tag	object-new
 vararg	gtk_shortcut_new_with_arguments	variant-new
 vararg	gtk_widget_activate_action	variant-new
 vararg	gtk_widget_class_add_binding	variant-new
@@ -1058,6 +1060,10 @@ float	adw_tab_view_insert_pinned	child
 float	adw_tab_view_prepend		child
 float	adw_tab_view_prepend_pinned	child
 
+vararg	adw_show_about_dialog		object-new
+vararg	adw_show_about_dialog_from_appdata object-new
+vararg	adw_show_about_window		object-new
+vararg	adw_show_about_window_from_appdata object-new
 vararg	adw_toast_set_action_target	variant-new
 float	adw_toast_set_action_target_value action_target
 
@@ -1129,3 +1135,6 @@ scope	gst_bus_add_watch		func	forever
 no-autofree JsonNode
 nest	JsonNodeType			Node::Type
 nest	JsonObjectIter			Object::Iter
+
+# GtkSource
+vararg	gtk_source_buffer_create_source_tag	object-new

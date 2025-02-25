@@ -542,6 +542,13 @@ struct GObject::Value::Traits<GLib::Variant>
   {
     take (value, std::move (v));
   }
+
+  static ::GVariant *
+  cast_for_create (FloatPtr<GLib::Variant> v) noexcept
+  {
+    GLib::Variant *vv = std::move (v).release_floating_ptr ();
+    return reinterpret_cast<::GVariant *> (vv);
+  }
 };
 
 template<>

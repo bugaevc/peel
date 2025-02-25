@@ -488,7 +488,14 @@ class Class(DefinedType):
             else:
                 # TODO: set_marshal_return
                 pass
-            l.append('};')
+            l.extend([
+                '  static ::{} *'.format(self.c_type),
+                '  cast_for_create (T *object) noexcept',
+                '  {',
+                '    return reinterpret_cast<::{} *> (object);'.format(self.c_type),
+                '  }',
+                '};'
+            ])
             s += '\n'.join(l)
         if self.ref_func or self.unref_func:
             s += '\n\n' + generate_ref_traits_specialization(

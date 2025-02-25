@@ -182,6 +182,7 @@ class Parameters(NodeHandler):
         return l
 
     def generate_cpp_signature(self, context, typed_tweak=None):
+        from peel_gen.type import StrType
         self.resolve_stuff(has_typed_tweak=typed_tweak is not None)
         l = []
         for p in self.params:
@@ -196,6 +197,10 @@ class Parameters(NodeHandler):
             if name == '...':
                 assert(p is self.params[-1])
                 name = 'args'
+                if p.vararg_mode == 'object-new':
+                    assert(len(self.params) > 1)
+                    assert(isinstance(self.params[-2].type, StrType))
+                    l.pop()
             l.append(p.generate_cpp_type(name, context))
         return ', '.join(l)
 
