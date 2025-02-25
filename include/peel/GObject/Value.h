@@ -448,7 +448,7 @@ struct Value::Traits<Value>
   }
 
   static void
-  set (::GValue *value, Value *v) noexcept
+  set (::GValue *value, const Value *v) noexcept
   {
     g_value_set_boxed (value, reinterpret_cast<const void *> (v));
   }
