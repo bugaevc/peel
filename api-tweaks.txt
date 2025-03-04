@@ -671,7 +671,8 @@ onstack	hb_feature_t
 onstack	hb_variation_t
 
 # Pango
-skip	pango_get_mirror_char
+out	pango_get_mirror_char		mirrored_ch
+optional pango_get_mirror_char		mirrored_ch
 skip	pango_log2vis_get_embedding_levels
 onstack	PangoAttribute
 onstack	PangoColor
@@ -705,6 +706,7 @@ unowned	pango_scan_int			pos
 unowned	pango_scan_string		pos
 unowned	pango_scan_word			pos
 unowned	pango_skip_space		pos
+owned	pango_glyph_item_apply_attrs	glyph_item
 
 # TODO: conflicts with a field, rename the field
 skip	pango_layout_line_is_paragraph_start
@@ -818,6 +820,8 @@ skip	gtk_enumerate_printers
 out	GtkWidget::vfunc_compute_expand	hexpand_p
 out	GtkWidget::vfunc_compute_expand	vexpand_p
 out	GtkEntryBuffer::vfunc_get_text	n_bytes
+nonnull	gtk_bitset_ref			self
+nonnull	gtk_bitset_unref		self
 
 vararg	gtk_snapshot_push_debug		format
 vararg	gtk_media_stream_error		format

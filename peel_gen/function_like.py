@@ -54,7 +54,7 @@ class FunctionLike(NodeHandler):
                 self.visibility = 'protected'
             elif tweak[0] == 'include':
                 self.extra_includes.append(tweak[1])
-            elif tweak[0] in ('float', 'unowned', 'owned', 'in', 'out', 'inout', 'optional', 'this', 'scope'):
+            elif tweak[0] in ('float', 'unowned', 'owned', 'in', 'out', 'inout', 'optional', 'nonnull', 'this', 'scope'):
                 p = self.find_param_for_tweak(tweak[1])
                 assert(p is not None)
                 if tweak[0] == 'float':
@@ -77,6 +77,8 @@ class FunctionLike(NodeHandler):
                     p.direction = 'inout'
                 elif tweak[0] == 'optional':
                     p.optional = True
+                elif tweak[0] == 'nonnull':
+                    p.nullable = False
                 elif tweak[0] == 'this':
                     p.force_cpp_this = True
                 elif tweak[0] == 'scope':
