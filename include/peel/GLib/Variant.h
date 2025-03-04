@@ -560,11 +560,17 @@ struct RefTraits<GLib::Variant, void>
     g_variant_ref (reinterpret_cast<::GVariant *> (v));
   }
 
+  constexpr static
+  bool can_ref_null = false;
+
   static void
   unref (GLib::Variant *v)
   {
     g_variant_unref (reinterpret_cast<::GVariant *> (v));
   }
+
+  constexpr static
+  bool can_unref_null = false;
 
   static void
   ref_sink (GLib::Variant *v)

@@ -8,7 +8,17 @@ def generate_get_type_specialization(cpp_type, gtype_expr):
         '}',
     ])
 
-def generate_ref_traits_specialization(cpp_type, c_type, ref_func, unref_func, ref_sink_func=None, sink_func=None, template_derived=True):
+def generate_ref_traits_specialization(
+    cpp_type,
+    c_type,
+    ref_func,
+    unref_func,
+    ref_sink_func=None,
+    sink_func=None,
+    template_derived=True,
+    can_ref_null=False,
+    can_unref_null=False,
+):
     l = []
     if template_derived:
         name = 'T'
@@ -30,11 +40,17 @@ def generate_ref_traits_specialization(cpp_type, c_type, ref_func, unref_func, r
         '    {} (reinterpret_cast<::{} *> (ptr));'.format(ref_func, c_type),
         '  }',
         '',
+        '  constexpr static',
+        '  bool can_ref_null = {};'.format('true' if can_ref_null else 'false'),
+        '',
         '  static void',
         '  unref ({} *ptr)'.format(name),
         '  {',
         '    {} (reinterpret_cast<::{} *> (ptr));'.format(unref_func, c_type),
         '  }',
+        '',
+        '  constexpr static',
+        '  bool can_unref_null = {};'.format('true' if can_unref_null else 'false'),
     ])
     if ref_sink_func:
         l.extend([
@@ -67,7 +83,7 @@ def generate_ref_traits_specialization(cpp_type, c_type, ref_func, unref_func, r
     l.append('};')
     return '\n'.join(l)
 
-def generate_unique_traits_specialization(cpp_type, c_type, free_func):
+def generate_unique_traits_specialization(cpp_type, c_type, free_func, can_free_null=False):
     return '\n'.join([
         'template<>',
         'struct UniqueTraits<{}>'.format(cpp_type),
@@ -77,6 +93,9 @@ def generate_unique_traits_specialization(cpp_type, c_type, free_func):
         '  {',
         '    {} (reinterpret_cast<::{} *> (ptr));'.format(free_func, c_type),
         '  }',
+        '',
+        '  constexpr static',
+        '  bool can_free_null = {};'.format('true' if can_free_null else 'false'),
         '};',
     ])
 

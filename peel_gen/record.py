@@ -49,19 +49,14 @@ class Record(DefinedType):
             c_ident = attrs['c:identifier']
             if m_name == 'ref':
                 self.ref_func = c_ident
-                return
             elif m_name == 'unref':
                 self.unref_func = c_ident
-                return
             elif m_name == 'free':
                 self.free_func = c_ident
-                return
             elif m_name == 'ref_sink':
                 self.ref_sink_func = c_ident
-                return
             elif m_name == 'sink':
                 self.sink_func = c_ident
-                return
             m = Method(attrs, self)
             self.methods.append(m)
             return m
@@ -209,6 +204,14 @@ class Record(DefinedType):
                 l.append('  /* Unsupported for now: {}: {} */'.format(constructor.name, e.reason))
             l.append('')
         for method in self.methods:
+            if method.c_ident in (self.ref_func, self.unref_func, self.ref_sink_func, self.sink_func):
+                l.append('  /* {} bound as RefTraits */'.format(method.name))
+                l.append('')
+                continue
+            elif method.c_ident == self.free_func:
+                l.append('  /* {} bound as UniqueTraits */'.format(method.name))
+                l.append('')
+                continue
             try:
                 l.append(method.generate(indent='  '))
             except UnsupportedForNowException as e:
@@ -295,6 +298,12 @@ class Record(DefinedType):
             ])
         if self.ref_func or self.unref_func:
             assert(not self.free_func)
+            can_ref_null = can_unref_null = False
+            for method in self.methods:
+                if method.c_ident == self.ref_func:
+                    can_ref_null = any(p.is_instance and p.nullable for p in method.params.params)
+                elif method.c_ident == self.unref_func:
+                    can_unref_null = any(p.is_instance and p.nullable for p in method.params.params)
             s += '\n\n' + generate_ref_traits_specialization(
                 full_name,
                 self.c_type,
@@ -303,8 +312,19 @@ class Record(DefinedType):
                 self.ref_sink_func,
                 self.sink_func,
                 template_derived=False,
+                can_ref_null=can_ref_null,
+                can_unref_null=can_unref_null,
             )
         elif self.free_func:
-            s += '\n\n' + generate_unique_traits_specialization(full_name, self.c_type, self.free_func)
+            can_free_null = False
+            for method in self.methods:
+                if method.c_ident == self.free_func:
+                    can_free_null = any(p.is_instance and p.nullable for p in method.params.params)
+            s += '\n\n' + generate_unique_traits_specialization(
+                full_name,
+                self.c_type,
+                self.free_func,
+                can_free_null=can_free_null,
+            )
         return s
 

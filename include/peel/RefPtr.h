@@ -12,8 +12,14 @@ struct RefTraits;
   static void
   ref (T *);
 
+  constexpr static
+  bool can_ref_null;
+
   static void
   unref (T *);
+
+  constexpr static
+  bool can_unref_null;
 
   static void
   ref_sink (T *);
@@ -35,6 +41,36 @@ private:
 
   T *ptr;
 
+  peel_always_inline
+  static void
+  do_ref (T *ptr)
+  {
+#ifdef __GNUC__
+    if (__builtin_constant_p (ptr == nullptr) && (ptr == nullptr))
+      return;
+    if (RefTraits<T>::can_ref_null || ptr)
+      RefTraits<T>::ref (ptr);
+#else
+    if (ptr)
+      RefTraits<T>::ref (ptr);
+#endif
+  }
+
+  peel_always_inline
+  static void
+  do_unref (T *ptr)
+  {
+#ifdef __GNUC__
+    if (__builtin_constant_p (ptr == nullptr) && (ptr == nullptr))
+      return;
+    if (RefTraits<T>::can_unref_null || ptr)
+      RefTraits<T>::unref (ptr);
+#else
+    if (ptr)
+      RefTraits<T>::unref (ptr);
+#endif
+  }
+
 public:
   constexpr RefPtr () noexcept
     : ptr (nullptr)
@@ -47,15 +83,13 @@ public:
   RefPtr (T *ptr) noexcept
     : ptr (ptr)
   {
-    if (ptr)
-      RefTraits<T>::ref (ptr);
+    do_ref (ptr);
   }
 
   RefPtr (const RefPtr &other) noexcept
     : ptr (other.ptr)
   {
-    if (ptr)
-      RefTraits<T>::ref (ptr);
+    do_ref (ptr);
   }
 
   RefPtr (RefPtr &&other) noexcept
@@ -77,8 +111,7 @@ public:
   RefPtr (U *ptr) noexcept
     : ptr (ptr)
   {
-    if (ptr)
-      RefTraits<T>::ref (ptr);
+    do_ref (ptr);
   }
   */
 
@@ -87,8 +120,7 @@ public:
   RefPtr (const RefPtr<U> &other) noexcept
     : ptr (other.ptr)
   {
-    if (ptr)
-      RefTraits<T>::ref (ptr);
+    do_ref (ptr);
   }
 
   /* Upcast.  */
@@ -111,8 +143,7 @@ public:
 
   ~RefPtr () noexcept
   {
-    if (ptr)
-      RefTraits<T>::unref (ptr);
+    do_unref (ptr);
   }
 
   static RefPtr
@@ -136,10 +167,8 @@ public:
   RefPtr &
   operator = (U *ptr) noexcept
   {
-    if (ptr)
-      RefTraits<T>::ref (ptr);
-    if (this->ptr)
-      RefTraits<T>::unref (this->ptr);
+    do_ref (ptr);
+    do_unref (this->ptr);
     this->ptr = ptr;
     return *this;
   }
@@ -147,10 +176,8 @@ public:
   RefPtr &
   operator = (const RefPtr &other) noexcept
   {
-    if (other.ptr)
-      RefTraits<T>::ref (other.ptr);
-    if (this->ptr)
-      RefTraits<T>::unref (this->ptr);
+    do_ref (other.ptr);
+    do_unref (this->ptr);
     this->ptr = other.ptr;
     return *this;
   }
@@ -160,10 +187,8 @@ public:
   RefPtr &
   operator = (const RefPtr<U> &other) noexcept
   {
-    if (other.ptr)
-      RefTraits<T>::ref (other.ptr);
-    if (this->ptr)
-      RefTraits<T>::unref (this->ptr);
+    do_ref (other.ptr);
+    do_unref (this->ptr);
     this->ptr = other.ptr;
     return *this;
   }
@@ -171,8 +196,7 @@ public:
   RefPtr &
   operator = (RefPtr &&other) & noexcept
   {
-    if (ptr)
-      RefTraits<T>::unref (ptr);
+    do_unref (ptr);
     ptr = other.ptr;
     other.ptr = nullptr;
     return *this;
@@ -183,8 +207,7 @@ public:
   RefPtr &
   operator = (RefPtr<U> &&other) & noexcept
   {
-    if (ptr)
-      RefTraits<T>::unref (ptr);
+    do_unref (ptr);
     ptr = other.ptr;
     other.ptr = nullptr;
     return *this;
@@ -209,8 +232,7 @@ public:
   RefPtr &
   operator = (decltype (nullptr)) noexcept
   {
-    if (this->ptr)
-      RefTraits<T>::unref (this->ptr);
+    do_unref (this->ptr);
     this->ptr = nullptr;
     return *this;
   }

@@ -498,6 +498,12 @@ class Class(DefinedType):
             ])
             s += '\n'.join(l)
         if self.ref_func or self.unref_func:
+            can_ref_null = can_unref_null = False
+            for method in self.methods:
+                if method.c_ident == self.ref_func:
+                    can_ref_null = any(p.is_instance and p.nullable for p in method.params.params)
+                elif method.c_ident == self.unref_func:
+                    can_unref_null = any(p.is_instance and p.nullable for p in method.params.params)
             s += '\n\n' + generate_ref_traits_specialization(
                 full_name,
                 self.c_type,
@@ -506,6 +512,8 @@ class Class(DefinedType):
                 self.ref_sink_func,
                 sink_func=None,
                 template_derived=True,
+                can_ref_null=can_ref_null,
+                can_unref_null=can_unref_null,
             )
         si = api_tweaks.ifdef_if_needed(self.c_type)
         if not si:

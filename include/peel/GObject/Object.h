@@ -814,11 +814,17 @@ struct RefTraits<T, peel::enable_if_derived<GObject::Object, T, void>>
     peel_assume (r == obj);
   }
 
+  static constexpr
+  bool can_ref_null = false;
+
   static void
   unref (T *obj)
   {
     g_object_unref (obj);
   }
+
+  static constexpr
+  bool can_unref_null = false;
 
   static void
   ref_sink (T *obj)

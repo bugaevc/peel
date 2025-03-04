@@ -140,11 +140,17 @@ struct RefTraits<T, peel::enable_if_derived<GObject::TypeClass, T, void>>
     peel_assume (klass == tc);
   }
 
+  static constexpr
+  bool can_ref_null = false;
+
   static void
   unref (T *klass)
   {
     g_type_class_unref (klass);
   }
+
+  static constexpr
+  bool can_unref_null = false;
 };
 
 } /* namespace peel */

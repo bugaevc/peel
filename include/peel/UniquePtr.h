@@ -12,6 +12,9 @@ struct UniqueTraits;
 {
   static void
   free (T *);
+
+  constexpr static
+  bool can_free_null;
 }
 */
 
@@ -43,8 +46,16 @@ public:
 
   ~UniquePtr () noexcept
   {
+#ifdef __GNUC__
+    /* If we can statically see it's nullptr, don't do anything. */
+    if (__builtin_constant_p (ptr == nullptr) && (ptr == nullptr))
+      return;
+    if (UniqueTraits<T>::can_free_null || ptr)
+      UniqueTraits<T>::free (ptr);
+#else
     if (ptr)
       UniqueTraits<T>::free (ptr);
+#endif
   }
 
   static UniquePtr
