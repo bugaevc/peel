@@ -3,6 +3,7 @@
 #include <peel/lang.h>
 #include <peel/GObject/Type.h>
 #include <peel/GObject/Value.h>
+#include <peel/GLib/Error.h>
 #include <glib.h>
 
 namespace peel
@@ -10,7 +11,6 @@ namespace peel
 namespace GLib
 {
 
-struct Error;
 class VariantIter;
 
 class Variant
