@@ -6,6 +6,9 @@ namespace peel
 {
 
 template<typename T>
+class RefPtr;
+
+template<typename T>
 class FloatPtr final
 {
 private:
@@ -62,6 +65,15 @@ public:
   {
     other.ptr = nullptr;
   }
+
+  /* Upcast from RefPtr.  */
+  template<typename U, peel::enable_if_derived<T, U, int> = 0>
+  FloatPtr (const RefPtr<U> &r) noexcept
+    : ptr ((U *) r)
+  { }
+
+  template<typename U>
+  FloatPtr (RefPtr<U> &&) = delete;
 
   ~FloatPtr () noexcept
   {
