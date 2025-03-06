@@ -711,6 +711,13 @@ owned	pango_glyph_item_apply_attrs	glyph_item
 # TODO: conflicts with a field, rename the field
 skip	pango_layout_line_is_paragraph_start
 
+nest	PangoLayoutSerializeFlags	Layout::SerializeFlags
+nest	PangoLayoutDeserializeFlags	Layout::DeserializeFlags
+
+nest	PangoLayoutIter			Layout::Iter
+nest	PangoScriptIter			Script::Iter
+nest	PangoGlyphItemIter		GlyphItem::Iter
+
 # Graphene
 onstack	graphene_rect_t
 onstack	graphene_point_t
@@ -994,7 +1001,7 @@ nest	GtkPrintOperationAction		PrintOperation::Action
 nest	GtkPrintOperationResult		PrintOperation::Result
 nest	GtkRevealerTransitionType	Revealer::TransitionType
 nest	GtkScrollablePolicy		Scrollable::Policy
-nest-alias GtkShortcutScope		Shortcut::Scope
+nest	GtkShortcutScope		Shortcut::Scope
 nest	GtkSizeGroupMode		SizeGroup::Mode
 nest	GtkSorterChange			Sorter::Change
 nest	GtkSorterOrder			Sorter::Order
@@ -1021,6 +1028,7 @@ nest	GtkPopoverMenuFlags		PopoverMenu::Flags
 nest	GtkShortcutActionFlags		ShortcutAction::Flags
 nest	GtkStyleContextPrintFlags	StyleContext::PrintFlags
 nest	GtkTreeModelFlags		TreeModel::Flags
+nest	GtkTextBufferNotifyFlags	TextBuffer::NotifyFlags
 
 nest	GtkBuilderError			Builder::Error
 nest	GtkConstraintVflParserError	Constraint::VflParserError
