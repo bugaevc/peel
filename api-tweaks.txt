@@ -1068,11 +1068,13 @@ vararg	adw_show_about_dialog		object-new
 vararg	adw_show_about_dialog_from_appdata object-new
 vararg	adw_show_about_window		object-new
 vararg	adw_show_about_window_from_appdata object-new
+vararg	adw_breakpoint_add_setters	object-new
 vararg	adw_toast_set_action_target	variant-new
 float	adw_toast_set_action_target_value action_target
 
-nest	AdwBreakpointConditionLengthType BreakpointCondition::LengthType
-nest	AdwBreakpointConditionRatioType	BreakpointCondition::RatioType
+nest	AdwBreakpointCondition		Breakpoint::Condition
+nest	AdwBreakpointConditionLengthType Breakpoint::Condition::LengthType
+nest	AdwBreakpointConditionRatioType	Breakpoint::Condition::RatioType
 
 nest	AdwAnimationState		Animation::State
 nest	AdwAnimationTarget		Animation::Target

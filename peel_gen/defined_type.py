@@ -30,12 +30,11 @@ class DefinedType(NodeHandler, AnyType):
             for tweak in api_tweaks.lookup(self.c_type, 'nest'):
                 self.emit_name = self.emit_def_name = tweak[1]
                 self.nested_in_name, self.own_name = self.emit_name.rsplit('::', 1)
-                # TODO: In theory, nested_in_name is an emit-name of the
-                # type we're nested in, it's not necessarily usable as
-                # its GIR name.
+                self.nested_in_name = self.nested_in_name.replace('::', '')
             for tweak in api_tweaks.lookup(self.c_type, 'nest-alias'):
                 self.emit_name = tweak[1]
                 self.nested_in_alias_name, not_own_name = self.emit_name.rsplit('::', 1)
+                self.nested_in_alias_name = self.nested_in_alias_name.replace('::', '')
         self.has_resolved_stuff = False
 
     def __repr__(self):
