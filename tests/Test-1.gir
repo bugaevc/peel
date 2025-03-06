@@ -1017,6 +1017,16 @@
           </parameter>
         </parameters>
       </virtual-method>
+      <virtual-method name="make_instance">
+        <return-value transfer-ownership="full">
+          <type name="Testy" c:type="TestTesty*"/>
+        </return-value>
+        <parameters>
+          <parameter name="i">
+            <type name="gint" c:type="int"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
     </class>
     <record name="TestyClass"
             c:type="TestTestyClass"

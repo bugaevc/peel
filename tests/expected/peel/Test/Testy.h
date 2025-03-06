@@ -722,6 +722,16 @@ protected:
     *values = peel::UniquePtr<GObject::Value[]>::adopt_ref (reinterpret_cast<GObject::Value *> (_peel_values), _peel_count);
   }
 
+  template<typename DerivedClass>
+  static peel::RefPtr<Testy>
+  parent_vfunc_make_instance (int i) noexcept
+  {
+    ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (Class::peek<DerivedClass> ()->peek_parent ());
+    ::TestTesty * _peel_return = _peel_class->make_instance (i);
+    peel_assume (_peel_return);
+    return peel::RefPtr<Testy>::adopt_ref (reinterpret_cast<Testy *> (_peel_return));
+  }
+
 public:
   class Class : public GObject::Object::Class
   {
@@ -1101,6 +1111,18 @@ public:
         peel::UniquePtr<GObject::Value[]> _peel_values = peel::UniquePtr<GObject::Value[]>::adopt_ref (reinterpret_cast<GObject::Value *> (*values), *count);
         _peel_this->DerivedClass::vfunc_inout_value_array (&_peel_values);
         *values = (*count = _peel_values.size (), reinterpret_cast<::GValue *> (std::move (_peel_values).release_ref ()));
+      };
+    }
+
+    template<typename DerivedClass>
+    void
+    override_vfunc_make_instance ()
+    {
+      ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
+      klass->make_instance = +[] (int i) -> ::TestTesty *
+      {
+        peel::RefPtr<Testy> _peel_return = DerivedClass::vfunc_make_instance (i);
+        return reinterpret_cast<::TestTesty *> (std::move (_peel_return).release_ref ());
       };
     }
   };
