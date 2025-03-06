@@ -11,8 +11,6 @@ namespace peel
 namespace GLib
 {
 
-class VariantIter;
-
 class Variant
 {
 private:
@@ -30,7 +28,7 @@ public:
 
   class Type;
   struct Builder;
-  typedef VariantIter Iter;
+  class Iter;
   enum class Class : std::underlying_type<::GVariantClass>::type;
 
   const Variant::Type *

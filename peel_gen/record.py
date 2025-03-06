@@ -112,11 +112,11 @@ class Record(DefinedType):
                 pass
         if self.nested_in:
             s.add(self.nested_in)
-        # If self got into the set (e.g. due to being passed inside RefPtr<>),
+        # If self got into the set due to a nested type being mentioned,
         # get rid of it, since there's no point in including ourselves.
         s.discard(self)
         for nested_type in self.nested_types:
-            s.discard(nested_type)
+            assert(nested_type not in s)
         return s
 
     def generate_extra_forward_members(self):
@@ -129,9 +129,13 @@ class Record(DefinedType):
                 s.update(member.generate_extra_forward_members())
             except UnsupportedForNowException:
                 pass
+        # We already forward-declare self and nested types.
         s.discard(self)
         for nested_type in self.nested_types:
             s.discard(nested_type)
+        # Forward-declare the underlying type for nested type aliases.
+        for nested_type in self.nested_type_aliases:
+            s.add(nested_type)
         return s
 
     def generate_extra_include_at_end_members(self):
@@ -144,11 +148,9 @@ class Record(DefinedType):
                 s.update(member.generate_extra_include_at_end_members())
             except UnsupportedForNowException:
                 pass
-        if self.nested_in:
-            s.add(self.nested_in)
+        # If self got into the set (e.g. due to being passed inside RefPtr<>),
+        # get rid of it, since there's no point in including ourselves.
         s.discard(self)
-        for nested_type in self.nested_types:
-            s.discard(nested_type)
         return s
 
     def generate_forward_decl(self, for_nested=False):

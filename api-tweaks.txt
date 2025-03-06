@@ -160,7 +160,7 @@ float	GVariant
 #ref-sink GVariant			g_variant_ref_sink
 nest	GVariantType			Variant::Type
 nest	GVariantClass			Variant::Class
-nest-alias GVariantIter			Variant::Iter
+nest	GVariantIter			Variant::Iter
 nest	GVariantBuilder			Variant::Builder
 nest	GMainContextFlags		MainContext::Flags
 onstack	GTimeVal

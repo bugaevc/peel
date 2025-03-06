@@ -94,12 +94,18 @@ class Parameter(NodeHandler):
             return set()
         elif tp.ns.emit_raw:
             return set()
-        elif not tp.is_passed_by_ref() or tp.nested_in:
-            return { tp }
+        s = set()
+        if tp.nested_in:
+            # We have to fully include the containing type
+            # to forward-declare the nested type.
+            s.add(tp.nested_in)
+        if not tp.is_passed_by_ref():
+            return s
         elif self.is_record_field and tp.can_be_allocated_by_value():
-            return { tp }
+            s.add(tp)
+            return s
         else:
-            return set()
+            return s
 
     def generate_extra_forward_members(self):
         self.resolve_stuff()

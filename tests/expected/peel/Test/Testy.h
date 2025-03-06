@@ -15,9 +15,7 @@
 #include <cstdint>
 #include <utility>
 #include <peel-test/peel-test.h>
-#include <peel/GObject/BindingFlags.h>
 #include <peel/GObject/Object.h>
-#include <peel/GObject/ObjectConstructParam.h>
 
 G_GNUC_BEGIN_IGNORE_DEPRECATIONS
 
