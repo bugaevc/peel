@@ -98,8 +98,6 @@ skip	g_strlcat
 skip	g_strlcpy
 skip	g_strreverse
 skip	g_strup
-skip	g_string_free_and_steal
-skip	g_string_free_to_bytes
 skip	g_test_log_buffer_push
 skip	g_timer_elapsed
 skip	g_type_class_adjust_private_offset
@@ -150,7 +148,6 @@ no-autofree GMatchInfo
 no-autofree GMemChunk
 no-autofree GOptionGroup
 no-autofree GPtrArray
-no-autofree GString
 no-autofree GThreadPool
 include	g_access			glib/gstdio.h
 include	g_chmod				glib/gstdio.h
@@ -234,6 +231,11 @@ ifdef	g_source_add_unix_fd		G_OS_UNIX
 ifdef	g_source_modify_unix_fd		G_OS_UNIX
 ifdef	g_source_remove_unix_fd		G_OS_UNIX
 ifdef	g_source_query_unix_fd		G_OS_UNIX
+
+# This one is a fun hack:
+no-autofree GString
+free	GString				[](::GString*str){g_string_free(str,TRUE);}
+skip	g_string_free
 
 # GObject
 # These all have (or should have) explicit bindings.
