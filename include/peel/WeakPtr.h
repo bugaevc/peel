@@ -11,7 +11,7 @@ namespace GObject
 class Object;
 };
 
-template<typename T, peel::enable_if_derived<GObject::Object, T, int> = 0>
+template<typename T /*, peel::enable_if_derived<GObject::Object, T, int> = 0*/>
 class WeakPtr final
 {
 private:
