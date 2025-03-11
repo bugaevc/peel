@@ -147,6 +147,15 @@ public:
     ptr = nullptr;
     return p;
   }
+
+  template<typename U>
+  FloatPtr<U>
+  cast () && noexcept
+  {
+    U *u_ptr = ptr->template cast<U> ();
+    ptr = nullptr;
+    return FloatPtr<U> (u_ptr);
+  }
 };
 
 } /* namespace peel */
