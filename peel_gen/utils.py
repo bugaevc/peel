@@ -68,6 +68,7 @@ def escape_cpp_name(name):
         'TRY_AGAIN',
         'ALTERNATE',
         'WINDING',
+        'DOUBLE_CLICK',
         'interface',
     ):
         return name + '_'
