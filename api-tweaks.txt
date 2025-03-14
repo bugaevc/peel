@@ -720,8 +720,9 @@ nest	PangoLayoutSerializeFlags	Layout::SerializeFlags
 nest	PangoLayoutDeserializeFlags	Layout::DeserializeFlags
 
 nest	PangoLayoutIter			Layout::Iter
-nest	PangoScriptIter			Script::Iter
 nest	PangoGlyphItemIter		GlyphItem::Iter
+# Can not be nested, since Pango::Script is itself an enum class.
+#nest	PangoScriptIter			Script::Iter
 
 # Graphene
 onstack	graphene_rect_t

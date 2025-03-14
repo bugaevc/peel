@@ -41,6 +41,8 @@ class Bitfield(DefinedType):
 
     def generate(self):
         api_tweaks.skip_if_needed(self.c_type, self.ns)
+        assert(not self.nested_types)
+        assert(not self.nested_type_aliases)
         l = [
             'enum class /* bitfield */ {} : std::underlying_type<::{}>::type'.format(self.emit_def_name, self.c_type),
             '{'

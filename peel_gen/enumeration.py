@@ -39,6 +39,8 @@ class Enumeration(DefinedType):
         return 'enum class {} : std::underlying_type<::{}>::type;'.format(self.own_name, self.c_type)
 
     def generate(self):
+        assert(not self.nested_types)
+        assert(not self.nested_type_aliases)
         api_tweaks.skip_if_needed(self.c_type, self.ns)
         l = [
             'enum class {} : std::underlying_type<::{}>::type'.format(self.emit_def_name, self.c_type),
