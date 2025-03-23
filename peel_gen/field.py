@@ -1,5 +1,6 @@
 from peel_gen.node_handler import NodeHandler
 from peel_gen.parameter import Parameter
+from peel_gen.exceptions import UnsupportedForNowException
 
 class Field(NodeHandler):
     def __init__(self, attrs, cpp_record):
@@ -15,9 +16,18 @@ class Field(NodeHandler):
         return 'Field({}.{})'.format(self.cpp_record, self.param)
 
     def resolve_stuff(self):
-        if not we_support_this:
+        if not self.we_support_this:
             return
-        self.param.resolve_stuff()
+        if self.param.type is self.param.type_name is None:
+            self.we_support_this = False
+            return
+        try:
+            self.param.resolve_stuff()
+        except UnsupportedForNowException:
+            self.we_support_this = False
+            return
+        if self.param.type is None:
+            self.we_support_this = False
 
     def start_child_element(self, name, attrs):
         if name in ('callback', 'array'):

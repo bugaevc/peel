@@ -98,7 +98,10 @@ class Record(DefinedType):
                 self.is_initially_floating = True
 
         self.is_refcounted = bool(self.ref_func)
-        self.all_fields_supported = self.all_fields_supported and all(f.we_support_this for f in self.fields)
+        for f in self.fields:
+            f.resolve_stuff()
+            if not f.we_support_this:
+                self.all_fields_supported = False
 
     def should_generate_fields(self):
         return self.all_fields_supported and not self.opaque and not self.incomplete and not self.is_private
