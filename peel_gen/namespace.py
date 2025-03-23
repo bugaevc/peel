@@ -48,9 +48,7 @@ class Namespace(NodeHandler):
             self.members.append(e)
             return e
         elif name == 'record':
-            if attrs['name'].endswith('Private'):
-                return
-            elif 'glib:is-gtype-struct-for' in attrs:
+            if 'glib:is-gtype-struct-for' in attrs:
                 return TypeStruct(attrs, ns=self)
             for tweak in api_tweaks.lookup(attrs['c:type'], 'type-struct-for'):
                 return TypeStruct(attrs, ns=self, type_struct_for=tweak[1])
@@ -87,7 +85,8 @@ class Namespace(NodeHandler):
     def should_emit_file(self, member):
         if not isinstance(member, (Class, Interface, Record, Enumeration, Bitfield)):
             return False
+        if isinstance(member, Record) and member.is_private:
+            return False
         if api_tweaks.should_skip(member.c_type, ns=self, keep_manual=True):
             return False
         return True
-
