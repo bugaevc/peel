@@ -11,6 +11,12 @@
              shared-library="libpeel-test.so.0"
              c:identifier-prefixes="Test"
              c:symbol-prefixes="test">
+    <constant name="COOLNESS_LEVEL" value="42" c:type="TEST_COOLNESS_LEVEL">
+      <type name="gint" c:type="gint"/>
+    </constant>
+    <constant name="LIBRARY_NAME" value="peel-test" c:type="TEST_LIBRARY_NAME">
+      <type name="utf8" c_type="gchar*"/>
+    </constant>
     <callback name="CoolCallback" c:type="TestCoolCallback">
       <return-value transfer-ownership="full">
         <type name="Testy" c:type="TestTesty*"/>

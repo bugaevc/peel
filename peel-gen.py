@@ -21,6 +21,7 @@ if __name__ == '__main__' and __package__ is None:
 from peel_gen import api_tweaks
 from peel_gen.type import AnyType
 from peel_gen.function import Function
+from peel_gen.constant import Constant
 from peel_gen.exceptions import UnsupportedForNowException
 from peel_gen.repository import find_and_parse_gir_repo, repository_map
 import peel_gen.namespace
@@ -154,10 +155,14 @@ def emit_repo(repo):
         base_path = Path('peel') / ns.name
         base_path.mkdir(parents=True, exist_ok=True)
         functions = []
+        constants = []
         emitted_files = []
         for member in ns.members:
             if isinstance(member, Function):
                 functions.append(member)
+                continue
+            elif isinstance(member, Constant):
+                constants.append(member)
                 continue
             elif not ns.should_emit_file(member):
                 continue
@@ -168,6 +173,10 @@ def emit_repo(repo):
         if functions:
             file_path = base_path / 'functions.h'
             if emit_file(repo, file_path, functions):
+                emitted_files.append(file_path)
+        if constants:
+            file_path = base_path / 'constants.h'
+            if emit_file(repo, file_path, constants):
                 emitted_files.append(file_path)
 
         file_path = base_path / '{}.h'.format(ns.name)

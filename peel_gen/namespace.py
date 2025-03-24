@@ -36,7 +36,7 @@ class Namespace(NodeHandler):
             self.members.append(a)
             return a
         elif name == 'constant':
-            c = Constant(attrs)
+            c = Constant(attrs, ns=self)
             self.members.append(c)
             return c
         elif name == 'bitfield':
