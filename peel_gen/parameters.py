@@ -73,7 +73,8 @@ class Parameters(NodeHandler):
             if p.name == '...':
                 assert(p is self.params[-1])
                 break
-            assert(p.type is not None)
+            if p.type is None:
+                raise UnsupportedForNowException('No type for ' + p.name)
             tp = chase_type_aliases(p.type)
             if isinstance(tp, Array):
                 if tp.length is not None:
