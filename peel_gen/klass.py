@@ -451,7 +451,7 @@ class Class(DefinedType):
                 '#if defined (G_DISABLE_CAST_CHECKS) || defined (__OPTIMIZE__)',
                 '    return reinterpret_cast<T *> (obj);',
                 '#else',
-                '    ::GType tp = static_cast<::GType> (Type::of<T> ());',
+                '    ::GType tp = static_cast<::GType> (GObject::Type::of<T> ());',
                 '    return G_TYPE_CHECK_INSTANCE_CAST (obj, tp, T);',
                 '#endif',
                 '  }',

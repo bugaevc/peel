@@ -23,13 +23,13 @@ class Vfunc(FunctionLike):
 
         api_tweaks.skip_if_needed(self.tweak_ident, self.ns)
         if isinstance(self.cpp_class, Class):
-            extra_decls = '    ::{} *_peel_class = reinterpret_cast<::{} *> (Class::peek<DerivedClass> ()->peek_parent ());'.format(
+            extra_decls = '    ::{} *_peel_class = reinterpret_cast<::{} *> (GObject::TypeClass::peek<DerivedClass> ()->peek_parent ());'.format(
                 self.cpp_class.type_struct.c_type,
                 self.cpp_class.type_struct.c_type,
             )
             c_callee = '_peel_class->{}'.format(self.name)
         elif isinstance(self.cpp_class, Interface):
-            extra_decls = '    ::{} *_peel_iface = reinterpret_cast<::{} *> (Class::peek<DerivedClass> ()->peek_interface (Type::of<{}> ())->peek_parent ());'.format(
+            extra_decls = '    ::{} *_peel_iface = reinterpret_cast<::{} *> (GObject::TypeClass::peek<DerivedClass> ()->peek_interface (GObject::Type::of<{}> ())->peek_parent ());'.format(
                 self.cpp_class.type_struct.c_type,
                 self.cpp_class.type_struct.c_type,
                 self.cpp_class.emit_name,
