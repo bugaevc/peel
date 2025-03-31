@@ -4,6 +4,8 @@
 #include <peel/lang.h>
 #include <glib-object.h>
 
+peel_begin_header
+
 namespace peel
 {
 namespace GObject
@@ -140,3 +142,5 @@ static_assert (alignof (TypeInstance) == alignof (::GTypeInstance),
 
 } /* namespace GObject */
 } /* namespace peel */
+
+peel_end_header

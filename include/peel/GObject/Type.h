@@ -3,6 +3,8 @@
 #include <peel/lang.h>
 #include <glib-object.h>
 
+peel_begin_header
+
 namespace peel
 {
 namespace GObject
@@ -324,3 +326,5 @@ Type::of<Type> ()
 using GObject::Type;
 
 } /* namespace peel */
+
+peel_end_header

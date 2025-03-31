@@ -5,6 +5,8 @@
 #include <peel/lang.h>
 #include <glib-object.h>
 
+peel_begin_header
+
 namespace peel
 {
 
@@ -664,3 +666,5 @@ struct DummyVisitor
     return ::peel::Property<type> { (name_str), &pspec };                      \
   }                                                                            \
 /* end of PEEL_PROPERTY */
+
+peel_end_header

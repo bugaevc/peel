@@ -90,17 +90,22 @@
 #if defined (_MSC_VER)
 /* Silence "consversion from size_t to int, possible loss of data" arising
  * from our usage of ArrayRef, and various functions accepting different
- * size types. Note that G_GNUC_BEGIN_IGNORE_DEPRECATIONS does
- * __pragma (warning (push)), and G_GNUC_END_IGNORE_DEPRECATIONS does
- * __pragma (warning (pop)).
+ * size types.
  */
 #define peel_begin_header                                                      \
-  G_GNUC_BEGIN_IGNORE_DEPRECATIONS                                             \
-  __pragma (warning (disable : 49264))
-#define peel_end_header G_GNUC_END_IGNORE_DEPRECATIONS
+  __pragma (warning (push))                                                    \
+  __pragma (warning (disable : 4996 49264))
+#define peel_end_header                                                        \
+  __pragma (warning (pop))
+#elif defined (__GNUC__)
+#define peel_begin_header                                                      \
+  _Pragma ("GCC diagnostic push")                                              \
+  _Pragma ("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
+#define peel_end_header                                                        \
+  _Pragma ("GCC diagnostic pop")
 #else
-#define peel_begin_header G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-#define peel_end_header G_GNUC_END_IGNORE_DEPRECATIONS
+#define peel_begin_header
+#define peel_end_header
 #endif
 
 #define peel_macro_overload_23(_1, _2, _3, macro, ...) macro
@@ -109,6 +114,8 @@
 #ifndef _Bool
 #define _Bool bool
 #endif
+
+peel_begin_header
 
 namespace peel
 {
@@ -145,3 +152,5 @@ offset_of_member_ptr (U T::*mptr)
 #endif
 
 } /* namespace peel */
+
+peel_end_header

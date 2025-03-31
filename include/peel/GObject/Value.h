@@ -5,6 +5,8 @@
 #include <glib-object.h>
 #include <utility>
 
+peel_begin_header
+
 namespace peel
 {
 
@@ -528,3 +530,5 @@ struct Value::Traits<Value>
 using GObject::Value;
 
 } /* namespace peel */
+
+peel_end_header

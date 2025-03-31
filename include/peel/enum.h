@@ -8,6 +8,8 @@
 #include <type_traits>
 #include <glib-object.h>
 
+peel_begin_header
+
 #define PEEL_ENUM(Enum)                                                        \
 template<>                                                                     \
 peel::GObject::Type                                                            \
@@ -232,3 +234,5 @@ peel::GObject::Type::of<Flags> ()                                              \
 
 #define PEEL_FLAGS_VALUE(value, nick)                                          \
 ::GFlagsValue { static_cast<gint> (value), #value, nick }
+
+peel_end_header

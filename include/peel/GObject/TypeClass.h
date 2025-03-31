@@ -5,6 +5,8 @@
 #include <peel/lang.h>
 #include <glib-object.h>
 
+peel_begin_header
+
 namespace peel
 {
 namespace GObject
@@ -154,3 +156,5 @@ struct RefTraits<T, peel::enable_if_derived<GObject::TypeClass, T, void>>
 };
 
 } /* namespace peel */
+
+peel_end_header

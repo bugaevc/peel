@@ -4,6 +4,8 @@
 #include <peel/signal.h>
 #include <peel/Gtk/Widget.h>
 
+peel_begin_header
+
 namespace peel
 {
 namespace internals
@@ -84,3 +86,5 @@ while (0)                                                                      \
     peel_widget_template_bind_callback_impl,                                   \
     peel_widget_template_bind_callback_impl2) (__VA_ARGS__))                   \
 /* end of PEEL_WIDGET_TEMPLATE_BIND_CHILD */
+
+peel_end_header

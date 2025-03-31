@@ -4,6 +4,8 @@
 #include <utility>
 #include <glib.h>
 
+peel_begin_header
+
 namespace peel
 {
 namespace internals
@@ -364,3 +366,5 @@ public:
 
 } /* namespace internals */
 } /* namespace peel */
+
+peel_end_header

@@ -6,6 +6,8 @@
 #include <peel/GLib/Error.h>
 #include <glib.h>
 
+peel_begin_header
+
 namespace peel
 {
 namespace GLib
@@ -585,3 +587,5 @@ struct RefTraits<GLib::Variant, void>
 };
 
 } /* namespace peel */
+
+peel_end_header

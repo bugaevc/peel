@@ -3,6 +3,8 @@
 #include <peel/lang.h>
 #include <glib-object.h>
 
+peel_begin_header
+
 namespace peel
 {
 namespace GObject
@@ -55,3 +57,5 @@ static_assert (alignof (TypeInterface) == alignof (::GTypeInterface),
 
 } /* namespace GObject */
 } /* namespace peel */
+
+peel_end_header

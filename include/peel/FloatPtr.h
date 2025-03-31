@@ -2,6 +2,8 @@
 
 #include <peel/lang.h>
 
+peel_begin_header
+
 namespace peel
 {
 
@@ -159,3 +161,5 @@ public:
 };
 
 } /* namespace peel */
+
+peel_end_header

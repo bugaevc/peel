@@ -6,6 +6,8 @@
 #include <type_traits>
 #include <glib-object.h>
 
+peel_begin_header
+
 namespace peel
 {
 namespace internals
@@ -327,3 +329,5 @@ do                                                                             \
   }                                                                            \
 while (0)                                                                      \
 /* end of PEEL_IMPLEMENT_INTERFACE */
+
+peel_end_header

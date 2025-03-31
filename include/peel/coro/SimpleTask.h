@@ -2,6 +2,8 @@
 
 #include <coroutine>
 
+peel_begin_header
+
 namespace peel
 {
 namespace coro
@@ -41,3 +43,5 @@ struct SimpleTask
 
 } /* namespace coro */
 } /* namespace peel */
+
+peel_end_header

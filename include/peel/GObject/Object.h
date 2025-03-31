@@ -12,6 +12,8 @@
 #include <utility>
 #include <glib-object.h>
 
+peel_begin_header
+
 namespace peel
 {
 
@@ -884,3 +886,5 @@ struct ObjectCreateHelper<Property<T>, U, Args...>
 } /* namespace internals */
 
 } /* namespace peel */
+
+peel_end_header

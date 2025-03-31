@@ -3,6 +3,8 @@
 #include <coroutine>
 #include <atomic>
 
+peel_begin_header
+
 namespace peel
 {
 
@@ -85,3 +87,5 @@ public:
 
 } /* namespace coro */
 } /* namespace peel */
+
+peel_end_header

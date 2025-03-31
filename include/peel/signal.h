@@ -11,6 +11,8 @@
 #include <type_traits>
 #include <glib-object.h>
 
+peel_begin_header
+
 namespace peel
 {
 namespace GObject
@@ -827,3 +829,5 @@ public:
     return (signal_obj).connect (this, detail, object, handler_method, after); \
   }                                                                            \
 /* end of PEEL_SIGNAL_CONNECT_METHOD */
+
+peel_end_header
