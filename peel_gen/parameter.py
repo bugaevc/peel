@@ -580,7 +580,7 @@ class Parameter(NodeHandler):
                         length_param_place = '*' + tp.length_param.name
                         set_length_param = '{} = {}'.format(length_param_place, make_call('size ()'))
                     else:
-                        set_length_param = 'g_assert ({} == {})'.format(
+                        set_length_param = '/* g_assert ({} == {}) */ 0'.format(
                             make_call('size ()'),
                             tp.length_param.name,
                         )

@@ -1036,7 +1036,7 @@ public:
       {
         DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
         peel::ArrayRef<const uint8_t> _peel_return = _peel_this->DerivedClass::vfunc_return_byte_array_of_size (size);
-        return (g_assert (_peel_return.size () == size), reinterpret_cast<gconstpointer> (_peel_return.data ()));
+        return (/* g_assert (_peel_return.size () == size) */ 0, reinterpret_cast<gconstpointer> (_peel_return.data ()));
       };
     }
 
@@ -1049,7 +1049,7 @@ public:
       {
         DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
         peel::UniquePtr<uint8_t[]> _peel_return = _peel_this->DerivedClass::vfunc_return_owned_byte_array_of_size (size);
-        return (g_assert (_peel_return.size () == size), reinterpret_cast<gpointer> (std::move (_peel_return).release_ref ()));
+        return (/* g_assert (_peel_return.size () == size) */ 0, reinterpret_cast<gpointer> (std::move (_peel_return).release_ref ()));
       };
     }
 
@@ -1063,7 +1063,7 @@ public:
         DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
         peel::UniquePtr<int[]> _peel_primes;
         _peel_this->DerivedClass::vfunc_first_n_primes (&_peel_primes, n);
-        *primes = (g_assert (_peel_primes.size () == n), reinterpret_cast<gint *> (std::move (_peel_primes).release_ref ()));
+        *primes = (/* g_assert (_peel_primes.size () == n) */ 0, reinterpret_cast<gint *> (std::move (_peel_primes).release_ref ()));
       };
     }
 
