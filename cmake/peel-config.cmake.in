@@ -54,6 +54,7 @@ function (peel_generate GIR_NAME GIR_VERSION)
   if (${CMAKE_VERSION} VERSION_LESS "3.31")
     set (codegen_arg)
   else ()
+    cmake_policy (SET CMP0171 NEW)
     set (codegen_arg CODEGEN)
   endif ()
 
