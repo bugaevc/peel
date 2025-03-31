@@ -16,7 +16,7 @@
 #include <utility>
 #include <peel-test/peel-test.h>
 
-G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+peel_begin_header
 
 namespace peel
 {
@@ -70,4 +70,4 @@ public:
 } /* namespace Test */
 } /* namespace peel */
 
-G_GNUC_END_IGNORE_DEPRECATIONS
+peel_end_header

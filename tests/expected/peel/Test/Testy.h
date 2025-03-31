@@ -17,7 +17,7 @@
 #include <peel-test/peel-test.h>
 #include <peel/GObject/Object.h>
 
-G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+peel_begin_header
 
 namespace peel
 {
@@ -1134,7 +1134,7 @@ public:
 } /* namespace Test */
 } /* namespace peel */
 
-G_GNUC_END_IGNORE_DEPRECATIONS
+peel_end_header
 
 #include <peel/GLib/Error.h>
 #include <peel/GObject/Binding.h>

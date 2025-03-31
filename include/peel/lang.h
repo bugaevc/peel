@@ -87,6 +87,22 @@
 #define _peel_diagnostic_pop
 #endif
 
+#if defined (_MSC_VER)
+/* Silence "consversion from size_t to int, possible loss of data" arising
+ * from our usage of ArrayRef, and various functions accepting different
+ * size types. Note that G_GNUC_BEGIN_IGNORE_DEPRECATIONS does
+ * __pragma (warning (push)), and G_GNUC_END_IGNORE_DEPRECATIONS does
+ * __pragma (warning (pop)).
+ */
+#define peel_begin_header                                                      \
+  G_GNUC_BEGIN_IGNORE_DEPRECATIONS                                             \
+  __pragma (warning (disable : 49264))
+#define peel_end_header G_GNUC_END_IGNORE_DEPRECATIONS
+#else
+#define peel_begin_header G_GNUC_BEGIN_IGNORE_DEPRECATIONS
+#define peel_end_header G_GNUC_END_IGNORE_DEPRECATIONS
+#endif
+
 #define peel_macro_overload_23(_1, _2, _3, macro, ...) macro
 #define peel_expand_for_msvc(x) x
 

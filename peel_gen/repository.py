@@ -77,7 +77,7 @@ class Repository(NodeHandler):
             l.append('#include <{}>'.format(include))
         l.extend([
             '',
-            'G_GNUC_BEGIN_IGNORE_DEPRECATIONS',
+            'peel_begin_header',
             '',
             'namespace peel',
             '{',
@@ -89,7 +89,7 @@ class Repository(NodeHandler):
         return (
             '} /* namespace peel */\n'
             '\n'
-            'G_GNUC_END_IGNORE_DEPRECATIONS\n'
+            'peel_end_header\n'
         )
 
 def work_out_gir_paths():
