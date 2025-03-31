@@ -37,7 +37,7 @@ class Vfunc(FunctionLike):
             c_callee = '_peel_iface->{}'.format(self.name)
         else:
             assert(False)
-        return c_function_wrapper.generate(
+        parent_vfunc = c_function_wrapper.generate(
             name='parent_vfunc_' + self.name,
             c_callee=c_callee,
             context=self.cpp_class,
@@ -48,6 +48,25 @@ class Vfunc(FunctionLike):
             extra_decls=extra_decls,
             templates=['typename DerivedClass'],
         )
+        if isinstance(self.cpp_class, Class):
+            return parent_vfunc
+        # For interfaces, also generate default_vfunc
+        extra_decls = '    ::{} *_peel_iface = reinterpret_cast<::{} *> (GObject::TypeInterface::peek_default (GObject::Type::of<{}> ()));'.format(
+            self.cpp_class.type_struct.c_type,
+            self.cpp_class.type_struct.c_type,
+            self.cpp_class.emit_name,
+        )
+        default_vfunc = c_function_wrapper.generate(
+            name='default_vfunc_' + self.name,
+            c_callee=c_callee,
+            context=self.cpp_class,
+            rv=self.rv,
+            params=self.params,
+            throws=self.throws,
+            indent='  ',
+            extra_decls=extra_decls,
+        )
+        return parent_vfunc + '\n\n' + default_vfunc
 
     def generate_override(self):
         from peel_gen.parameter import Parameter
