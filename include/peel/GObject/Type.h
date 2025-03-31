@@ -1,6 +1,7 @@
 #pragma once
 
 #include <peel/lang.h>
+#include <peel/UniquePtr.h>
 #include <glib-object.h>
 
 peel_begin_header
@@ -225,6 +226,22 @@ public:
 #else
     g_type_ensure (tp);
 #endif
+  }
+
+  UniquePtr<Type[]>
+  children () const noexcept
+  {
+    guint n_children = 0;
+    ::GType *ch = g_type_children (tp, &n_children);
+    return UniquePtr<Type[]>::adopt_ref (reinterpret_cast<Type *> (ch), n_children);
+  }
+
+  UniquePtr<Type[]>
+  interfaces () const noexcept
+  {
+    guint n_interfaces = 0;
+    ::GType *is = g_type_interfaces (tp, &n_interfaces);
+    return UniquePtr<Type[]>::adopt_ref (reinterpret_cast<Type *> (is), n_interfaces);
   }
 };
 
