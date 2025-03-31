@@ -970,6 +970,11 @@ float	gtk_scrollbar_set_adjustment	adjustment
 float	gtk_scrolled_window_set_hadjustment hadjustment
 float	gtk_scrolled_window_set_vadjustment vadjustment
 
+float	gtk_file_filter_to_gvariant	return
+float	gtk_page_setup_to_gvariant	return
+float	gtk_paper_size_to_gvariant	return
+float	gtk_print_settings_to_gvariant	return
+
 unowned	GtkWindow			construct
 typed	gtk_constant_expression_new	gtk_constant_expression_new_for_value
 
