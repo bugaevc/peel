@@ -164,6 +164,7 @@ onstack	GTimeVal
 onstack	GDate
 onstack	GLogField
 onstack	GPollFD
+onstack	GOptionEntry
 opaque	GSource
 
 onstack	GHashTableIter
@@ -341,11 +342,14 @@ float	g_dbus_gvariant_to_gvalue	value
 float	g_bus_own_name_with_closures	bus_acquired_closure
 float	g_bus_own_name_with_closures	name_acquired_closure
 float	g_bus_own_name_with_closures	name_lost_closure
-float	g_bus_own_name_on_connection_with_closures	name_acquired_closure
-float	g_bus_own_name_on_connection_with_closures	name_lost_closure
-float	g_dbus_connection_register_object_with_closures	method_call_closure
-float	g_dbus_connection_register_object_with_closures	get_property_closure
-float	g_dbus_connection_register_object_with_closures	set_property_closure
+float	g_bus_own_name_on_connection_with_closures		name_acquired_closure
+float	g_bus_own_name_on_connection_with_closures		name_lost_closure
+float	g_dbus_connection_register_object_with_closures		method_call_closure
+float	g_dbus_connection_register_object_with_closures		get_property_closure
+float	g_dbus_connection_register_object_with_closures		set_property_closure
+float	g_dbus_connection_register_object_with_closures2	method_call_closure
+float	g_dbus_connection_register_object_with_closures2	get_property_closure
+float	g_dbus_connection_register_object_with_closures2	set_property_closure
 float	g_settings_bind_with_mapping_closures	get_mapping
 float	g_settings_bind_with_mapping_closures	set_mapping
 
@@ -842,6 +846,9 @@ out	GtkEntryBuffer::vfunc_get_text	n_bytes
 nonnull	gtk_bitset_ref			self
 nonnull	gtk_bitset_unref		self
 
+unowned	gdk_dmabuf_texture_builder_get_color_state	return
+unowned	gdk_gl_texture_builder_get_color_state		return
+
 vararg	gtk_snapshot_push_debug		format
 vararg	gtk_media_stream_error		format
 vararg	gtk_show_about_dialog		object-new
@@ -1088,6 +1095,7 @@ float	adw_tab_view_insert		child
 float	adw_tab_view_insert_pinned	child
 float	adw_tab_view_prepend		child
 float	adw_tab_view_prepend_pinned	child
+float	adw_preferences_page_set_banner	banner
 
 vararg	adw_show_about_dialog		object-new
 vararg	adw_show_about_dialog_from_appdata object-new
@@ -1111,6 +1119,8 @@ nest	AdwFlapTransitionType		Flap::TransitionType
 nest	AdwSqueezerTransitionType	Squeezer::TransitionType
 nest	AdwLeafletTransitionType	Leaflet::TransitionType
 nest	AdwTabViewShortcuts		TabView::Shortcuts
+nest	AdwInlineViewSwitcherDisplayMode InlineViewSwitcher::DisplayMode
+nest	AdwBannerButtonStyle		Banner::ButtonStyle
 
 skip	adw_breakpoint_add_settersv
 skip	AdwSwipeable::vfunc_get_snap_points
