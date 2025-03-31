@@ -82,16 +82,6 @@ class Vfunc(FunctionLike):
                     new_p.type = fake_class
                     params.params[i] = new_p
 
-            rv_tp = chase_type_aliases(self.rv.type)
-            if hasattr(rv_tp, 'length_param'):
-                params.skip_params.append(rv_tp.length_param)
-            if hasattr(self.rv, 'closure_param'):
-                params.skip_params.append(self.rv.closure_param)
-            if hasattr(self.rv, 'destroy_param'):
-                params.skip_params.append(self.rv.destroy_param)
-
-            params.resolve_stuff(has_typed_tweak=False)
-
         cpp_wrapper = cpp_function_wrapper.generate(
             cpp_callee='DerivedClass::vfunc_' + self.name,
             context=self.cpp_class,

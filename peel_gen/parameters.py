@@ -14,6 +14,7 @@ class Parameters(NodeHandler):
     def clone(self):
         ps = Parameters(None, self.ns)
         ps.params = self.params[:]
+        ps.skip_params = self.skip_params[:]
         return ps
 
     def start_child_element(self, name, attrs):
@@ -75,23 +76,19 @@ class Parameters(NodeHandler):
                 break
             if p.type is None:
                 raise UnsupportedForNowException('No type for ' + p.name)
+            if p in self.skip_params:
+                continue
             tp = chase_type_aliases(p.type)
             if isinstance(tp, Array):
                 if tp.length is not None:
                     tp.length_param = self.params[int(tp.length) + offset]
-                    self.skip_params.append(tp.length_param)
-                continue
-            if not isinstance(tp, Callback):
-                continue
-            if p in self.skip_params:
-                continue
-            if p.closure is None:
-                continue
-            p.closure_param = self.params[int(p.closure) + offset]
-            self.skip_params.append(p.closure_param)
-            if p.destroy is not None:
-                p.destroy_param = self.params[int(p.destroy) + offset]
-                self.skip_params.append(p.destroy_param)
+            elif isinstance(tp, Callback):
+                if p.closure is None:
+                    continue
+                p.closure_param = self.params[int(p.closure) + offset]
+                if p.destroy is not None:
+                    p.destroy_param = self.params[int(p.destroy) + offset]
+            p.append_skip_params_to(self.skip_params)
 
     def generate_cpp_signature_templates(self, has_typed_tweak):
         from peel_gen.callback import Callback

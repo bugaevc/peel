@@ -110,7 +110,7 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
                 if p.direction == 'in':
                     args.append(casted_name)
                 else:
-                    # FIXME: Should pass nullptr when the owning param is nullptr.
+                    # TODO: Should pass nullptr when the owning param is nullptr.
                     args.append('&' + casted_name)
                 continue
             if typed_tweak_callee and p is params.params[-2]:

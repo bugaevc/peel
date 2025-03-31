@@ -96,15 +96,14 @@ class FunctionLike(NodeHandler):
             if tp.length is not None:
                 assert(self.params is not None)
                 tp.length_param = self.params.params[int(tp.length) + offset]
-                self.params.skip_params.append(tp.length_param)
         elif isinstance(tp, Callback):
             if self.rv.closure is not None:
                 assert(self.params is not None)
                 self.rv.closure_param = self.params.params[int(self.rv.closure) + offset]
-                self.params.skip_params.append(self.rv.closure_param)
                 if self.rv.destroy is not None:
                     self.rv.destroy_param = self.params.params[int(self.rv.destroy) + offset]
-                    self.params.skip_params.append(self.rv.destroy_param)
+        if self.params is not None:
+            self.rv.append_skip_params_to(self.params.skip_params)
 
     def generate_extra_include_members(self):
         self.resolve_stuff()

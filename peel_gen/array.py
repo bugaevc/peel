@@ -7,6 +7,7 @@ class Array(NodeHandler, AnyType):
         self.ns = ns
         self.fixed_size = attrs.get('fixed-size', None)
         self.length = attrs.get('length', None)
+        self.zero_terminated = attrs.get('zero-terminated', '0') == '1'
         self.item_type_name = None
         self.item_type = None
         self.has_resolved_stuff = False

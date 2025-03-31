@@ -76,6 +76,35 @@ class Parameter(NodeHandler):
                 self.type.stdname = self.c_type[:-1].strip()
                 self.type.corresponds_exactly = True
 
+    def append_skip_params_to(self, skip_params):
+        self.resolve_stuff()
+        if self in skip_params:
+            # Ignore DestroyNotify for callbacks.
+            return
+        tp = chase_type_aliases(self.type)
+        if isinstance(tp, Array):
+            if tp.length is None:
+                return
+            array_direction = self.direction
+            if self.is_rv:
+                array_direction = 'out'
+            length_direction = tp.length_param.direction
+            if tp.length_param.is_rv:
+                length_direction = 'out'
+            if array_direction == length_direction:
+                skip_params.append(tp.length_param)
+            elif array_direction == 'out' and self.caller_allocates:
+                skip_params.append(tp.length_param)
+            elif length_direction == 'inout':
+                raise UnsupportedForNowException('inout array length')
+            # Otherwise, leave the length param.
+        elif isinstance(tp, Callback):
+            if self.closure is None:
+                return
+            skip_params.append(self.closure_param)
+            if self.destroy is not None:
+                skip_params.append(self.destroy_param)
+
     def is_cpp_this(self):
         if self.force_cpp_this:
             return True
@@ -219,7 +248,7 @@ class Parameter(NodeHandler):
                 raise UnsupportedForNowException('non-in callback')
             if self.closure is None:
                 if not tp.force_cpp_wrapper:
-                    # Plain C callback with no C++ callable wrapping
+                    # Plain C callback with no C++ callable wrapping.
                     if name is None:
                         return '::' + tp.c_type
                     else:
@@ -278,6 +307,13 @@ class Parameter(NodeHandler):
                 if name is None:
                     return array_type
                 return '{} {}{}'.format(array_type, out_asterisk, name)
+            #elif not tp.zero_terminated and self.ownership in ('none', None):
+            #    # A conceptual array, but there's no way to know the length.
+            #    # Use a plain pointer to the item type.
+            #    s = add_asterisk(s) + out_asterisk
+            #    if name is None:
+            #        return s
+            #    return s + name
             else:
                 # TODO support null-terminated arrays
                 raise UnsupportedForNowException('Complex array')
@@ -540,9 +576,14 @@ class Parameter(NodeHandler):
                     length_param_place = tp.length_param.generate_casted_name()
                     set_length_param = '{} = {}'.format(length_param_place, make_call('size ()'))
                 elif not tp.length_param.optional:
-                    assert(tp.length_param.direction != 'in')
-                    length_param_place = '*' + tp.length_param.name
-                    set_length_param = '{} = {}'.format(length_param_place, make_call('size ()'))
+                    if tp.length_param.direction != 'in':
+                        length_param_place = '*' + tp.length_param.name
+                        set_length_param = '{} = {}'.format(length_param_place, make_call('size ()'))
+                    else:
+                        set_length_param = 'g_assert ({} == {})'.format(
+                            make_call('size ()'),
+                            tp.length_param.name,
+                        )
                 else:
                     assert(tp.length_param.direction != 'in')
                     set_length_param = '({} ? (*{} = {}) : 0)'.format(
@@ -552,15 +593,20 @@ class Parameter(NodeHandler):
                     )
 
                 if c_type == 'char **' and self.ownership in (None, 'none'):
-                    return '({}, const_cast<char **> ({}))'.format(
-                        set_length_param,
-                        ptr_expr,
-                    )
-                return '({}, reinterpret_cast<{}> ({}))'.format(
-                    set_length_param,
-                    c_type,
-                    ptr_expr,
-                )
+                    cast_expr = 'const_cast<char **> ({})'.format(ptr_expr)
+                else:
+                    cast_expr = 'reinterpret_cast<{}> ({})'.format(c_type, ptr_expr)
+                return '({}, {})'.format(set_length_param, cast_expr)
+            #elif not tp.zero_terminated and self.ownership in ('none', None):
+            #    param_cpp_type = self.generate_cpp_type(
+            #        name='',
+            #        context=context,
+            #        strip_refs=0,
+            #        for_local_copy=False,
+            #    )
+            #    if param_cpp_type == c_type:
+            #        return None
+            #    return 'reinterpret_cast<{}> ({})'.format(c_type, cpp_name)
             else:
                 raise UnsupportedForNowException('Complex array')
 
@@ -616,10 +662,10 @@ class Parameter(NodeHandler):
             if tp.fixed_size is not None:
                 return 'reinterpret_cast<{}> (*{})'.format(plain_cpp_type, c_name)
             elif tp.length is not None:
-                if skip_params_casted:
-                    length_param_name = tp.length_param.generate_casted_name()
-                elif tp.length_param.direction == 'in':
+                if tp.length_param.direction == 'in':
                     length_param_name = tp.length_param.name
+                elif skip_params_casted:
+                    length_param_name = tp.length_param.generate_casted_name()
                 else:
                     length_param_name = '*' + tp.length_param.name
                 if self.c_type == add_asterisk(plain_cpp_type):
@@ -638,6 +684,10 @@ class Parameter(NodeHandler):
                         ptr_expr,
                         length_param_name,
                     )
+            #elif not tp.zero_terminated and self.ownership in ('none', None):
+            #    if self.c_type == add_asterisk(plain_cpp_type):
+            #        return None
+            #    return 'reinterpret_cast<{}> ({})'.format(add_asterisk(plain_cpp_type), c_name)
             else:
                 raise UnsupportedForNowException('Complex array')
 

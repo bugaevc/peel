@@ -599,6 +599,106 @@
           </parameter>
         </parameters>
       </virtual-method>
+      <method name="return_byte_array_of_size" c:identifier="test_testy_return_byte_array_of_size">
+        <return-value transfer-ownership="none">
+          <array length="0" c:type="gconstpointer">
+            <type name="guint8"/>
+          </array>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="size" transfer-ownership="none">
+            <type name="gsize" c:type="gsize"/>
+          </parameter>
+        </parameters>
+      </method>
+      <virtual-method name="return_byte_array_of_size">
+        <return-value transfer-ownership="none">
+          <array length="0" c:type="gconstpointer">
+            <type name="guint8"/>
+          </array>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="size" transfer-ownership="none">
+            <type name="gsize" c:type="gsize"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <method name="return_owned_byte_array_of_size" c:identifier="test_testy_return_owned_byte_array_of_size">
+        <return-value transfer-ownership="full">
+          <array length="0" c:type="gpointer">
+            <type name="guint8"/>
+          </array>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="size" transfer-ownership="none">
+            <type name="gsize" c:type="gsize"/>
+          </parameter>
+        </parameters>
+      </method>
+      <virtual-method name="return_owned_byte_array_of_size">
+        <return-value transfer-ownership="full">
+          <array length="0" c:type="gpointer">
+            <type name="guint8"/>
+          </array>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="size" transfer-ownership="none">
+            <type name="gsize" c:type="gsize"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
+      <method name="first_n_primes" c:identifier="test_testy_first_n_primes">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter direction="out"
+                     name="primes"
+                     transfer-ownership="container">
+            <array length="1" c:type="gint**">
+              <type name="gint"/>
+            </array>
+          </parameter>
+          <parameter name="n" transfer-ownership="none">
+            <type name="gint" c:type="gint"/>
+          </parameter>
+        </parameters>
+      </method>
+      <virtual-method name="first_n_primes">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter direction="out"
+                     name="primes"
+                     transfer-ownership="container">
+            <array length="1" c:type="gint**">
+              <type name="gint"/>
+            </array>
+          </parameter>
+          <parameter name="n" transfer-ownership="none">
+            <type name="gint" c:type="gint"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
       <method name="return_fixed_size_array" c:identifier="test_testy_return_fixed_size_array">
         <return-value transfer-ownership="none">
           <array zero-terminated="0" c:type="const float*" fixed-size="4">
