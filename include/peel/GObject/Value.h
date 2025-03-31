@@ -163,6 +163,13 @@ static_assert (alignof (Value) == alignof (::GValue),
                "GObject::Value align mismatch");
 
 template<>
+inline Type
+Type::of<Value> ()
+{
+  return G_TYPE_VALUE;
+}
+
+template<>
 struct Value::Traits<signed char>
 {
   typedef signed char UnownedType;
