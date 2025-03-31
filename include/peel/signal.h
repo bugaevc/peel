@@ -748,11 +748,23 @@ public:
     bool after = false
   ) noexcept
   {
+#if defined (__GNUC__) && !defined (__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpmf-conversions"
+    auto plain_handler = (Ret (*) (HandlerObject *, Instance *, Args...)) (object->*handler_method);
+    auto handler = [object, plain_handler]
+      (Instance *instance, Args... args) noexcept -> Ret
+      {
+        return plain_handler (object, instance, args...);
+      };
+#pragma GCC diagnostic pop
+#else
     auto handler = [object, handler_method]
-      (Instance *instance, Args... args) -> Ret
+      (Instance *instance, Args... args) noexcept -> Ret
       {
         return (object->*handler_method) (instance, args...);
       };
+#endif
     typedef internals::SignalClosure<Instance, decltype (handler), Ret, Args...> ClosureType;
     ClosureType *closure = ClosureType::make (std::move (handler));
     g_object_watch_closure (reinterpret_cast<::GObject *> (object), closure);
@@ -785,11 +797,23 @@ public:
     bool after = false
   ) noexcept
   {
+#if defined (__GNUC__) && !defined (__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpmf-conversions"
+    auto plain_handler = (Ret (*) (HandlerObject *, Instance *, Args...)) (object->*handler_method);
+    auto handler = [object, plain_handler]
+      (Instance *instance, Args... args) noexcept -> Ret
+      {
+        return plain_handler (object, instance, args...);
+      };
+#pragma GCC diagnostic pop
+#else
     auto handler = [object, handler_method]
-      (Instance *instance, Args... args) -> Ret
+      (Instance *instance, Args... args) noexcept -> Ret
       {
         return (object->*handler_method) (instance, args...);
       };
+#endif
     typedef internals::SignalClosure<Instance, decltype (handler), Ret, Args...> ClosureType;
     ClosureType *closure = ClosureType::make (std::move (handler));
     g_object_watch_closure (reinterpret_cast<::GObject *> (object), closure);
