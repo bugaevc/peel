@@ -784,7 +784,7 @@ struct Object::BindingTransformHelper<T1, T2, decltype (nullptr), void>
 
 using GObject::Object;
 
-#define PEEL_USE_COMPAT_CONTROL_HACK
+// #define PEEL_USE_COMPAT_CONTROL_HACK
 
 #ifdef PEEL_USE_COMPAT_CONTROL_HACK
 /* Note: this function is very intentionally marked inline,
