@@ -45,26 +45,24 @@ class FunctionLike(NodeHandler):
         if self.has_resolved_stuff:
             return
         self.has_resolved_stuff = True
-        self.rv.resolve_stuff()
-        if self.params is not None:
-            for p in self.params.params:
-                p.resolve_stuff()
         for tweak in api_tweaks.lookup(self.tweak_ident):
             if tweak[0] == 'protected':
                 self.visibility = 'protected'
             elif tweak[0] == 'include':
                 self.extra_includes.append(tweak[1])
-            elif tweak[0] in ('float', 'unowned', 'owned', 'in', 'out', 'inout', 'optional', 'nonnull', 'this', 'scope'):
+            elif tweak[0] in ('float', 'unowned', 'owned', 'in', 'out', 'inout', 'optional', 'nonnull', 'this', 'scope', 'type'):
                 p = self.find_param_for_tweak(tweak[1])
                 assert(p is not None)
                 if tweak[0] == 'float':
+                    p.ownership = 'floating'
+
+                    p.resolve_stuff()
                     tp = chase_type_aliases(p.type)
                     from peel_gen.klass import Class
                     from peel_gen.record import Record
                     from peel_gen.interface import Interface
                     assert(isinstance(tp, (Class, Record, Interface)))
                     assert(tp.is_initially_floating)
-                    p.ownership = 'floating'
                 elif tweak[0] == 'unowned':
                     p.ownership = 'none'
                 elif tweak[0] == 'owned':
@@ -83,10 +81,17 @@ class FunctionLike(NodeHandler):
                     p.force_cpp_this = True
                 elif tweak[0] == 'scope':
                     p.scope = tweak[2]
+                elif tweak[0] == 'type':
+                    p.type_name = tweak[2]
             elif tweak[0] == 'vararg':
                 p = self.params.params[-1]
                 assert(p.name == '...')
                 p.vararg_mode = tweak[1]
+
+        self.rv.resolve_stuff()
+        if self.params is not None:
+            for p in self.params.params:
+                p.resolve_stuff()
 
         # TODO: code duplication with Parameters.resovle_stuff()
         assert(self.rv.type is not None)
