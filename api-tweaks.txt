@@ -40,9 +40,11 @@ skip	g_atomic_ref_count_dec
 skip	g_atomic_ref_count_inc
 skip	g_atomic_ref_count_init
 skip	g_base64_decode_inplace
-skip	g_bit_lock
-skip	g_bit_trylock
-skip	g_bit_unlock
+type	g_bit_lock			address		gpointer
+type	g_bit_trylock			address		gpointer
+type	g_bit_unlock			address		gpointer
+type	g_bit_lock_and_get		address		gpointer
+type	g_bit_unlock_and_set		address		gpointer
 skip	g_clear_handle_id
 skip	g_clear_signal_handler
 skip	g_completion_complete
