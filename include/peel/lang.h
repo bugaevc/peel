@@ -94,7 +94,7 @@
  */
 #define peel_begin_header                                                      \
   __pragma (warning (push))                                                    \
-  __pragma (warning (disable : 4996 49264))
+  __pragma (warning (disable : 4996 4267))
 #define peel_end_header                                                        \
   __pragma (warning (pop))
 #elif defined (__GNUC__)
