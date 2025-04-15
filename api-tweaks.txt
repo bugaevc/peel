@@ -235,6 +235,13 @@ ifdef	g_source_modify_unix_fd		G_OS_UNIX
 ifdef	g_source_remove_unix_fd		G_OS_UNIX
 ifdef	g_source_query_unix_fd		G_OS_UNIX
 
+array	g_ptr_array_new_from_null_terminated_array	return
+array	g_ptr_array_free	return
+array	g_byte_array_steal	return
+array	g_byte_array_free	return
+array	g_byte_array_append	data
+array	g_byte_array_prepend	data
+
 # This one is a fun hack:
 no-autofree GString
 free	GString				[](::GString*str){g_string_free(str,TRUE);}

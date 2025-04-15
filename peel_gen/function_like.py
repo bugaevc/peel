@@ -50,7 +50,7 @@ class FunctionLike(NodeHandler):
                 self.visibility = 'protected'
             elif tweak[0] == 'include':
                 self.extra_includes.append(tweak[1])
-            elif tweak[0] in ('float', 'unowned', 'owned', 'in', 'out', 'inout', 'optional', 'nonnull', 'this', 'scope', 'type'):
+            elif tweak[0] in ('float', 'unowned', 'owned', 'in', 'out', 'inout', 'optional', 'nonnull', 'this', 'scope', 'type', 'array'):
                 p = self.find_param_for_tweak(tweak[1])
                 assert(p is not None)
                 if tweak[0] == 'float':
@@ -83,6 +83,13 @@ class FunctionLike(NodeHandler):
                     p.scope = tweak[2]
                 elif tweak[0] == 'type':
                     p.type_name = tweak[2]
+                elif tweak[0] == 'array':
+                    # Force the type to be an array. This will likely result in
+                    # an UnsupportedForNowException when we try to generate anything.
+                    if not isinstance(p.type, Array):
+                        p.type = Array(dict(), self.ns)
+                        p.type.item_type_name = p.type_name
+                        p.type_name = None
             elif tweak[0] == 'vararg':
                 p = self.params.params[-1]
                 assert(p.name == '...')
