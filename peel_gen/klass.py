@@ -294,15 +294,18 @@ class Class(DefinedType):
             '  operator = (const {} &) = delete;'.format(self.own_name),
             '  {} &'.format(self.own_name),
             '  operator = ({} &&) = delete;'.format(self.own_name),
-            '',
-            'protected:',
-            '  ~{} () = default;'.format(self.own_name),
         ])
-        l.append('')
-        l.append('public:')
-        l.append(self.generate_nested_type_defs())
+        visibility = VisibilityTracker(l, 'private')
 
-        visibility = VisibilityTracker(l, 'public')
+        if self.sealed or self.final:
+            visibility.switch('private')
+            l.append('  ~{} () = delete;'.format(self.own_name))
+        else:
+            visibility.switch('protected')
+            l.append('  ~{} () = default;'.format(self.own_name))
+
+        visibility.switch('public')
+        l.append(self.generate_nested_type_defs())
 
         for constructor in self.constructors:
             try:

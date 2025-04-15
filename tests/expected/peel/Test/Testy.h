@@ -65,10 +65,7 @@ private:
   operator = (const Testy &) = delete;
   Testy &
   operator = (Testy &&) = delete;
-
-protected:
-  ~Testy () = default;
-
+  ~Testy () = delete;
 public:
 
   static peel::RefPtr<Testy>
