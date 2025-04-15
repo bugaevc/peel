@@ -1,5 +1,6 @@
 from peel_gen.node_handler import NodeHandler
 from peel_gen.type import AnyType, lookup_type
+from peel_gen.utils import is_type_element
 
 # Not a defined type!
 class Array(NodeHandler, AnyType):
@@ -16,7 +17,7 @@ class Array(NodeHandler, AnyType):
         return 'Array(item_type_name={})'.format(self.item_type_name)
 
     def start_child_element(self, name, attrs):
-        if name == 'type':
+        if is_type_element(name, attrs):
             self.item_type_name = attrs['name']
         elif name == 'array':
             self.item_type = Array(attrs, ns=self.ns)

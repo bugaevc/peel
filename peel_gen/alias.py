@@ -1,5 +1,6 @@
 from peel_gen.defined_type import DefinedType
 from peel_gen.type import lookup_type
+from peel_gen.utils import is_type_element
 
 __all__ = ('Alias', 'chase_type_aliases')
 
@@ -11,9 +12,10 @@ class Alias(DefinedType):
         self.aliased_type = None
 
     def start_child_element(self, name, attrs):
-        if name == 'type':
+        if is_type_element(name, attrs):
             self.aliased_name = attrs['name']
             self.aliased_c_type = attrs.get('c:type', None)
+        # TODO: can we reference arrays this way?
 
     def resolve_stuff(self):
         if self.has_resolved_stuff:

@@ -1,6 +1,7 @@
 from peel_gen.node_handler import NodeHandler
 from peel_gen.parameter import Parameter
 from peel_gen.exceptions import UnsupportedForNowException
+from peel_gen.utils import is_type_element
 
 class Field(NodeHandler):
     def __init__(self, attrs, cpp_record):
@@ -30,11 +31,11 @@ class Field(NodeHandler):
             self.we_support_this = False
 
     def start_child_element(self, name, attrs):
-        if name in ('callback', 'array'):
+        if is_type_element(name, attrs):
+            return self.param.start_child_element(name, attrs)
+        elif name in ('callback', 'array'):
             self.we_support_this = False
             return
-        elif name == 'type':
-            return self.param.start_child_element(name, attrs)
 
     def generate_extra_include_members(self):
         if not self.we_support_this:

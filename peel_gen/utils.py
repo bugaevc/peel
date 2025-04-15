@@ -131,3 +131,11 @@ class VisibilityTracker:
             return
         self.l.append(self.indent + visibility + ':')
         self.current_visibility = visibility
+
+def is_type_element(name, attrs):
+    if name == 'type':
+        return True
+    if name == 'array':
+        # e.g. <array name="GLib.ByteArray" c:type="GByteArray*">
+        return 'name' in attrs
+    return False

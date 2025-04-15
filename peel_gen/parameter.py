@@ -1,7 +1,7 @@
 from peel_gen.node_handler import NodeHandler
 from peel_gen.array import Array
 from peel_gen.alias import chase_type_aliases
-from peel_gen.utils import massage_c_type, extract_constness_from_c_type, add_asterisk, add_root_namespace
+from peel_gen.utils import massage_c_type, extract_constness_from_c_type, add_asterisk, add_root_namespace, is_type_element
 from peel_gen.type import lookup_type, PlainType, VoidType, StrType, VaListType
 from peel_gen.callback import Callback
 from peel_gen.enumeration import Enumeration
@@ -35,7 +35,7 @@ class Parameter(NodeHandler):
         return 'Parameter({} {})'.format(self.c_type, self.name)
 
     def start_child_element(self, name, attrs):
-        if name == 'type':
+        if is_type_element(name, attrs):
             self.type_name = attrs.get('name', None)
             self.c_type = attrs.get('c:type', None)
             if self.c_type:
