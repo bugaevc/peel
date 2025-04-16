@@ -363,7 +363,7 @@ struct ClosureStoringCallback : public ::GClosure
 
 template<typename Callback>
 using ClosureStoringOptionalCallback = typename std::conditional<
-  (sizeof (Callback) > sizeof (gpointer)),
+  (sizeof (Callback) > sizeof (gpointer) || !std::is_trivially_destructible<Callback>::value),
   ClosureStoringCallback<Callback>,
   ::GClosure
 >::type;
@@ -392,7 +392,8 @@ private:
   Callback *
   callback_ptr ()
   {
-    if (sizeof (Callback) > sizeof (gpointer))
+    /* Note: closure->data is erased when the closure gets invalidated */
+    if (sizeof (Callback) > sizeof (gpointer) || !std::is_trivially_destructible<Callback>::value)
       return &reinterpret_cast<ClosureStoringCallback<Callback> *> (this)->storage;
     return reinterpret_cast<Callback *> (&reinterpret_cast<::GClosure *> (this)->data);
   }
