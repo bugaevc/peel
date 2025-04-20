@@ -1127,6 +1127,32 @@
           </parameter>
         </parameters>
       </virtual-method>
+      <method name="out_gconstpointer" c:identifier="test_testy_out_gconstpointer">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="ptr" direction="out">
+            <type name="gpointer" c:type="gconstpointer*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <virtual-method name="out_gconstpointer">
+        <return-value>
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="ptr" direction="out">
+            <type name="gpointer" c:type="gconstpointer*"/>
+          </parameter>
+        </parameters>
+      </virtual-method>
     </class>
     <record name="TestyClass"
             c:type="TestTestyClass"

@@ -70,7 +70,8 @@ class Parameter(NodeHandler):
                 self.type = self.type.clone()
                 self.type.stdname = self.c_type
                 self.type.corresponds_exactly = True
-            elif self.direction != 'in' and self.c_type not in ('gpointer*', 'gconstpointer*'):
+            elif self.direction != 'in' and self.c_type not in ('gpointer *', 'gconstpointer *'):
+                # Note the space ^^^ added by massage_c_type().
                 self.type = self.type.clone()
                 assert(self.c_type.endswith('*'))
                 self.type.stdname = self.c_type[:-1].strip()

@@ -416,6 +416,15 @@ public:
     *values = peel::UniquePtr<GObject::Value[]>::adopt_ref (reinterpret_cast<GObject::Value *> (_peel_values), _peel_count);
   }
 
+  peel_arg_out (2) peel_nonnull_args (2)
+  void
+  out_gconstpointer (const void **ptr) noexcept
+  {
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    gconstpointer * _peel_ptr = reinterpret_cast<gconstpointer *> (ptr);
+    test_testy_out_gconstpointer (_peel_this, _peel_ptr);
+  }
+
 protected:
   template<typename DerivedClass>
   int
@@ -785,6 +794,17 @@ protected:
     ::TestTesty * _peel_return = _peel_class->make_instance (i);
     peel_assume (_peel_return);
     return peel::RefPtr<Testy>::adopt_ref (reinterpret_cast<Testy *> (_peel_return));
+  }
+
+  template<typename DerivedClass>
+  peel_arg_out (2) peel_nonnull_args (2)
+  void
+  parent_vfunc_out_gconstpointer (const void **ptr) noexcept
+  {
+    ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (GObject::TypeClass::peek<DerivedClass> ()->peek_parent ());
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    gconstpointer * _peel_ptr = reinterpret_cast<gconstpointer *> (ptr);
+    _peel_class->out_gconstpointer (_peel_this, _peel_ptr);
   }
 
 public:
@@ -1218,6 +1238,18 @@ public:
       {
         peel::RefPtr<Testy> _peel_return = DerivedClass::vfunc_make_instance (i);
         return reinterpret_cast<::TestTesty *> (std::move (_peel_return).release_ref ());
+      };
+    }
+
+    template<typename DerivedClass>
+    void
+    override_vfunc_out_gconstpointer ()
+    {
+      ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
+      klass->out_gconstpointer = +[] (::TestTesty *self, gconstpointer *ptr) -> void
+      {
+        DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
+        _peel_this->DerivedClass::vfunc_out_gconstpointer (ptr);
       };
     }
   };
