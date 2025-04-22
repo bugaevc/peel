@@ -441,7 +441,7 @@ class Parameter(NodeHandler):
                 plain_closure_type = 'decltype ({})'.format(cpp_name)
             if self.closure is None:
                 if not tp.force_cpp_wrapper:
-                    return
+                    return None
                 cpp_callee = cpp_callee_name = self.generate_casted_name()
                 if self.nullable:
                     cpp_callee = 'peel::internals::invoke_if_nonnull<{}> ({})'.format(
