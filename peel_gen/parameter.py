@@ -693,6 +693,9 @@ class Parameter(NodeHandler):
                 raise UnsupportedForNowException('Complex array')
 
         if isinstance(tp, Callback):
+            if self.closure is None and not tp.force_cpp_wrapper:
+                # Plain C callback with no C++ callable wrapping.
+                return None
             raise UnsupportedForNowException('casting callback from C to C++')
             # return '/* callback cast of {} goes here */'.format(c_name)
 
