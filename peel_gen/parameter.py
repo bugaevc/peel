@@ -177,7 +177,7 @@ class Parameter(NodeHandler):
         if isinstance(tp, Array):
             return not self.caller_allocates
         if tp.is_passed_by_ref():
-            return self.ownership not in (None, 'none')
+            return not self.caller_allocates and self.ownership not in (None, 'none')
         if isinstance(tp, PlainType) and tp.corresponds_exactly:
             return False
         if isinstance(tp, (StrType, Enumeration, Bitfield)):
@@ -381,7 +381,7 @@ class Parameter(NodeHandler):
                 else:
                     return make_type(type_name)
 
-        if self.ownership == 'none' or self.ownership is None:
+        if self.ownership in ('none', None) or self.caller_allocates:
             return make_type(constness0 + add_asterisk(type_name) + constness1)
         elif self.ownership == 'floating':
             assert(itp is tp)
@@ -632,7 +632,7 @@ class Parameter(NodeHandler):
         if tp.ns.emit_raw:
             return None
 
-        if self.ownership == 'none' or self.ownership is None:
+        if self.ownership in ('none', None) or self.caller_allocates:
             return 'reinterpret_cast<{}> ({})'.format(c_type, cpp_name)
         elif self.ownership == 'container':
             raise UnsupportedForNowException('non-array transfer container')
@@ -723,7 +723,9 @@ class Parameter(NodeHandler):
         if tp.ns.emit_raw:
             return None
 
-        if self.ownership == 'full':
+        if self.ownership in ('none', None) or self.caller_allocates:
+            return 'reinterpret_cast<{}> ({})'.format(add_asterisk(plain_cpp_type), c_name)
+        elif self.ownership == 'full':
             if tp.is_refcounted:
                 return 'peel::RefPtr<{}>::adopt_ref (reinterpret_cast<{}> ({}))'.format(
                     plain_cpp_type,
@@ -747,7 +749,7 @@ class Parameter(NodeHandler):
                 c_name,
             )
         else:
-            return 'reinterpret_cast<{}> ({})'.format(add_asterisk(plain_cpp_type), c_name)
+            raise UnsupportedForNowException('no idea about ownership semantics')
 
     def generate_rv_function_attributes(self, throws):
         assert(self.is_rv)
