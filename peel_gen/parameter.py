@@ -66,11 +66,11 @@ class Parameter(NodeHandler):
         # that gconstpointer implies, and add our own 'const'.
         if self.type_name == 'gpointer':
             assert(isinstance(self.type, PlainType))
-            if self.direction == 'in' and self.c_type not in ('gpointer', 'gconstpointer'):
+            if self.direction == 'in' and self.c_type not in ('gpointer', 'gconstpointer', None):
                 self.type = self.type.clone()
                 self.type.stdname = self.c_type
                 self.type.corresponds_exactly = True
-            elif self.direction != 'in' and self.c_type not in ('gpointer *', 'gconstpointer *'):
+            elif self.direction != 'in' and self.c_type not in ('gpointer *', 'gconstpointer *', None):
                 # Note the space ^^^ added by massage_c_type().
                 self.type = self.type.clone()
                 assert(self.c_type.endswith('*'))
@@ -79,6 +79,8 @@ class Parameter(NodeHandler):
 
     def append_skip_params_to(self, skip_params):
         self.resolve_stuff()
+        if self.type is None:
+            raise UnsupportedForNowException('no type for ' + self.name)
         if self in skip_params:
             # Ignore DestroyNotify for callbacks.
             return
@@ -188,6 +190,8 @@ class Parameter(NodeHandler):
         self.resolve_stuff()
         # vararg shouldn't get here
         assert(self.name != '...')
+        if self.type is None:
+            raise UnsupportedForNowException('no type for ' + self.name)
         tp = chase_type_aliases(self.type)
         # Handle the case where we don't have a C type and need to make one up
         # completely. This happens in signals.
@@ -230,6 +234,8 @@ class Parameter(NodeHandler):
                 return 'Args ...' + name
             return 'Args &&...' + name
 
+        if self.type is None:
+            raise UnsupportedForNowException('no type for ' + self.name)
         tp = chase_type_aliases(self.type)
 
         if self.direction == 'in' or for_local_copy:
