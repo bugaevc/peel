@@ -289,12 +289,13 @@ class Record(DefinedType):
                 '};',
             ])
         elif self.get_type:
+            constness = '' if self.ref_func or self.unref_func else 'const '
             # XXX: We assume that structures that have get_type are boxed
             s += '\n' + generate_value_traits_specialization(
                 full_name,
-                full_name + ' *',
+                constness + full_name + ' *',
                 'r',
-                'reinterpret_cast<{} *> (g_value_get_boxed (value))'.format(full_name),
+                'reinterpret_cast<{} *> (g_value_get_boxed (value))'.format(constness + full_name),
                 'g_value_set_boxed (value, reinterpret_cast<const void *> (r))',
                 support_set_marshal_return=False, # TODO
             )
