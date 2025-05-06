@@ -737,6 +737,8 @@ nest	PangoGlyphItemIter		GlyphItem::Iter
 # Can not be nested, since Pango::Script is itself an enum class.
 #nest	PangoScriptIter			Script::Iter
 
+free	PangoAttribute			pango_attribute_destroy
+
 # Graphene
 onstack	graphene_rect_t
 onstack	graphene_point_t
