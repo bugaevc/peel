@@ -35,25 +35,25 @@ class Gradient final : public Gtk::Widget
   Gdk::RGBA end_color;
 
 public:
-  Gdk::RGBA *
+  const Gdk::RGBA *
   get_start_color ()
   {
     return &start_color;
   }
 
   void
-  set_start_color (Gdk::RGBA *);
+  set_start_color (const Gdk::RGBA *);
 
   PEEL_PROPERTY (Gdk::RGBA, start_color, "start-color")
 
-  Gdk::RGBA *
+  const Gdk::RGBA *
   get_end_color ()
   {
     return &end_color;
   }
 
   void
-  set_end_color (Gdk::RGBA *);
+  set_end_color (const Gdk::RGBA *);
 
   PEEL_PROPERTY (Gdk::RGBA, end_color, "end-color")
 };
@@ -93,7 +93,7 @@ Gradient::vfunc_snapshot (Gtk::Snapshot *snapshot)
 }
 
 void
-Gradient::set_start_color (Gdk::RGBA *color)
+Gradient::set_start_color (const Gdk::RGBA *color)
 {
   g_return_if_fail (color != nullptr);
   if (start_color.equal (color))
@@ -104,7 +104,7 @@ Gradient::set_start_color (Gdk::RGBA *color)
 }
 
 void
-Gradient::set_end_color (Gdk::RGBA *color)
+Gradient::set_end_color (const Gdk::RGBA *color)
 {
   g_return_if_fail (color != nullptr);
   if (end_color.equal (color))
