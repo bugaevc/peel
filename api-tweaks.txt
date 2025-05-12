@@ -321,7 +321,10 @@ onstack	GSignalQuery
 onstack	GTypeQuery
 
 # Gio
+
+# Broken return c:type in GIR (void * instead on const void *)
 skip	g_buffered_input_stream_peek_buffer
+
 skip	g_networking_init
 skip	g_inet_address_to_bytes
 skip	g_keyfile_settings_backend_new
@@ -342,6 +345,8 @@ ifdef	GSettingsBackend		G_SETTINGS_ENABLE_BACKEND
 in	g_socket_receive		size
 in	g_socket_receive_from		size
 in	g_socket_receive_with_blocking	size
+
+out	GIcon::vfunc_to_tokens		out_version
 
 float	g_file_copy_async_with_closures	progress_callback_closure
 float	g_file_copy_async_with_closures	ready_callback_closure
