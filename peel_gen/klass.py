@@ -147,6 +147,7 @@ class Class(DefinedType):
             s.add(self.cpp_base_type)
         else:
             s.add(lookup_type('TypeInstance', 'GObject'))
+            s.add('peel/GObject/TypeClass.h')
         for member in self.constructors + self.methods + self.vfuncs + self.props + self.signals + [self.type_struct]:
             if member is None:
                 continue
