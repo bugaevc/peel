@@ -806,6 +806,9 @@ onstack	GdkRGBA
 onstack	GdkRectangle
 onstack	GdkTimeCoord
 
+# https://gitlab.gnome.org/GNOME/gtk/-/issues/6167
+unowned	gdk_drop_read_finish		out_mime_type
+
 # GdkX11
 skip	gdk_x11_display_text_property_to_text_list
 skip	gdk_x11_free_text_list
