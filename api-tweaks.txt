@@ -1195,3 +1195,7 @@ nest	JsonObjectIter			Object::Iter
 
 # GtkSource
 vararg	gtk_source_buffer_create_source_tag	object-new
+
+# JavaScriptCore
+array	jsc_value_array_buffer_get_data		return
+out	jsc_value_array_buffer_get_data		size
