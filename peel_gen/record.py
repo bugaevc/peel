@@ -9,7 +9,7 @@ from peel_gen.specializations import (
     generate_unique_traits_specialization
 )
 from peel_gen.exceptions import UnsupportedForNowException
-from peel_gen.utils import intern_get_type_map
+from peel_gen.utils import intern_get_type_map, VisibilityTracker
 from peel_gen import api_tweaks
 
 class Record(DefinedType):
@@ -198,19 +198,20 @@ class Record(DefinedType):
                 '  {} ({} &&) = delete;'.format(self.own_name, self.own_name),
                 '  ~{} ();'.format(self.own_name),
             ])
-        l.extend([
-            '',
-            'public:'
-        ])
+        l.append('')
+        visibility = VisibilityTracker(l, 'private')
         for nested_type in self.nested_types:
+            visibility.switch('public')
             l.append('  ' + nested_type.generate_forward_decl(for_nested=True))
         if self.nested_types:
             l.append('')
         if self.should_generate_fields():
             for field in self.fields:
+                visibility.switch('private' if field.private else 'public')
                 l.append(field.generate())
             if self.fields:
                 l.append('')
+        visibility.switch('public')
         for constructor in self.constructors:
             constructor.resolve_stuff()
             try:
