@@ -1157,6 +1157,9 @@ hide	AdwApplicationWindow		prop_child
 
 # Gee
 opaque	GeeHazardPointer
+nest	GeeHazardPointerContext		HazardPointer::Context
+nest	GeeHazardPointerPolicy		HazardPointer::Policy
+nest	GeeHazardPointerReleasePolicy	HazardPointer::ReleasePolicy
 
 # Dex
 take-value DexObject			dex_value_take_object
