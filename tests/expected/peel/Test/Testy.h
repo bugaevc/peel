@@ -425,6 +425,23 @@ public:
     test_testy_out_gconstpointer (_peel_this, _peel_ptr);
   }
 
+  peel_nonnull_args (2) peel_returns_nonnull
+  VoidAlias *
+  void_alias (VoidAlias *arg) noexcept
+  {
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    TestVoidAlias * _peel_arg = reinterpret_cast<TestVoidAlias *> (arg);
+    TestVoidAlias * _peel_return = test_testy_void_alias (_peel_this, _peel_arg);
+    peel_assume (_peel_return);
+    return reinterpret_cast<VoidAlias *> (_peel_return);
+  }
+
+  static peel::Property<void *>
+  prop_smuggled_pointer ()
+  {
+    return peel::Property<void *> { "smuggled-pointer" };
+  }
+
 protected:
   template<typename DerivedClass>
   int

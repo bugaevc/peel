@@ -2,7 +2,7 @@ from peel_gen.node_handler import NodeHandler
 from peel_gen.array import Array
 from peel_gen.alias import chase_type_aliases
 from peel_gen.utils import massage_c_type, extract_constness_from_c_type, add_asterisk, add_root_namespace, is_type_element
-from peel_gen.type import lookup_type, PlainType, VoidType, StrType, VaListType
+from peel_gen.type import lookup_type, PlainType, VoidType, StrType, VaListType, VoidAliasType, SmuggledPointerType
 from peel_gen.callback import Callback
 from peel_gen.enumeration import Enumeration
 from peel_gen.bitfield import Bitfield
@@ -64,18 +64,16 @@ class Parameter(NodeHandler):
         # through GIR as a gpointer. See g_date_to_struct_tm ()
         # for an example. Note we already detect the constness
         # that gconstpointer implies, and add our own 'const'.
-        if self.type_name == 'gpointer':
+        # We don't do this for properties, since we need to keep
+        # Value::Traits working for the property type.
+        if self.type_name == 'gpointer' and self.name != 'property-value':
             assert(isinstance(self.type, PlainType))
             if self.direction == 'in' and self.c_type not in ('gpointer', 'gconstpointer', None):
-                self.type = self.type.clone()
-                self.type.stdname = self.c_type
-                self.type.corresponds_exactly = True
+                self.type = SmuggledPointerType(self.c_type)
             elif self.direction != 'in' and self.c_type not in ('gpointer *', 'gconstpointer *', None):
                 # Note the space ^^^ added by massage_c_type().
-                self.type = self.type.clone()
                 assert(self.c_type.endswith('*'))
-                self.type.stdname = self.c_type[:-1].strip()
-                self.type.corresponds_exactly = True
+                self.type = SmuggledPointerType(self.c_type[:-1].strip())
 
     def append_skip_params_to(self, skip_params):
         self.resolve_stuff()
@@ -336,6 +334,9 @@ class Parameter(NodeHandler):
 
         if isinstance(itp, DefinedType):
             type_name = itp.emit_name_for_context(context)
+        elif isinstance(itp, VoidAliasType):
+            # Undo what chase_type_aliases() did, in a way.
+            type_name = itp.alias.emit_name_for_context(context)
         else:
             type_name = None
 
@@ -387,7 +388,7 @@ class Parameter(NodeHandler):
                 else:
                     return make_type(type_name)
 
-        if self.ownership in ('none', None) or self.caller_allocates:
+        if self.ownership in ('none', None) or self.caller_allocates or isinstance(itp, VoidAliasType):
             return make_type(constness0 + add_asterisk(type_name) + constness1)
         elif self.ownership == 'floating':
             assert(itp is tp)
@@ -635,10 +636,10 @@ class Parameter(NodeHandler):
                 return 'static_cast<{}> ({})'.format(c_type, cpp_name)
             return None
 
-        if tp.ns.emit_raw:
+        if isinstance(tp, DefinedType) and tp.ns.emit_raw:
             return None
 
-        if self.ownership in ('none', None) or self.caller_allocates:
+        if self.ownership in ('none', None) or self.caller_allocates or isinstance(tp, VoidAliasType):
             return 'reinterpret_cast<{}> ({})'.format(c_type, cpp_name)
         elif self.ownership == 'container':
             raise UnsupportedForNowException('non-array transfer container')
@@ -726,10 +727,10 @@ class Parameter(NodeHandler):
                 return 'static_cast<{}> ({})'.format(plain_cpp_type, c_name)
             return None
 
-        if tp.ns.emit_raw:
+        if isinstance(tp, DefinedType) and tp.ns.emit_raw:
             return None
 
-        if self.ownership in ('none', None) or self.caller_allocates:
+        if self.ownership in ('none', None) or self.caller_allocates or isinstance(tp, VoidAliasType):
             return 'reinterpret_cast<{}> ({})'.format(add_asterisk(plain_cpp_type), c_name)
         elif self.ownership == 'full':
             if tp.is_refcounted:

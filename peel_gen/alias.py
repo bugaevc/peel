@@ -1,5 +1,5 @@
 from peel_gen.defined_type import DefinedType
-from peel_gen.type import lookup_type
+from peel_gen.type import lookup_type, VoidType, VoidAliasType
 from peel_gen.utils import is_type_element
 
 __all__ = ('Alias', 'chase_type_aliases')
@@ -24,6 +24,8 @@ class Alias(DefinedType):
         if self.aliased_type is not None:
             return
         self.aliased_type = lookup_type(self.aliased_name, self.ns)
+        if isinstance(self.aliased_type, VoidType):
+            self.aliased_type = VoidAliasType(self)
 
     def generate(self):
         assert(not self.nested_types)

@@ -35,6 +35,23 @@ class VaListType(AnyType):
     def __repr__(self):
         return 'VaListType()'
 
+class VoidAliasType(AnyType):
+    def __init__(self, alias):
+        self.alias = alias
+
+    def __repr__(self):
+        return 'VoidAliasType({})'.format(self.alias.c_type)
+
+    def is_passed_by_ref(self):
+        return True
+
+class SmuggledPointerType(PlainType):
+    def __init__(self, c_type):
+        super().__init__('gpointer', c_type)
+
+    def __repr__(self):
+        return 'SmuggledPointerType({})'.format(self.stdname)
+
 # Ns.Name -> Python object deriving from AnyType
 type_map = {
     'none': VoidType(),

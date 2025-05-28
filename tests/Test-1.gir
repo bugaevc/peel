@@ -27,6 +27,9 @@
         </parameter>
       </parameters>
     </callback>
+    <alias name="VoidAlias" c:type="TestVoidAlias">
+      <type name="none" c:type="void"/>
+    </alias>
     <class name="Testy"
            c:type="TestTesty"
            c:symbol-prefix="testy"
@@ -1153,6 +1156,22 @@
           </parameter>
         </parameters>
       </virtual-method>
+      <method name="void_alias" c:identifier="test_testy_void_alias">
+        <return-value>
+          <type name="VoidAlias" c:type="TestVoidAlias*"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="arg">
+            <type name="VoidAlias" c:type="TestVoidAlias*"/>
+          </parameter>
+        </parameters>
+      </method>
+      <property name="smuggled-pointer" writable="1">
+        <type name="gpointer" c:type="GBoxedCopyFunc"/>
+      </property>
     </class>
     <record name="TestyClass"
             c:type="TestTestyClass"

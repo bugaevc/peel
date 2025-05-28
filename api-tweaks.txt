@@ -1100,6 +1100,9 @@ prefer-autobase GtkSectionModel		SelectionModel
 prefer-autobase GtkTreeDragSource	TreeModel
 prefer-autobase GtkCellEditable		Editable
 
+# Gtk 3
+no-autofree	GtkWidgetPath
+
 # Adw
 float	adw_window_set_content		content
 float	adw_application_window_set_content content
