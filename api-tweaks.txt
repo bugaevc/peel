@@ -492,6 +492,9 @@ float	g_dbus_message_set_header	value
 float	g_dbus_method_invocation_return_value		parameters
 float	g_dbus_method_invocation_return_value_with_unix_fd_list parameters
 
+float	g_settings_set_value		value
+
+
 cpp-wrapper GTaskThreadFunc
 
 # For compatibility reasons, these APIs are present in Gio-2.0.gir,
