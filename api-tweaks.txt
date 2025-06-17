@@ -162,6 +162,7 @@ nest	GVariantClass			Variant::Class
 nest	GVariantIter			Variant::Iter
 nest	GVariantBuilder			Variant::Builder
 nest	GMainContextFlags		MainContext::Flags
+nest	GKeyFileFlags			KeyFile::Flags
 onstack	GTimeVal
 onstack	GDate
 onstack	GLogField
