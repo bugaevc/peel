@@ -188,6 +188,46 @@ struct PspecTraits<void *>
 };
 
 template<>
+struct PspecTraits<signed char>
+{
+  signed char minimum;
+  signed char maximum;
+  signed char default_value;
+
+  constexpr PspecTraits (signed char minimum, signed char maximum, signed char default_value)
+    : minimum (minimum)
+    , maximum (maximum)
+    , default_value (default_value)
+  { }
+
+  ::GParamSpec *
+  create_pspec (PspecBasics basics)
+  {
+    return g_param_spec_char (basics.name, basics.nick, basics.blurb, minimum, maximum, default_value, basics.flags);
+  }
+};
+
+template<>
+struct PspecTraits<unsigned char>
+{
+  unsigned char minimum;
+  unsigned char maximum;
+  unsigned char default_value;
+
+  constexpr PspecTraits (unsigned char minimum, unsigned char maximum, unsigned char default_value)
+    : minimum (minimum)
+    , maximum (maximum)
+    , default_value (default_value)
+  { }
+
+  ::GParamSpec *
+  create_pspec (PspecBasics basics)
+  {
+    return g_param_spec_uchar (basics.name, basics.nick, basics.blurb, minimum, maximum, default_value, basics.flags);
+  }
+};
+
+template<>
 struct PspecTraits<GObject::Type>
 {
   GObject::Type is_a_type;
