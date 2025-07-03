@@ -89,6 +89,7 @@ skip	g_ref_string_acquire
 skip	g_ref_string_length
 skip	g_ref_string_release
 skip	g_set_prgname_once
+skip	g_steal_pointer
 skip	g_strtod
 skip	g_stpcpy
 skip	g_strcanon
