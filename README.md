@@ -89,3 +89,8 @@ You can either use peel uninstalled, which is most useful for consuming it as a 
 subproject, or install it system-wide.
 
 See [examples](examples/).
+
+## Copying
+
+peel is licensed under the permissive MIT license. Note however that the libraries
+you use through peel have their own licenses, which you have to follow.
