@@ -14,6 +14,10 @@ subdir('cmake')
 
 peel_dep = declare_dependency(include_directories: inc)
 
+if get_option('build_examples')
+  subdir('examples')
+endif
+
 # The unary join_paths() is to force forward slashes even on Windows.
 if meson.is_subproject()
   conf = {
