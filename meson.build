@@ -1,4 +1,8 @@
-project('peel', version: '0.1.0')
+project(
+  'peel',
+  version: '0.1.0',
+  license: 'MIT',
+)
 
 pkg = import('pkgconfig')
 py = import('python').find_installation()
