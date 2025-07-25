@@ -54,8 +54,6 @@ You need to run the bindings generator, `peel-gen`, and add its output directory
 to your include path. When using peel uninstalled, you also need to add the `include/` subdirectory from this repository to your include path.
 bindings.
 
-1
-
 Use the following template to consume peel in Meson project:
 
 ```meson
@@ -83,12 +81,22 @@ executable('example',
 This should work both with a system-wide installation of peel and with peel
 pulled as a Meson subproject.
 
-3
-
 You can either use peel uninstalled, which is most useful for consuming it as a Meson
 subproject, or install it system-wide.
 
 See [examples](examples/).
+
+## Getting in Touch
+
+Chat on Matrix: [#peel:matrix.org](https://matrix.to/#/#peel:matrix.org)
+
+## Documentation
+
+The documentation is hosted in [GitLab pages](https://bugaevc.pages.gitlab.gnome.org/peel/)
+and generated from the [docs](docs/) directory in this repo using
+[mbBook](https://rust-lang.github.io/mdBook/).
+
+The documentation is currently very incomplete, so contributions are welcome!
 
 ## Copying
 
