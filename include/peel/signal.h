@@ -822,6 +822,12 @@ public:
     gulong conn_id = g_signal_connect_closure (reinterpret_cast<::GObject *> (instance), detailed_name, closure, after);
     return SignalConnection::Token { instance, conn_id };
   }
+
+  bool
+  has_handler_pending (Instance *instance, ::GQuark detail = 0, bool may_be_blocked = false) noexcept
+  {
+    return !!g_signal_has_handler_pending (instance, id, detail, may_be_blocked);
+  }
 };
 
 } /* namespace peel */
