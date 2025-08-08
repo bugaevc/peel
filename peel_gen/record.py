@@ -211,6 +211,8 @@ class Record(DefinedType):
                 l.append(field.generate())
             if self.fields:
                 l.append('')
+        elif not self.is_private and not self.all_fields_supported:
+            l.append('  /* Some fields not yet supported */')
         visibility.switch('public')
         for constructor in self.constructors:
             constructor.resolve_stuff()
