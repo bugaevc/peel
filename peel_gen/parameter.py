@@ -75,6 +75,30 @@ class Parameter(NodeHandler):
                 assert(self.c_type.endswith('*'))
                 self.type = SmuggledPointerType(self.c_type[:-1].strip())
 
+        if self.is_record_field:
+            assert(self.ownership is None)
+            # Work out self.is_inline_record_field
+            tp = chase_type_aliases(self.type)
+            if isinstance(tp, Array):
+                itp = chase_type_aliases(tp.item_type)
+            else:
+                itp = tp
+            if not itp.is_passed_by_ref() or (tp is not tp and itp.can_be_allocated_by_value()):
+                self.is_inline_record_field = True
+            elif self.c_type:
+                # In record fields, even some types that cannot be normally allocated by
+                # value, still are.
+                #
+                # Could be either by-value (inline), or by-pointer. Try to guess which
+                # one it is by interrogating the C type. extract_constness_from_c_type()
+                # groks the number of indirections in the C type, so if it's non-zero,
+                # we're looking at a by-pointer stored field.
+                constness = extract_constness_from_c_type(self.c_type)
+                self.is_inline_record_field = not constness
+            else:
+                self.is_inline_record_field = False
+
+
     def append_skip_params_to(self, skip_params):
         self.resolve_stuff()
         if self.type is None:
@@ -131,7 +155,7 @@ class Parameter(NodeHandler):
             s.add(tp.nested_in)
         if not tp.is_passed_by_ref():
             return s
-        elif self.is_record_field and tp.can_be_allocated_by_value():
+        elif self.is_record_field and self.is_inline_record_field:
             s.add(tp)
             return s
         else:
@@ -377,16 +401,12 @@ class Parameter(NodeHandler):
             # to the array, not the item.
             if itp is not tp:
                 return make_type(constness0 + type_name)
-            if self.is_record_field:
-                assert(self.ownership is None)
-                # Could be either by-value (inline), or by-pointer. Try to guess which
-                # one it is by interrogating the C type. extract_constness_from_c_type()
-                # has grokked the number of indirections in the C type, so if it's non-
-                # zero, we're looking at a by-pointer stored field.
-                if constness:
-                    return make_type(constness0 + add_asterisk(type_name) + constness1)
-                else:
-                    return make_type(type_name)
+
+        if self.is_record_field:
+            if self.is_inline_record_field:
+                return make_type(type_name)
+            else:
+                return make_type(constness0 + add_asterisk(type_name) + constness1)
 
         if self.ownership in ('none', None) or self.caller_allocates or isinstance(itp, VoidAliasType):
             return make_type(constness0 + add_asterisk(type_name) + constness1)
