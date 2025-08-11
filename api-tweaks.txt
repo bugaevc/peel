@@ -1197,6 +1197,8 @@ vararg	soup_session_new_with_options	object-new
 in	gst_buffer_extract		size
 skip	gst_mini_object_weak_ref
 skip	gst_mini_object_weak_unref
+# TODO: conflicts with a field, rename the field
+skip	gst_mini_object_copy
 skip	gst_pad_set_activate_function_full
 skip	gst_pad_set_activatemode_function_full
 skip	gst_pad_set_chain_function_full
@@ -1208,7 +1210,39 @@ skip	gst_pad_set_iterate_internal_links_function_full
 skip	gst_pad_set_link_function_full
 skip	gst_pad_set_query_function_full
 skip	gst_pad_set_unlink_function_full
-scope	gst_bus_add_watch		func	forever
+skip	gst_structure_from_string
+skip	gst_type_find_peek
+# Need to use _full() variant to be able to provide destroy notify
+skip	gst_bus_add_watch
+float	gst_element_factory_make	return
+float	gst_element_factory_make_full	return
+vararg	gst_element_factory_make_full	object-new
+float	gst_element_factory_make_valist	return
+float	gst_element_factory_make_with_properties	return
+float	gst_element_factory_create	return
+float	gst_element_factory_create_full	return
+vararg	gst_element_factory_create_full	object-new
+float	gst_element_factory_create_valist	return
+float	gst_element_factory_create_with_properties	return
+float	gst_element_make_from_uri	return
+float	gst_element_class_add_pad_template	templ
+float	gst_element_add_pad	pad
+vararg	gst_element_link_many	argv
+float	gst_device_create_element	return
+float	gst_parse_launch	return
+float	gst_parse_launchv	return
+float	gst_parse_launch_full	return
+float	gst_parse_launchv_full	return
+float	gst_parse_bin_from_description	return
+float	gst_parse_bin_from_description_full	return
+float	gst_bin_add			element
+# FIXME: varargs also need to be float
+float	gst_bin_add_many			element_1
+vararg	gst_bin_add_many			argv
+vararg	gst_bin_remove_many			argv
+nest	GstEventType			Event::Type
+nest	GstMessageType			Message::Type
+nest	GstQueryType			Query::Type
 
 # Json (json-glib)
 no-autofree JsonNode
