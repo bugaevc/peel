@@ -83,7 +83,7 @@ class Namespace(NodeHandler):
                 member.resolve_stuff()
 
     def should_emit_file(self, member):
-        if not isinstance(member, (Class, Interface, Record, Enumeration, Bitfield)):
+        if not isinstance(member, (Class, Interface, Record, Enumeration, Bitfield, Union)):
             return False
         if isinstance(member, Record) and member.is_private:
             return False
