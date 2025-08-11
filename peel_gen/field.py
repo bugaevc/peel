@@ -17,7 +17,6 @@ class Field(NodeHandler):
         return 'Field({}.{})'.format(self.cpp_record, self.param)
 
     def resolve_stuff(self):
-        from peel_gen.union import Union
         if not self.we_support_this:
             return
         if self.param.type is self.param.type_name is None:
@@ -29,8 +28,6 @@ class Field(NodeHandler):
             self.we_support_this = False
             return
         if self.param.type is None:
-            self.we_support_this = False
-        elif isinstance(self.param.type, Union):
             self.we_support_this = False
 
     def start_child_element(self, name, attrs):

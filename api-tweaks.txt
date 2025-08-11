@@ -249,6 +249,12 @@ no-autofree GString
 free	GString				[](::GString*str){g_string_free(str,TRUE);}
 skip	g_string_free
 
+# Union by-value
+skip	GTokenValue
+skip	GDoubleIEEE754
+skip	GFloatIEEE754
+
+
 # GObject
 # These all have (or should have) explicit bindings.
 skip	GType				GObject		manual
