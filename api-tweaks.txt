@@ -1257,6 +1257,13 @@ float	gst_parse_launch_full	return
 float	gst_parse_launchv_full	return
 float	gst_parse_bin_from_description	return
 float	gst_parse_bin_from_description_full	return
+float	gst_static_pad_template_get	return
+float	gst_device_provider_device_add			device
+float	gst_device_provider_device_changed		changed_device
+float	gst_object_set_parent		object
+float	gst_object_add_control_binding		binding
+float	gst_registry_add_plugin		plugin
+float	gst_registry_add_feature	feature
 float	gst_bin_add			element
 # FIXME: varargs also need to be float
 float	gst_bin_add_many			element_1
