@@ -4,6 +4,7 @@
 #include <peel/GLib/Error.h>
 #include <peel/Gio/File.h>
 #include <peel/Gio/InputStream.h>
+#include <peel/Gio/OutputStreamSpliceFlags.h>
 
 using namespace peel;
 

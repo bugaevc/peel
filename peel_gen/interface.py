@@ -112,6 +112,8 @@ class Interface(DefinedType):
                 s.update(member.generate_extra_include_members())
             except UnsupportedForNowException:
                 pass
+        if self.nested_in:
+            s.add(self.nested_in)
         s.discard(self)
         for nested_type in self.nested_types:
             s.discard(nested_type)
