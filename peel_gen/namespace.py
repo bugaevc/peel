@@ -50,8 +50,9 @@ class Namespace(NodeHandler):
         elif name == 'record':
             if 'glib:is-gtype-struct-for' in attrs:
                 return TypeStruct(attrs, ns=self)
-            for tweak in api_tweaks.lookup(attrs['c:type'], 'type-struct-for'):
-                return TypeStruct(attrs, ns=self, type_struct_for=tweak[1])
+            elif 'c:type' in attrs:
+                for tweak in api_tweaks.lookup(attrs['c:type'], 'type-struct-for'):
+                    return TypeStruct(attrs, ns=self, type_struct_for=tweak[1])
             r = Record(attrs, ns=self)
             self.members.append(r)
             return r
