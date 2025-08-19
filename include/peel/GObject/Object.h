@@ -118,6 +118,30 @@ private:
     return std::is_same<F, decltype (nullptr)>::value || std::is_empty<F>::value;
   }
 
+  template<typename T, typename = void>
+  struct GetPropertyHelper
+  {
+    typedef typename Value::Traits<T>::UnownedType GetType;
+
+    static GetType
+    get (const Value *value) noexcept
+    {
+      return value->get<T> ();
+    }
+  };
+
+  template<typename T>
+  struct GetPropertyHelper<T, void_t<typename Value::Traits<T>::OwnedType>>
+  {
+    typedef typename Value::Traits<T>::OwnedType GetType;
+
+    static GetType
+    get (const Value *value) noexcept
+    {
+      return value->dup<T> ();
+    }
+  };
+
 protected:
   ~Object () = default;
 
@@ -239,12 +263,12 @@ public:
   }
 
   template<typename T>
-  typename Value::Traits<T>::UnownedType
+  typename GetPropertyHelper<T>::GetType
   get_property (Property<T> prop) noexcept
   {
     Value value { Type::of<T> () };
     get_property (prop.name, &value);
-    return value.get<T> ();
+    return GetPropertyHelper<T>::get (&value);
   }
 
   void
@@ -257,11 +281,11 @@ public:
 
   template<typename T, typename U>
   void
-  set_property (Property<T> prop, U &&v) noexcept
+  set_property (Property<T> prop, U &&value) noexcept
   {
-    Value value { Type::of<T> () };
-    value.set<T> (std::forward<U> (v));
-    set_property (prop.name, &value);
+    Value v { Type::of<T> () };
+    v.set<T> (std::forward<U> (value));
+    set_property (prop.name, &v);
   }
 
   // TODO: variadic get/set
