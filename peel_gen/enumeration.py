@@ -61,6 +61,8 @@ class Enumeration(DefinedType):
             'm',
             'static_cast<{}> (g_value_get_enum (value))'.format(type_name),
             'g_value_set_enum (value, static_cast<::{}> (m))'.format(self.c_type),
+            None,
+            None,
             support_set_marshal_return=True,
         )]
         if self.get_type:

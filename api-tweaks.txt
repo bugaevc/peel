@@ -343,6 +343,7 @@ ref	GParamSpec			g_param_spec_ref
 ref-sink GParamSpec			g_param_spec_ref_sink
 float	GParamSpec
 take-value GParamSpec			g_value_take_param
+dup-value GParamSpec			g_value_dup_param
 
 onstack	GSignalQuery
 onstack	GTypeQuery
@@ -870,6 +871,7 @@ onstack	GskPathPoint
 onstack	GskShadow
 
 take-value GskRenderNode		gsk_value_take_render_node
+dup-value GskRenderNode			gsk_value_dup_render_node
 
 # Gtk
 skip	gtk_tree_model_rows_reordered
@@ -882,6 +884,7 @@ skip	gtk_value_get_expression
 skip	gtk_value_set_expression
 skip	gtk_value_take_expression
 take-value GtkExpression		gtk_value_take_expression
+dup-value GtkExpression			gtk_value_dup_expression
 
 skip	GtkPageSetupUnixDialog
 skip	GtkPrintJob
@@ -1197,6 +1200,7 @@ nest	GeeHazardPointerReleasePolicy	HazardPointer::ReleasePolicy
 
 # Dex
 take-value DexObject			dex_value_take_object
+dup-value DexObject			dex_value_dup_object
 skip	dex_value_get_object
 skip	dex_value_set_object
 skip	dex_value_take_object

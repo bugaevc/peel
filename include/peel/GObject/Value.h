@@ -112,6 +112,13 @@ public:
   }
 
   template<typename T>
+  typename Traits<T>::OwnedType
+  dup () const noexcept
+  {
+    return Traits<T>::dup (&this->value);
+  }
+
+  template<typename T>
   void
   set (typename Traits<T>::UnownedType value) noexcept
   {
@@ -400,6 +407,12 @@ struct Value::Traits<const char *>
   get (const ::GValue *value) noexcept
   {
     return g_value_get_string (value);
+  }
+
+  static String
+  dup (const ::GValue *value) noexcept
+  {
+    return String::adopt_string (g_value_dup_string (value));
   }
 
   static void

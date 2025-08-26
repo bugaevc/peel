@@ -276,6 +276,8 @@ class Record(DefinedType):
                 'r',
                 'reinterpret_cast<{} *> (g_value_get_pointer (value))'.format(full_name),
                 'g_value_set_pointer (value, reinterpret_cast<void *> (r))',
+                None,
+                None,
                 support_set_marshal_return=True,
             )
             s += '\n\n' + '\n'.join([
@@ -301,6 +303,14 @@ class Record(DefinedType):
                 owned_type = 'UniquePtr<{}>'.format(full_name)
             else:
                 owned_type = None
+
+            if owned_type is not None:
+                dup_expr = '{}::adopt_ref (reinterpret_cast<{} *> (g_value_dup_boxed (value)))'.format(owned_type, full_name)
+                take_expr = 'g_value_take_boxed (value, reinterpret_cast<const void *> (std::move (r).release_ref ()))'
+            else:
+                dup_expr = None
+                take_expr = None
+
             unowned_type = constness + full_name + ' *'
             s += '\n' + generate_value_traits_specialization(
                 full_name,
@@ -309,6 +319,8 @@ class Record(DefinedType):
                 'r',
                 'reinterpret_cast<{} *> (g_value_get_boxed (value))'.format(constness + full_name),
                 'g_value_set_boxed (value, reinterpret_cast<const void *> (r))',
+                dup_expr,
+                take_expr,
                 support_set_marshal_return=False, # TODO
             )
             s += '\n\n' + '\n'.join([

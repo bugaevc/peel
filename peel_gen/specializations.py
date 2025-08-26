@@ -99,7 +99,7 @@ def generate_unique_traits_specialization(cpp_type, c_type, free_func, can_free_
         '};',
     ])
 
-def generate_value_traits_specialization(cpp_type, owned_type, unowned_type, arg_name, get_expr, set_expr, support_set_marshal_return):
+def generate_value_traits_specialization(cpp_type, owned_type, unowned_type, arg_name, get_expr, set_expr, dup_expr, take_expr, support_set_marshal_return):
     l = [
         'template<>',
         'struct GObject::Value::Traits<{}>'.format(cpp_type),
@@ -124,6 +124,27 @@ def generate_value_traits_specialization(cpp_type, owned_type, unowned_type, arg
         '    {};'.format(set_expr),
         '  }',
     ])
+
+    if owned_type is not None and dup_expr is not None:
+        l.extend([
+            '',
+            '  static {}'.format(owned_type),
+            '  dup (const ::GValue *value)',
+            '  {',
+            '    return {};'.format(dup_expr),
+            '  }',
+        ])
+
+    if owned_type is not None and take_expr is not None:
+        l.extend([
+            '',
+            '  static void',
+            '  take (::GValue *value, {} &&{})'.format(owned_type, arg_name),
+            '  {',
+            '    {};'.format(take_expr),
+            '  }',
+        ])
+
     if support_set_marshal_return:
         l.extend([
             '',
@@ -133,6 +154,17 @@ def generate_value_traits_specialization(cpp_type, owned_type, unowned_type, arg
             '    set (value, {});'.format(arg_name),
             '  }',
         ])
+
+        if owned_type is not None and take_expr is not None:
+            l.extend([
+                '',
+                '  static void',
+                '  set_marshal_return (::GValue *value, {} &&{})'.format(owned_type, arg_name),
+                '  {',
+                '    take (value, std::move ({}));'.format(arg_name),
+                '  }',
+            ])
+
     l.extend([
         '',
         '  static {}'.format(unowned_type),

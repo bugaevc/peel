@@ -19,6 +19,7 @@ class Class(DefinedType):
         self.get_value_func = attrs.get('glib:get-value-func', None)
         self.set_value_func = attrs.get('glib:set-value-func', None)
         self.take_value_func = None
+        self.dup_value_func = None
         self.ref_func = attrs.get('glib:ref-func', None)
         self.unref_func = attrs.get('glib:unref-func', None)
         self.free_func = None  # Always None
@@ -71,6 +72,8 @@ class Class(DefinedType):
                 self.ref_sink_func = tweak[1]
             elif tweak[0] == 'take-value':
                 self.take_value_func = tweak[1]
+            elif tweak[0] == 'dup-value':
+                self.dup_value_func = tweak[1]
             elif tweak[0] == 'hide':
                 self.hidden_members.append(tweak[1])
 
@@ -468,6 +471,24 @@ class Class(DefinedType):
                 '  }',
                 '',
             ])
+            if self.dup_value_func is not None:
+                l.extend([
+                    '',
+                    '  static RefPtr<T>',
+                    '  dup (const ::GValue *value)',
+                    '  {',
+                    '    void *obj = {} (value);'.format(self.dup_value_func),
+                    '    if (std::is_same<T, {}>::value)'.format(full_name),
+                    '      return RefPtr<{}>::adopt_ref (reinterpret_cast<{} *> (obj));'.format(full_name, full_name),
+                    '#if defined (G_DISABLE_CAST_CHECKS) || defined (__OPTIMIZE__)',
+                    '    return RefPtr<T>::adopt_ref (reinterpret_cast<T *> (obj));',
+                    '#else',
+                    '    ::GType tp = static_cast<::GType> (GObject::Type::of<T> ());',
+                    '    return RefPtr<T>::adopt_ref (G_TYPE_CHECK_INSTANCE_CAST (obj, tp, T));',
+                    '#endif',
+                    '  }',
+                ])
+
             if self.take_value_func is not None:
                 l.extend([
                     '  static void',

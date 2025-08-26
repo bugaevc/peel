@@ -511,6 +511,13 @@ struct GObject::Value::Traits<GLib::Variant>
     return reinterpret_cast<GLib::Variant *> (g_value_get_variant (value));
   }
 
+  static RefPtr<GLib::Variant>
+  dup (const ::GValue *value) noexcept
+  {
+    ::GVariant *vv = g_value_dup_variant (value);
+    return RefPtr<GLib::Variant>::adopt_ref (reinterpret_cast<GLib::Variant *> (vv));
+  }
+
   static void
   set (::GValue *value, GLib::Variant *v)
   {

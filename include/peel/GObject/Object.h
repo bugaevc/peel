@@ -657,6 +657,20 @@ struct Value::Traits<T, peel::enable_if_derived<Object, T, void>>
 #endif
   }
 
+  static RefPtr<T>
+  dup (const ::GValue *value) noexcept
+  {
+    void *obj = g_value_dup_object (value);
+    if (std::is_same<T, Object>::value)
+      return RefPtr<T>::adopt_ref (reinterpret_cast<T *> (obj));
+#if defined (G_DISABLE_CAST_CHECKS) || defined (__OPTIMIZE__)
+    return RefPtr<T>::adopt_ref (reinterpret_cast<T *> (obj));
+#else
+    ::GType tp = static_cast<::GType> (Type::of<T> ());
+    return RefPtr<T>::adopt_ref (G_TYPE_CHECK_INSTANCE_CAST (obj, tp, T));
+#endif
+  }
+
   static void
   set (::GValue *value, T *object) noexcept
   {
