@@ -271,6 +271,15 @@ public:
     return GetPropertyHelper<T>::get (&value);
   }
 
+  template<typename T>
+  typename GetPropertyHelper<T>::GetType
+  get_property (const char *name) noexcept
+  {
+    Value value { Type::of<T> () };
+    get_property (name, &value);
+    return GetPropertyHelper<T>::get (&value);
+  }
+
   void
   set_property (const char *name, const Value *value) noexcept
   {
@@ -286,6 +295,15 @@ public:
     Value v { Type::of<T> () };
     v.set<T> (std::forward<U> (value));
     set_property (prop.name, &v);
+  }
+
+  template<typename T, typename U>
+  void
+  set_property (const char *name, U &&value) noexcept
+  {
+    Value v { Type::of<T> () };
+    v.set<T> (std::forward<U> (value));
+    set_property (name, &v);
   }
 
   // TODO: variadic get/set
