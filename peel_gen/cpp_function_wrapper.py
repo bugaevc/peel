@@ -1,9 +1,16 @@
 from peel_gen.exceptions import UnsupportedForNowException
 
-def generate(cpp_callee, context, rv, params, throws, indent, extra_decls=None, trailing_specs=None):
+def generate(cpp_callee, context, rv, params, throws, indent, extra_decls=None, trailing_specs=None, gst_pad_callback=False):
     if params is not None:
         c_signature = params.generate_c_signature()
+        # For GstPad callbacks the C callback does not contain a user_data
+        # parameter but we extract it from the instance instead and then pass
+        # it to the wrapper callback for keeping the code below generic for
+        # all cases.
+        if gst_pad_callback:
+            c_signature += ', gpointer user_data'
     else:
+        assert(not gst_pad_callback)
         c_signature = ''
 
     if throws:

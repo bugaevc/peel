@@ -616,20 +616,27 @@ class Parameter(NodeHandler):
                 raise UnsupportedForNowException('GCallback')
             assert(tp.params is not None)
             assert(len(tp.params.params) >= 1)
-            user_data_param = tp.params.params[-1]
-            if user_data_param.type_name != 'gpointer':
-                raise UnsupportedForNowException('Unexpected user_data format')
+            if tp.gst_pad_callback is None:
+                user_data_param = tp.params.params[-1]
+                if user_data_param.type_name != 'gpointer':
+                    raise UnsupportedForNowException('Unexpected user_data format')
+            else:
+                assert(self.scope == 'notified')
+                user_data_param = None
+
             tp.params.resolve_stuff(has_typed_tweak=False)
             # FIXME: This is a gross place to do this.
             if user_data_param not in tp.params.skip_params:
                  tp.params.skip_params.append(user_data_param)
             captured_closure_name = '_peel_captured_' + cpp_name
+
             extra_decls = '        {} &{} = *reinterpret_cast<typename std::remove_reference<{}>::type *> ({});'.format(
                 plain_closure_type,
                 captured_closure_name,
                 plain_closure_type,
-                user_data_param.name,
+                user_data_param.name if tp.gst_pad_callback is None else 'user_data',
             )
+
             if self.scope != 'async':
                 cpp_callee_expr = captured_closure_name
             else:
@@ -650,6 +657,7 @@ class Parameter(NodeHandler):
                 throws=False,
                 indent='      ',
                 extra_decls=extra_decls,
+                gst_pad_callback=tp.gst_pad_callback is not None,
             )
             if skip_params_casted:
                 closure_param_place = self.closure_param.generate_casted_name()
@@ -664,8 +672,13 @@ class Parameter(NodeHandler):
                 ''.join(', ' + p.generate_cpp_type(name=None, context=context) for p in tp.params.params if p is not user_data_param),
             )
             if self.scope == 'notified':
-                wrap_method_name = 'wrap_notified_callback'
-                misc_args = ', &{}, {}'.format(self.destroy_param.generate_casted_name(), is_const_invocable_expr)
+                if tp.gst_pad_callback is None:
+                    wrap_method_name = 'wrap_notified_callback'
+                    misc_args = ', &{}, {}'.format(self.destroy_param.generate_casted_name(), is_const_invocable_expr)
+                else:
+                    assert(tp.params.params[0].c_type == 'GstPad *')
+                    wrap_method_name = 'wrap_gst_pad_callback<&::GstPad::{}>'.format(tp.gst_pad_callback)
+                    misc_args = ', &{}'.format(self.destroy_param.generate_casted_name())
             elif self.scope == 'forever':
                 wrap_method_name = 'wrap_notified_callback'
                 misc_args = ', nullptr, {}'.format(is_const_invocable_expr)

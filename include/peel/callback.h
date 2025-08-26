@@ -6,6 +6,8 @@
 
 peel_begin_header
 
+typedef struct _GstPad GstPad;
+
 namespace peel
 {
 namespace internals
@@ -38,11 +40,19 @@ struct is_const_invocable<F, void_t<decltype (std::declval<const typename std::r
   static constexpr bool value = true;
 };
 
+template<typename... Args>
+static inline ::GstPad *
+extract_gst_pad (::GstPad *pad, Args...)
+{
+  return pad;
+}
+
 template<typename Ret, typename... Args>
 class CallbackHelper
 {
 public:
   typedef Ret (*CallbackType) (Args..., gpointer);
+  typedef Ret (*CallbackTypeNoUserData) (Args...);
 
   template<typename F, typename F2>
   static CallbackType
@@ -293,6 +303,87 @@ public:
         };
       }
   }
+
+  template<void * ::GstPad::*UserDataMember, typename F, typename F2>
+  static CallbackTypeNoUserData
+  wrap_gst_pad_callback (F &&f, F2 &&, gpointer *out_data, GDestroyNotify *out_notify)
+  {
+    typedef typename std::remove_reference<F>::type C;
+    if (std::is_same<C, decltype (nullptr)>::value)
+      {
+        if (out_notify)
+          *out_notify = nullptr;
+        *out_data = nullptr;
+        return nullptr;
+      }
+    else if (sizeof (C) <= sizeof (gpointer))
+      {
+        union U
+          {
+            C f;
+            F2 *f2;
+            gpointer data;
+            U (gpointer data) : data (data) { }
+            ~U () { }
+          } u { nullptr };
+        new (&u.f) C (static_cast<F &&> (f));
+        *out_data = u.data;
+        if (out_notify)
+          {
+            if (std::is_trivially_destructible<C>::value)
+              *out_notify = nullptr;
+            else
+              *out_notify = +[] (gpointer data)
+              {
+                U u { data };
+                u.f.~C ();
+              };
+          }
+        return +[] (Args... args) -> Ret
+        {
+          ::GstPad *pad = extract_gst_pad (args...);
+          U &u = reinterpret_cast<U &> (pad->*UserDataMember);
+#ifdef peel_cpp_20
+          F2 f2;
+#else
+          // Make up a fake instance of F2.
+          F2 &f2 = *u.f2;
+#endif
+          return f2 (args..., &u.data);
+        };
+      }
+    else
+      {
+        C *heap_f = reinterpret_cast<C *> (g_malloc (sizeof (C)));
+        new (heap_f) C (static_cast<F &&> (f));
+        *out_data = heap_f;
+        if (out_notify)
+          *out_notify = +[] (gpointer data)
+          {
+            peel_assume (data);
+            C *f = reinterpret_cast<C *> (data);
+            f->~C ();
+#if GLIB_CHECK_VERSION (2, 76, 0)
+            g_free_sized (f, sizeof (C));
+#else
+            g_free (f);
+#endif
+          };
+        return +[] (Args... args) -> Ret
+        {
+          ::GstPad *pad = extract_gst_pad (args...);
+          gpointer data = pad->*UserDataMember;
+          peel_assume (data);
+#ifdef peel_cpp_20
+          F2 f2;
+#else
+          // Make up a fake instance of F2.
+          F2 &f2 = *reinterpret_cast<F2 *> (data);
+#endif
+          return f2 (args..., data);
+        };
+      }
+  }
 };
 
 template<typename... Args>
@@ -300,6 +391,7 @@ class CallbackHelper<void, Args...>
 {
 public:
   typedef void (*CallbackType) (Args..., gpointer);
+  typedef void (*CallbackTypeNoUserData) (Args...);
 
   template<typename F, typename F2>
   static CallbackType
@@ -472,6 +564,86 @@ public:
         *out_data = f_ptr;
         return +[] (Args... args, gpointer data) -> void
         {
+#ifdef peel_cpp_20
+          F2 f2;
+#else
+          // Make up a fake instance of F2.
+          F2 &f2 = *reinterpret_cast<F2 *> (data);
+#endif
+          f2 (args..., data);
+        };
+      }
+  }
+
+  template<void * ::GstPad::*UserDataMember, typename F, typename F2>
+  static CallbackTypeNoUserData
+  wrap_gst_pad_callback (F &&f, F2 &&, gpointer *out_data, GDestroyNotify *out_notify)
+  {
+    typedef typename std::remove_reference<F>::type C;
+    if (std::is_same<C, decltype (nullptr)>::value)
+      {
+        if (out_notify)
+          *out_notify = nullptr;
+        *out_data = nullptr;
+        return nullptr;
+      }
+    else if (sizeof (C) <= sizeof (gpointer))
+      {
+        union U
+          {
+            C f;
+            F2 *f2;
+            gpointer data;
+            U (gpointer data) : data (data) { }
+            ~U () { }
+          } u { nullptr };
+        new (&u.f) C (static_cast<F &&> (f));
+        *out_data = u.data;
+        if (out_notify)
+          {
+            if (std::is_trivially_destructible<C>::value)
+              *out_notify = nullptr;
+            else
+              *out_notify = +[] (gpointer data)
+              {
+                U u { data };
+                u.f.~C ();
+              };
+          }
+        return +[] (Args... args) -> void
+        {
+          ::GstPad *pad = extract_gst_pad (args...);
+          U &u = reinterpret_cast<U &> (pad->*UserDataMember);
+#ifdef peel_cpp_20
+          F2 f2;
+#else
+          // Make up a fake instance of F2.
+          F2 &f2 = *u.f2;
+#endif
+          f2 (args..., &u.data);
+        };
+      }
+    else
+      {
+        C *heap_f = reinterpret_cast<C *> (g_malloc (sizeof (C)));
+        new (heap_f) C (static_cast<F &&> (f));
+        *out_data = heap_f;
+        if (out_notify)
+          *out_notify = +[] (gpointer data)
+          {
+            peel_assume (data);
+            C *f = reinterpret_cast<C *> (data);
+#if GLIB_CHECK_VERSION (2, 76, 0)
+            g_free_sized (f, sizeof (C));
+#else
+            g_free (f);
+#endif
+          };
+        return +[] (Args... args) -> void
+        {
+          ::GstPad *pad = extract_gst_pad (args...);
+          gpointer data = pad->*UserDataMember;
+          peel_assume (data);
 #ifdef peel_cpp_20
           F2 f2;
 #else

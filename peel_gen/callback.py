@@ -8,6 +8,7 @@ class Callback(FunctionLike, DefinedType):
         FunctionLike.__init__(self, attrs, ns)
         self.tweak_ident = self.c_type
         self.force_cpp_wrapper = False
+        self.gst_pad_callback = None
 
     def resolve_stuff(self):
         if self.has_resolved_stuff:
@@ -19,3 +20,5 @@ class Callback(FunctionLike, DefinedType):
         for tweak in api_tweaks.lookup(self.tweak_ident):
             if tweak[0] == 'cpp-wrapper':
                 self.force_cpp_wrapper = True
+            elif tweak[0] == 'gst-pad-callback':
+                self.gst_pad_callback = tweak[1]

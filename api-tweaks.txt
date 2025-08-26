@@ -1307,17 +1307,6 @@ skip	gst_mini_object_weak_ref
 skip	gst_mini_object_weak_unref
 # TODO: conflicts with a field, rename the field
 skip	gst_mini_object_copy
-skip	gst_pad_set_activate_function_full
-skip	gst_pad_set_activatemode_function_full
-skip	gst_pad_set_chain_function_full
-skip	gst_pad_set_chain_list_function_full
-skip	gst_pad_set_getrange_function_full
-skip	gst_pad_set_event_function_full
-skip	gst_pad_set_event_full_function_full
-skip	gst_pad_set_iterate_internal_links_function_full
-skip	gst_pad_set_link_function_full
-skip	gst_pad_set_query_function_full
-skip	gst_pad_set_unlink_function_full
 skip	gst_structure_from_string
 skip	gst_type_find_peek
 # Need to use _full() variant to be able to provide destroy notify
@@ -1425,6 +1414,18 @@ onstack GstSegment
 
 raw-params-overload	gst_init	argc,argv
 raw-params-overload	gst_init_check	argc,argv
+
+gst-pad-callback GstPadActivateFunction	activatedata
+gst-pad-callback GstPadActivateModeFunction	activatemodedata
+gst-pad-callback GstPadLinkFunction	linkdata
+gst-pad-callback GstPadUnlinkFunction	unlinkdata
+gst-pad-callback GstPadChainFunction	chaindata
+gst-pad-callback GstPadChainListFunction	chainlistdata
+gst-pad-callback GstPadGetRangeFunction	getrangedata
+gst-pad-callback GstPadEventFunction	eventdata
+gst-pad-callback GstPadEventFullFunction	eventdata
+gst-pad-callback GstPadQueryFunction	querydata
+gst-pad-callback GstPadIterIntLinkFunction	iterintlinkdata
 
 # GstBase
 
