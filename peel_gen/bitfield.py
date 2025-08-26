@@ -116,6 +116,7 @@ class Bitfield(DefinedType):
         type_name = self.emit_name_for_context(None)
         l = [generate_value_traits_specialization(
             type_name,
+            None,
             type_name,
             'flags',
             'static_cast<{}> (g_value_get_flags (value))'.format(type_name),

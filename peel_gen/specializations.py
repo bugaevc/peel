@@ -99,11 +99,17 @@ def generate_unique_traits_specialization(cpp_type, c_type, free_func, can_free_
         '};',
     ])
 
-def generate_value_traits_specialization(cpp_type, unowned_type, arg_name, get_expr, set_expr, support_set_marshal_return):
+def generate_value_traits_specialization(cpp_type, owned_type, unowned_type, arg_name, get_expr, set_expr, support_set_marshal_return):
     l = [
         'template<>',
         'struct GObject::Value::Traits<{}>'.format(cpp_type),
         '{',
+    ]
+
+    if owned_type is not None:
+        l.append('  typedef {} OwnedType;'.format(owned_type))
+
+    l.extend([
         '  typedef {} UnownedType;'.format(unowned_type),
         '',
         '  static {}'.format(unowned_type),
@@ -117,7 +123,7 @@ def generate_value_traits_specialization(cpp_type, unowned_type, arg_name, get_e
         '  {',
         '    {};'.format(set_expr),
         '  }',
-    ]
+    ])
     if support_set_marshal_return:
         l.extend([
             '',

@@ -271,6 +271,7 @@ class Record(DefinedType):
         if self.is_pointer_type:
             s += '\n' + generate_value_traits_specialization(
                 full_name,
+                None,
                 full_name + ' *',
                 'r',
                 'reinterpret_cast<{} *> (g_value_get_pointer (value))'.format(full_name),
@@ -294,9 +295,17 @@ class Record(DefinedType):
         elif self.get_type:
             constness = '' if self.ref_func or self.unref_func else 'const '
             # XXX: We assume that structures that have get_type are boxed
+            if self.ref_func or self.unref_func:
+                owned_type = 'RefPtr<{}>'.format(full_name)
+            elif self.free_func:
+                owned_type = 'UniquePtr<{}>'.format(full_name)
+            else:
+                owned_type = None
+            unowned_type = constness + full_name + ' *'
             s += '\n' + generate_value_traits_specialization(
                 full_name,
-                constness + full_name + ' *',
+                owned_type,
+                unowned_type,
                 'r',
                 'reinterpret_cast<{} *> (g_value_get_boxed (value))'.format(constness + full_name),
                 'g_value_set_boxed (value, reinterpret_cast<const void *> (r))',
