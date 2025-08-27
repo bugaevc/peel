@@ -254,6 +254,8 @@ skip	GTokenValue
 skip	GDoubleIEEE754
 skip	GFloatIEEE754
 
+# Fails badly
+skip	GScanner
 
 # GObject
 # These all have (or should have) explicit bindings.
