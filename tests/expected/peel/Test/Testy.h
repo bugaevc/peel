@@ -31,6 +31,7 @@ namespace GObject
 {
 class Binding;
 enum class BindingFlags : std::underlying_type<::GBindingFlags>::type;
+class InitiallyUnowned;
 class Object;
 struct Value;
 } /* namespace GObject */
@@ -436,6 +437,42 @@ public:
     TestVoidAlias * _peel_return = test_testy_void_alias (_peel_this, _peel_arg);
     peel_assume (_peel_return);
     return reinterpret_cast<VoidAlias *> (_peel_return);
+  }
+
+  template<typename... Args>
+  peel_nonnull_args (2)
+  void
+  argv_transfer_none (GObject::Object *first_object, Args &&...args) noexcept
+  {
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    ::GObject * _peel_first_object = reinterpret_cast<::GObject *> (first_object);
+    test_testy_argv_transfer_none (_peel_this, _peel_first_object, reinterpret_cast<::GObject *> (static_cast<GObject::Object *> (std::forward<Args> (args)))..., nullptr);
+  }
+
+  template<typename... Args>
+  void
+  argv_transfer_floating (peel::FloatPtr<GObject::InitiallyUnowned> first_object, Args &&...args) noexcept
+  {
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    ::GInitiallyUnowned * _peel_first_object = reinterpret_cast<::GInitiallyUnowned *> (std::move (first_object).release_floating_ptr ());
+    test_testy_argv_transfer_floating (_peel_this, _peel_first_object, reinterpret_cast<::GInitiallyUnowned *> (std::move (static_cast<peel::FloatPtr<GObject::InitiallyUnowned>> (std::forward<Args> (args))).release_floating_ptr ())..., nullptr);
+  }
+
+  template<typename... Args>
+  void
+  argv_transfer_full (peel::RefPtr<GObject::Object> first_object, Args &&...args) noexcept
+  {
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    ::GObject * _peel_first_object = reinterpret_cast<::GObject *> (std::move (first_object).release_ref ());
+    test_testy_argv_transfer_full (_peel_this, _peel_first_object, reinterpret_cast<::GObject *> (std::move (static_cast<peel::RefPtr<GObject::Object>> (std::forward<Args> (args))).release_ref ())..., nullptr);
+  }
+
+  template<typename... Args>
+  void
+  argv_transfer_none_str (const char *first_str, Args &&...args) noexcept
+  {
+    ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
+    test_testy_argv_transfer_none_str (_peel_this, first_str, args..., nullptr);
   }
 
   static peel::Property<void *>
@@ -1288,4 +1325,5 @@ peel_end_header
 
 #include <peel/GLib/Error.h>
 #include <peel/GObject/Binding.h>
+#include <peel/GObject/InitiallyUnowned.h>
 #include <peel/GObject/Value.h>

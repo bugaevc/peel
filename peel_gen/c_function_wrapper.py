@@ -121,19 +121,23 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
                 ])
                 args.append('_peel_value_ref')
                 break
-            if p.name == '...':
-                assert(p is params.params[-1])
-                cast_to_c = p.generate_cast_to_c(
-                    cpp_name='args',
-                    context=context,
-                    for_local_copy=False,
-                    skip_params_casted=True,
-                )
-                args.append(cast_to_c)
-                break
             needs_local_copy = p.needs_local_copy()
             if needs_local_copy:
                 num_local_copies += 1
+
+            if p.name == '...':
+                assert(p is params.params[-1])
+                assert(not needs_local_copy)
+                cast_to_c = p.generate_cast_to_c(
+                    cpp_name='args',
+                    context=context,
+                    for_local_copy=needs_local_copy,
+                    skip_params_casted=True,
+                    vararg_reference_param=params.params[-2],
+                )
+                args.append(cast_to_c)
+                break
+
             if not needs_local_copy or p.direction == 'inout':
                 if p.is_cpp_this():
                     cpp_name = 'this'

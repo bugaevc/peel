@@ -1265,7 +1265,6 @@ float	gst_object_add_control_binding		binding
 float	gst_registry_add_plugin		plugin
 float	gst_registry_add_feature	feature
 float	gst_bin_add			element
-# FIXME: varargs also need to be float
 float	gst_bin_add_many			element_1
 vararg	gst_bin_add_many			argv
 vararg	gst_bin_remove_many			argv

@@ -1,0 +1,5 @@
+vararg	test_testy_argv_transfer_none		argv
+vararg	test_testy_argv_transfer_none_str	argv
+float	test_testy_argv_transfer_floating	first_object
+vararg	test_testy_argv_transfer_floating	argv
+vararg	test_testy_argv_transfer_full		argv

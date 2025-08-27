@@ -1169,6 +1169,78 @@
           </parameter>
         </parameters>
       </method>
+      <method name="argv_transfer_none"
+              c:identifier="test_testy_argv_transfer_none"
+              introspectable="0">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="first_object" transfer-ownership="none">
+            <type name="GObject.Object" c:type="GObject*"/>
+          </parameter>
+          <parameter name="..." transfer-ownership="none">
+            <varargs/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="argv_transfer_floating"
+              c:identifier="test_testy_argv_transfer_floating"
+              introspectable="0">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="first_object" transfer-ownership="none">
+            <type name="GObject.InitiallyUnowned" c:type="GInitiallyUnowned*"/>
+          </parameter>
+          <parameter name="..." transfer-ownership="none">
+            <varargs/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="argv_transfer_full"
+              c:identifier="test_testy_argv_transfer_full"
+              introspectable="0">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="first_object" transfer-ownership="full">
+            <type name="GObject.Object" c:type="GObject*"/>
+          </parameter>
+          <parameter name="..." transfer-ownership="none">
+            <varargs/>
+          </parameter>
+        </parameters>
+      </method>
+      <method name="argv_transfer_none_str"
+              c:identifier="test_testy_argv_transfer_none_str"
+              introspectable="0">
+        <return-value transfer-ownership="none">
+          <type name="none" c:type="void"/>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+          <parameter name="first_str" transfer-ownership="none">
+            <type name="utf8" c:type="const gchar*"/>
+          </parameter>
+          <parameter name="..." transfer-ownership="none">
+            <varargs/>
+          </parameter>
+        </parameters>
+      </method>
       <property name="smuggled-pointer" writable="1">
         <type name="gpointer" c:type="GBoxedCopyFunc"/>
       </property>

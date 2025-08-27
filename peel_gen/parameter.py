@@ -254,7 +254,7 @@ class Parameter(NodeHandler):
         if self.name == '...':
             if self.vararg_mode is None:
                 raise UnsupportedForNowException('varargs')
-            elif self.vararg_mode in ('format', 'argv'):
+            elif self.vararg_mode == 'format':
                 return 'Args ...' + name
             return 'Args &&...' + name
 
@@ -437,7 +437,7 @@ class Parameter(NodeHandler):
             name = self.name
         return '_peel_' + name
 
-    def generate_cast_to_c(self, cpp_name, context, for_local_copy, skip_params_casted):
+    def generate_cast_to_c(self, cpp_name, context, for_local_copy, skip_params_casted, vararg_reference_param=None):
         self.resolve_stuff()
 
         if self.name == '...':
@@ -446,7 +446,27 @@ class Parameter(NodeHandler):
             elif self.vararg_mode == 'format':
                 return '{}...'.format(cpp_name)
             elif self.vararg_mode == 'argv':
-                return '{}..., nullptr'.format(cpp_name)
+                assert(vararg_reference_param is not None)
+
+                assert(not for_local_copy)
+                plain_cpp_type = vararg_reference_param.generate_cpp_type(
+                    name=None,
+                    context=context,
+                    strip_refs=0,
+                    for_local_copy=for_local_copy,
+                )
+                cast = vararg_reference_param.generate_cast_to_c(
+                        cpp_name='static_cast<{}> (std::forward<Args> ({}))'.format(plain_cpp_type, cpp_name),
+                        context=context,
+                        for_local_copy=for_local_copy,
+                        skip_params_casted=skip_params_casted,
+                        vararg_reference_param=None,
+                )
+                if cast is None:
+                    assert(not self.is_cpp_this())
+                    return '{}..., nullptr'.format(cpp_name)
+                else:
+                    return '{}..., nullptr'.format(cast)
             elif self.vararg_mode == 'variant-new':
                 return 'GLib::Variant::Traits<typename std::decay<Args>::type>::cast_for_create (std::forward<Args> ({}))...'.format(cpp_name)
             elif self.vararg_mode == 'object-new':
