@@ -580,9 +580,8 @@ public:
       klass->constructor = +[] (::GType tp, guint n, ::GObjectConstructParam *raw_params) -> ::GObject *
       {
         Type type = tp;
-        size_t num = n;
         ConstructParam *params = reinterpret_cast<ConstructParam *> (raw_params);
-        RefPtr<Object> obj = DerivedClass::vfunc_constructor (type, num, params);
+        RefPtr<Object> obj = DerivedClass::vfunc_constructor (type, ArrayRef { params, n });
         return reinterpret_cast<::GObject *> (std::move (obj).release_ref ());
       };
     }
