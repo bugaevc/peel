@@ -1,6 +1,7 @@
 #pragma once
 
 #include <peel/lang.h>
+#include <peel/String.h>
 #include <peel/GObject/Type.h>
 #include <peel/GObject/Value.h>
 #include <peel/GLib/Error.h>
@@ -191,12 +192,12 @@ public:
     return peel::RefPtr<Variant>::adopt_ref (reinterpret_cast<Variant *> (_peel_return));
   }
 
-  /* owned */ char *
+  peel::String
   print (bool type_annotate) noexcept
   {
     ::GVariant *_peel_this = reinterpret_cast<::GVariant *> (this);
     gboolean _peel_type_annotate = static_cast<gboolean> (type_annotate);
-    return g_variant_print (_peel_this, _peel_type_annotate);
+    return peel::String::adopt_string (g_variant_print (_peel_this, _peel_type_annotate));
   }
 };
 

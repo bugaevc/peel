@@ -23,20 +23,20 @@ main ()
     entry2, Gtk::Editable::prop_text (),
     peel::GObject::Binding::Flags::BIDIRECTIONAL,
     /* transform-to function: we add 1 to each character */
-    [] (const char *s) -> char *
+    [] (const char *s) -> String
     {
       char *r = g_strdup (s);
       for (char *c = r; *c; c++)
         ++*c;
-      return r;
+      return String::adopt_string (r);
     },
     /* transform-from function: we subtract 1 from each character */
-    [] (const char *s) -> char *
+    [] (const char *s) -> String
     {
       char *r = g_strdup (s);
       for (char *c = r; *c; c++)
         --*c;
-      return r;
+      return String::adopt_string (r);
     });
 
   box->append (std::move (entry1));

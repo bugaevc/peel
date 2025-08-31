@@ -2,9 +2,8 @@
 // This is the C++ header for Demo::Person.
 
 #include <peel/GObject/Object.h>
-#include <peel/GObject/Value.h>
+#include <peel/String.h>
 #include <peel/class.h>
-#include <string>
 
 namespace Demo
 {
@@ -13,11 +12,8 @@ class Person final : public peel::Object
 {
   PEEL_SIMPLE_CLASS (Person, peel::Object)
 
-  inline void
-  init (Class *);
-
-  std::string first_name;
-  std::string last_name;
+  peel::String first_name;
+  peel::String last_name;
 
   template<typename F>
   static void
@@ -37,7 +33,7 @@ public:
   const char *
   get_first_name ()
   {
-    return first_name.c_str ();
+    return first_name;
   }
 
   void
@@ -48,7 +44,7 @@ public:
   const char *
   get_last_name ()
   {
-    return last_name.c_str ();
+    return last_name;
   }
 
   void
@@ -56,7 +52,7 @@ public:
 
   PEEL_PROPERTY (const char *, last_name, "last-name")
 
-  /* owned */ char *
+  peel::String
   get_full_name ();
 
   PEEL_PROPERTY (const char *, full_name, "full-name")

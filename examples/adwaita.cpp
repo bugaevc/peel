@@ -126,13 +126,11 @@ Window::open_new_tab ()
   FloatPtr<Adw::StatusPage> status_page = Adw::StatusPage::create ();
 
   static unsigned tabs_open_this_far;
-  char *title = g_strdup_printf ("Tab #%d", ++tabs_open_this_far);
+  String title = GLib::strdup_printf ("Tab #%d", ++tabs_open_this_far);
   status_page->set_title (title);
 
   Adw::TabPage *tab_page = tab_view->append (std::move (status_page));
   tab_page->set_title (title);
-
-  g_free (title);
 }
 
 void

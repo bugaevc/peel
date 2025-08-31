@@ -5,6 +5,7 @@
 #include <peel/GObject/Value.h>
 #include <peel/RefPtr.h>
 #include <peel/UniquePtr.h>
+#include <peel/String.h>
 #include <peel/lang.h>
 #include <peel/callback.h>
 #include <new>
@@ -96,21 +97,17 @@ struct SignalTraits<const char *>
 };
 
 template<>
-struct SignalTraits<char *>
+struct SignalTraits<String>
 {
   typedef char *CType;
-  typedef char *PlainCppType;
+  typedef String PlainCppType;
 
-  static char *
-  to_c (char *s)
-  {
-    return s;
-  }
+  /* No conversion to C, as this should never be needed. */
 
-  static char *
+  static String
   from_c (char *s)
   {
-    return s;
+    return String::adopt_string (s);
   }
 };
 
@@ -139,7 +136,7 @@ struct SignalTraits<RefPtr<T>>
   typedef T *CType;
   typedef T PlainCppType;
 
-  // No conversion to C, as this should never be needed.
+  /* No conversion to C, as this should never be needed. */
 
   static RefPtr<T>
   from_c (T *ptr)
@@ -154,7 +151,7 @@ struct SignalTraits<UniquePtr<T>>
   typedef T *CType;
   typedef T PlainCppType;
 
-  // No conversion to C, as this should never be needed.
+  /* No conversion to C, as this should never be needed. */
 
   static UniquePtr<T>
   from_c (T *ptr)

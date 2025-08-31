@@ -1,6 +1,7 @@
 #pragma once
 
 #include <peel/GObject/Type.h>
+#include <peel/String.h>
 #include <peel/lang.h>
 #include <glib-object.h>
 #include <utility>
@@ -392,7 +393,7 @@ template<>
 struct Value::Traits<const char *>
 {
   typedef const char *UnownedType;
-  typedef char *OwnedType;
+  typedef String OwnedType;
 
   G_GNUC_CONST
   static const char *
@@ -413,15 +414,15 @@ struct Value::Traits<const char *>
   }
 
   static void
-  take (::GValue *value, char *str) noexcept
+  take (::GValue *value, String &&str) noexcept
   {
-    g_value_take_string (value, str);
+    g_value_take_string (value, std::move (str).release_string ());
   }
 
   static void
-  set_marshal_return (::GValue *value, char *str) noexcept
+  set_marshal_return (::GValue *value, String &&str) noexcept
   {
-    g_value_take_string (value, str);
+    take (value, std::move (str));
   }
 
 /*
@@ -444,6 +445,11 @@ struct Value::Traits<const char *>
   static const char *
   cast_for_create (char *) = delete;
 };
+
+/* Allow both String and const char * as logical value types */
+template<>
+struct Value::Traits<String> : Value::Traits<const char *>
+{ };
 
 template<>
 struct Value::Traits<Type>

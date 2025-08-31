@@ -2,8 +2,8 @@
 #include <peel/Gdk/RGBA.h>
 #include <peel/Pango/Layout.h>
 #include <peel/GLib/MainContext.h>
+#include <peel/String.h>
 #include <peel/class.h>
-#include <string>
 
 using namespace peel;
 
@@ -15,14 +15,8 @@ class Label final : public Gtk::Widget
   PEEL_SIMPLE_CLASS (Label, Gtk::Widget)
   friend class Gtk::Widget;
 
-  std::string text;
+  String text;
   RefPtr<Pango::Layout> layout;
-
-  void
-  init (Class *)
-  {
-    new (&text) std::string;
-  }
 
   template<typename F>
   static void
@@ -54,7 +48,7 @@ public:
   const char *
   get_text ()
   {
-    return text.c_str ();
+    return text;
   }
 
   void
@@ -79,9 +73,8 @@ Label::Class::init ()
 void
 Label::set_text (const char *new_text)
 {
-  if (text == new_text)
+  if (!text.set (new_text))
     return;
-  text = new_text;
 
   if (layout)
     layout->set_text (new_text, -1);
@@ -96,7 +89,7 @@ Label::vfunc_measure (Gtk::Orientation orienatation, int for_size,
                       int *minimum_baseline, int *natural_baseline)
 {
   if (!layout)
-    layout = create_pango_layout (text.c_str ());
+    layout = create_pango_layout (text);
 
   int width, height;
   layout->get_pixel_size (&width, &height);

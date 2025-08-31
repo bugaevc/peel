@@ -14,6 +14,7 @@ static_headers = files(
   'peel/RefPtr.h',
   'peel/FloatPtr.h',
   'peel/WeakPtr.h',
+  'peel/String.h',
 
   'peel/coro/SimpleTask.h',
   'peel/coro/AsyncResult.h',

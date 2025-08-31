@@ -1,17 +1,10 @@
 #include "DemoPerson.hpp"
-#include <new>
+#include <peel/GLib/functions.h>
 
 namespace Demo
 {
 
 PEEL_CLASS_IMPL (Person, "DemoPerson", peel::Object)
-
-inline void
-Person::init (Class *)
-{
-  new (&first_name) std::string;
-  new (&last_name) std::string;
-}
 
 inline void
 Person::Class::init ()
@@ -21,27 +14,27 @@ Person::Class::init ()
 void
 Person::set_first_name (const char *name)
 {
-  if (first_name == name)
-    return;
-  first_name = name;
-  notify (prop_first_name ());
-  notify (prop_full_name ());
+  if (first_name.set (name))
+    {
+      notify (prop_first_name ());
+      notify (prop_full_name ());
+    }
 }
 
 void
 Person::set_last_name (const char *name)
 {
-  if (last_name == name)
-    return;
-  last_name = name;
-  notify (prop_last_name ());
-  notify (prop_full_name ());
+  if (last_name.set (name))
+    {
+      notify (prop_last_name ());
+      notify (prop_full_name ());
+    }
 }
 
-/* owned */ char *
+peel::String
 Person::get_full_name ()
 {
-  return g_strdup_printf ("%s %s", first_name.c_str (), last_name.c_str ());
+  return peel::GLib::strdup_printf ("%s %s", (const char *) first_name, (const char *) last_name);
 }
 
 peel::RefPtr<Person>

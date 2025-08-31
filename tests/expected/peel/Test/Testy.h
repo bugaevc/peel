@@ -8,6 +8,7 @@
 #include <peel/FloatPtr.h>
 #include <peel/UniquePtr.h>
 #include <peel/ArrayRef.h>
+#include <peel/String.h>
 #include <peel/signal.h>
 #include <peel/callback.h>
 #include <peel/property.h>
@@ -241,11 +242,12 @@ public:
 
   template<typename CoolCallback>
   int
-  add_cool_callback (peel::RefPtr<GObject::Binding> binding, /* owned */ char *s, CoolCallback &&callback) noexcept
+  add_cool_callback (peel::RefPtr<GObject::Binding> binding, peel::String s, CoolCallback &&callback) noexcept
   {
     gpointer _peel_user_data;
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     ::GBinding * _peel_binding = reinterpret_cast<::GBinding *> (std::move (binding).release_ref ());
+    char * _peel_s = std::move (s).release_string ();
     ::TestCoolCallback _peel_callback = peel::internals::CallbackHelper<::TestTesty *, gboolean *>::wrap_async_callback (
       static_cast<CoolCallback &&> (callback),
       [] (gboolean *b, gpointer user_data) -> ::TestTesty *
@@ -257,7 +259,7 @@ public:
         return reinterpret_cast<::TestTesty *> (std::move (_peel_return).release_ref ());
       },
       &_peel_user_data);
-    return test_testy_add_cool_callback (_peel_this, _peel_binding, s, _peel_callback, _peel_user_data);
+    return test_testy_add_cool_callback (_peel_this, _peel_binding, _peel_s, _peel_callback, _peel_user_data);
   }
 
   /* Unsupported for now: get_cool_callback: casting callback from C to C++ */
@@ -597,12 +599,13 @@ protected:
 
   template<typename DerivedClass, typename CoolCallback>
   int
-  parent_vfunc_add_cool_callback (peel::RefPtr<GObject::Binding> binding, /* owned */ char *s, CoolCallback &&callback) noexcept
+  parent_vfunc_add_cool_callback (peel::RefPtr<GObject::Binding> binding, peel::String s, CoolCallback &&callback) noexcept
   {
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (GObject::TypeClass::peek<DerivedClass> ()->peek_parent ());
     gpointer _peel_user_data;
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
     ::GBinding * _peel_binding = reinterpret_cast<::GBinding *> (std::move (binding).release_ref ());
+    char * _peel_s = std::move (s).release_string ();
     ::TestCoolCallback _peel_callback = peel::internals::CallbackHelper<::TestTesty *, gboolean *>::wrap_async_callback (
       static_cast<CoolCallback &&> (callback),
       [] (gboolean *b, gpointer user_data) -> ::TestTesty *
@@ -614,7 +617,7 @@ protected:
         return reinterpret_cast<::TestTesty *> (std::move (_peel_return).release_ref ());
       },
       &_peel_user_data);
-    return _peel_class->add_cool_callback (_peel_this, _peel_binding, s, _peel_callback, _peel_user_data);
+    return _peel_class->add_cool_callback (_peel_this, _peel_binding, _peel_s, _peel_callback, _peel_user_data);
   }
 
   /* Unsupported for now: get_cool_callback: casting callback from C to C++ */
@@ -1020,7 +1023,8 @@ public:
       {
         DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
         peel::RefPtr<GObject::Binding> _peel_binding = peel::RefPtr<GObject::Binding>::adopt_ref (reinterpret_cast<GObject::Binding *> (binding));
-        auto _peel_return = _peel_this->DerivedClass::vfunc_get_cool_callback (std::move (_peel_binding), s);
+        peel::String _peel_s = peel::String::adopt_string (s);
+        auto _peel_return = _peel_this->DerivedClass::vfunc_get_cool_callback (std::move (_peel_binding), std::move (_peel_s));
         return peel::internals::CallbackHelper<::TestTesty *, gboolean *>::wrap_async_callback (
       static_cast<decltype (_peel_return) &&> (_peel_return),
       [] (gboolean *b, gpointer user_data) -> ::TestTesty *

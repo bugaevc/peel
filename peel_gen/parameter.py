@@ -202,9 +202,11 @@ class Parameter(NodeHandler):
             return not self.caller_allocates
         if tp.is_passed_by_ref():
             return not self.caller_allocates and self.ownership not in (None, 'none')
+        if isinstance(tp, StrType):
+            return self.ownership == 'full'
         if isinstance(tp, PlainType) and tp.corresponds_exactly:
             return False
-        if isinstance(tp, (StrType, Enumeration, Bitfield)):
+        if isinstance(tp, (Enumeration, Bitfield)):
             return False
         return True
 
@@ -383,7 +385,7 @@ class Parameter(NodeHandler):
                 return make_type(constness0 + itp.stdname)
             elif isinstance(itp, StrType):
                 if self.ownership == 'full':
-                    return make_type('/* owned */ char *' + constness1)
+                    return make_type('peel::String' + constness1)
                 else:
                     return make_type('const char *' + constness1)
             elif isinstance(itp, (Enumeration, Bitfield)):
@@ -654,6 +656,8 @@ class Parameter(NodeHandler):
         if not tp.is_passed_by_ref():
             if isinstance(tp, (Enumeration, Bitfield)) or (isinstance(tp, PlainType) and not tp.corresponds_exactly and tp.stdname != self.c_type):
                 return 'static_cast<{}> ({})'.format(c_type, cpp_name)
+            if isinstance(tp, StrType) and self.ownership == 'full':
+                return 'std::move ({}).release_string ()'.format(cpp_name)
             return None
 
         if isinstance(tp, DefinedType) and tp.ns.emit_raw:
@@ -745,6 +749,8 @@ class Parameter(NodeHandler):
                 return 'static_cast<{}> ({})'.format(tp.stdname, c_name)
             if isinstance(tp, (Enumeration, Bitfield)):
                 return 'static_cast<{}> ({})'.format(plain_cpp_type, c_name)
+            if isinstance(tp, StrType) and self.ownership == 'full':
+                return 'peel::String::adopt_string ({})'.format(c_name)
             return None
 
         if isinstance(tp, DefinedType) and tp.ns.emit_raw:

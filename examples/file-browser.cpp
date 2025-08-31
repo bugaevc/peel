@@ -184,9 +184,8 @@ main ()
       Gtk::TreeListRow *tree_list_row = item->get_item ()->cast<Gtk::TreeListRow> ();
       RefPtr<Gio::FileInfo> file_info = tree_list_row->get_item ().cast<Gio::FileInfo> ();
       RefPtr<GLib::DateTime> mtime = file_info->get_modification_date_time ();
-      char *text = mtime->format ("%c");
+      String text = mtime->format ("%c");
       inscription->set_text (text);
-      g_free (text);
     });
   RefPtr<Gtk::ColumnView::Column> mtime_column = Gtk::ColumnView::Column::create (
     "Modification time", std::move (mtime_column_factory));
@@ -207,10 +206,9 @@ main ()
       RefPtr<Gio::FileInfo> file_info = tree_list_row->get_item ().cast<Gio::FileInfo> ();
       Gio::File *file = file_info->get_attribute_object ("standard::file")->cast<Gio::File> ();
       // Call Gio::AppInfo::launch_default_for_uri (), passing the file URI.
-      char *uri = file->get_uri ();
+      String uri = file->get_uri ();
       RefPtr<Gio::AppLaunchContext> launch_context = column_view->get_display ()->get_app_launch_context ();
       Gio::AppInfo::launch_default_for_uri (uri, launch_context, nullptr);
-      g_free (uri);
     });
 
   // Wrap the column view into a scrolled window, to enable scrolling.

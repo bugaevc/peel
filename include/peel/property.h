@@ -10,6 +10,8 @@ peel_begin_header
 namespace peel
 {
 
+class String;
+
 namespace GObject
 {
 class Object;
@@ -172,6 +174,13 @@ struct PspecTraits<const char *>
   {
     return g_param_spec_string (basics.name, basics.nick, basics.blurb, default_value, basics.flags);
   }
+};
+
+/* Allow both String and const char * as logical value types */
+template<>
+struct PspecTraits<String> : PspecTraits<const char *>
+{
+  using PspecTraits<const char *>::PspecTraits;
 };
 
 template<>

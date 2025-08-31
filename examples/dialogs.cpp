@@ -1,6 +1,7 @@
 #include <peel/Gtk/Gtk.h>
 #include <peel/Gdk/RGBA.h>
 #include <peel/GLib/MainContext.h>
+#include <peel/GLib/functions.h>
 
 using namespace peel;
 
@@ -30,15 +31,14 @@ main ()
           UniquePtr<GLib::Error> error;
           UniquePtr<Gdk::RGBA> color = dialog->choose_rgba_finish (res, &error);
 
-          char *text;
+          String text;
           if (error)
-            text = g_strdup_printf ("Failed to pick a color: %s", error->message);
+            text = GLib::strdup_printf ("Failed to pick a color: %s", error->message);
           else
-            text = g_strdup_printf ("Picked rgba (%f, %f, %f, %f)",
+            text = GLib::strdup_printf ("Picked rgba (%f, %f, %f, %f)",
                                     color->red, color->green,
                                     color->blue, color->alpha);
           label->set_label (text);
-          g_free (text);
         });
     }
   );
@@ -58,17 +58,15 @@ main ()
           // https://docs.gtk.org/gtk4/method.FileDialog.open_finish.html
           UniquePtr<GLib::Error> error;
           RefPtr<Gio::File> file = dialog->open_finish (res, &error);
-          char *text;
+          String text;
           if (error)
-            text = g_strdup_printf ("Failed to pick a file: %s", error->message);
+            text = GLib::strdup_printf ("Failed to pick a file: %s", error->message);
           else
             {
-              char *path = file->get_path ();
-              text = g_strdup_printf ("Picked %s", path);
-              g_free (path);
+              String path = file->get_path ();
+              text = GLib::strdup_printf ("Picked %s", (const char *) path);
             }
           label->set_label (text);
-          g_free (text);
         });
     });
   hbox->append (std::move (pick_file_button));
@@ -88,13 +86,12 @@ main ()
           UniquePtr<GLib::Error> error;
           RefPtr<Pango::FontFace> font_face = dialog->choose_face_finish (res, &error);
 
-          char *text;
+          String text;
           if (error)
-            text = g_strdup_printf ("Failed to pick a font: %s", error->message);
+            text = GLib::strdup_printf ("Failed to pick a font: %s", error->message);
           else
             text = font_face->describe ()->to_string ();
           label->set_label (text);
-          g_free (text);
         });
     });
   hbox->append (std::move (pick_font_button));

@@ -8,6 +8,7 @@
 #include <peel/FloatPtr.h>
 #include <peel/UniquePtr.h>
 #include <peel/ArrayRef.h>
+#include <peel/String.h>
 #include <peel/signal.h>
 #include <peel/callback.h>
 #include <peel/property.h>

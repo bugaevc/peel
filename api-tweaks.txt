@@ -197,6 +197,7 @@ vararg	g_print				format
 vararg	g_printerr			format
 #vararg	printf				format
 #vararg	fprintf				format
+vararg	g_strdup_printf			format
 
 # Not actually argv, but close enough:
 vararg	g_build_filename		argv

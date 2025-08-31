@@ -8,6 +8,9 @@ peel_begin_header
 
 namespace peel
 {
+
+class String;
+
 namespace GObject
 {
 
@@ -320,6 +323,13 @@ Type::of<double> ()
 template<>
 constexpr inline Type
 Type::of<const char *> ()
+{
+  return G_TYPE_STRING;
+}
+
+template<>
+constexpr inline Type
+Type::of<String> ()
 {
   return G_TYPE_STRING;
 }
