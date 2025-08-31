@@ -372,7 +372,8 @@ public:
           CTo transform_to;
           CFrom transform_from;
         };
-        TransformClosure *closure = new TransformClosure
+        TransformClosure *closure = reinterpret_cast<TransformClosure *> (g_malloc (sizeof (TransformClosure)));
+        new (closure) TransformClosure
         {
           static_cast<TransformTo &&> (transform_to),
           static_cast<TransformFrom &&> (transform_from)
@@ -381,7 +382,12 @@ public:
         _peel_notify = +[] (gpointer data)
         {
           peel_assume (data);
-          delete reinterpret_cast<TransformClosure *> (data);
+          reinterpret_cast<TransformClosure *> (data)->~TransformClosure ();
+#if GLIB_CHECK_VERSION (2, 76, 0)
+          g_free_sized (data, sizeof (TransformClosure));
+#else
+          g_free (data);
+#endif
         };
         _peel_transform_to = std::is_same<CTo, decltype (nullptr)>::value ? nullptr : +[] (::GBinding *binding, const ::GValue *from_value, ::GValue *to_value, gpointer data) -> gboolean
         {
@@ -753,6 +759,7 @@ struct Object::BindingTransformHelper
   static bool
   transform (C &callback, Binding *binding, const Value *from_value, Value *to_value)
   {
+    /* The callback accepts the binding, plus the two GValues. */
     return callback (binding, from_value, to_value);
   }
 };
@@ -763,6 +770,7 @@ struct Object::BindingTransformHelper<T1, T2, C, decltype (std::declval<Value> (
   static bool
   transform (C &callback, Binding *binding, const Value *from_value, Value *to_value)
   {
+    /* The callback accepts the unpacked "from value", and returns the unpacked "to value". */
     (void) binding;
     to_value->set<T2> (callback (from_value->get<T1> ()));
     return true;

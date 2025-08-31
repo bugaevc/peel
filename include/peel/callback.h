@@ -93,14 +93,20 @@ public:
       }
     else
       {
-        C *heap_f = new C (static_cast<F &&> (f));
+        C *heap_f = reinterpret_cast<C *> (g_malloc (sizeof (C)));
+        new (heap_f) C (static_cast<F &&> (f));
         *out_data = heap_f;
         if (out_notify)
           *out_notify = +[] (gpointer data)
           {
             peel_assume (data);
             C *f = reinterpret_cast<C *> (data);
-            delete f;
+            f->~C ();
+#if GLIB_CHECK_VERSION (2, 76, 0)
+            g_free_sized (f, sizeof (C));
+#else
+            g_free (f);
+#endif
           };
         return +[] (Args... args, gpointer data) -> Ret
         {
@@ -154,7 +160,8 @@ public:
       }
     else
       {
-        C *heap_f = new C (static_cast<F &&> (f));
+        C *heap_f = reinterpret_cast<C *> (g_malloc (sizeof (C)));
+        new (heap_f) C (static_cast<F &&> (f));
         *out_data = heap_f;
         return +[] (Args... args, gpointer data) -> Ret
         {
@@ -166,7 +173,12 @@ public:
           F2 &f2 = *reinterpret_cast<F2 *> (data);
 #endif
           Ret ret = f2 (args..., data);
-          delete reinterpret_cast<C *> (data);
+          reinterpret_cast<C *> (data)->~C ();
+#if GLIB_CHECK_VERSION (2, 76, 0)
+          g_free_sized (data, sizeof (C));
+#else
+          g_free (data);
+#endif
           return ret;
         };
       }
@@ -211,7 +223,8 @@ public:
       }
     else
       {
-        C *heap_f = new C (static_cast<F &&> (f));
+        C *heap_f = reinterpret_cast<C *> (g_malloc (sizeof (C)));
+        new (heap_f) C (static_cast<F &&> (f));
         *out_data = heap_f;
         return +[] (Args... args, gpointer data) -> gboolean
         {
@@ -224,7 +237,14 @@ public:
 #endif
           gboolean again = f2 (args..., data);
           if (!again)
-            delete reinterpret_cast<C *> (data);
+            {
+              reinterpret_cast<C *> (data)->~C ();
+#if GLIB_CHECK_VERSION (2, 76, 0)
+              g_free_sized (data, sizeof (C));
+#else
+              g_free (data);
+#endif
+            }
           return again;
         };
       }
@@ -286,14 +306,20 @@ public:
       }
     else
       {
-        C *heap_f = new C (static_cast<F &&> (f));
+        C *heap_f = reinterpret_cast<C *> (g_malloc (sizeof (C)));
+        new (heap_f) C (static_cast<F &&> (f));
         *out_data = heap_f;
         if (out_notify)
           *out_notify = +[] (gpointer data)
           {
             peel_assume (data);
             C *f = reinterpret_cast<C *> (data);
-            delete f;
+            f->~C ();
+#if GLIB_CHECK_VERSION (2, 76, 0)
+            g_free_sized (f, sizeof (C));
+#else
+            g_free (f);
+#endif
           };
         return +[] (Args... args, gpointer data) -> void
         {
@@ -346,7 +372,8 @@ public:
       }
     else
       {
-        C *heap_f = new C (static_cast<F &&> (f));
+        C *heap_f = reinterpret_cast<C *> (g_malloc (sizeof (C)));
+        new (heap_f) C (static_cast<F &&> (f));
         *out_data = heap_f;
         return +[] (Args... args, gpointer data) -> void
         {
@@ -358,7 +385,12 @@ public:
           F2 &f2 = *reinterpret_cast<F2 *> (data);
 #endif
           f2 (args..., data);
-          delete reinterpret_cast<C *> (data);
+          reinterpret_cast<C *> (data)->~C ();
+#if GLIB_CHECK_VERSION (2, 76, 0)
+          g_free_sized (data, sizeof (C));
+#else
+          g_free (data);
+#endif
         };
       }
   }

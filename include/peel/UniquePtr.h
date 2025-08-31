@@ -143,7 +143,11 @@ private:
        know at compile time that it's nullptr that we're dealing with. */
     if (!__builtin_constant_p (ptr == nullptr) || (ptr != nullptr))
 #endif
-    g_free (reinterpret_cast<gpointer> (ptr));
+#if GLIB_CHECK_VERSION (2, 76, 0)
+      g_free_sized (ptr, sizeof (T) * c);
+#else
+      g_free (ptr);
+#endif
     ptr = nullptr;
     c = 0;
   }
