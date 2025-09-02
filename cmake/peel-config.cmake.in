@@ -2,16 +2,19 @@ cmake_minimum_required(VERSION 3.16)
 
 find_package (Python3 REQUIRED)
 
+set (peel_VERSION "@version@")
 set (peel_LIBRARIES)
 set (peel_INCLUDE_DIRS "@includedir@")
 set (PEEL_GEN_MODULE "@peel_gen_path@")
-mark_as_advanced (peel_LIBRARIES peel_INCLUDE_DIRS PEEL_GEN_MODULE)
+mark_as_advanced (peel_VERSION peel_LIBRARIES peel_INCLUDE_DIRS PEEL_GEN_MODULE)
 
 add_library (peel::peel INTERFACE IMPORTED)
 set_property (TARGET peel::peel APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES "${peel_INCLUDE_DIRS}")
 
 include (FindPackageHandleStandardArgs)
-find_package_handle_standard_args (peel DEFAULT_MSG)
+find_package_handle_standard_args (peel
+  REQUIRED_VARS PEEL_GEN_MODULE peel_INCLUDE_DIRS
+  VERSION_VAR peel_VERSION)
 
 function (peel_generate GIR_NAME GIR_VERSION)
   # Parse our arguments.
