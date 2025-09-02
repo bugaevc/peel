@@ -1,45 +1,5 @@
 # Gotchas and Pitfalls
 
-## `gettext` return type
-
-For internationalization, it is common to use [gettext with glib]. Here's a
-simple example of using `gettext` to make the button's label translatable:
-
-```cpp
-auto button = Gtk::Button::create_with_label (_("Save Changes"));
-```
-
-This works great. Where things may go wrong is when you try to use this in
-combination with properties (or values):
-
-```cpp
-auto button = Object::create<Gtk::Button> (
-  Gtk::Button::prop_label (), _("Save Changes"),  /* <- broken! */
-  Gtk::Widget::prop_halign (), Gtk::Align::CENTER,
-  Gtk::Actionable::prop_action_name (), "win.save");
-```
-
-This is due to combination of:
-* `gettext ()` [being declared][gettext-declaration] as returning `char *`, not
-  `const char *`, for some reason,
-* peel's `Value` machinery interpreting `char *` as an _owned_ string, which
-  the value takes ownership of (by using [`g_value_take_string`]), and will
-  eventually attempt to free with [`g_free`].
-
-To avoid this, explicitly cast the string returned from `gettext ()` to
-`const char *` when it's used in a property or value context:
-
-```cpp
-button->set_property (
-  Gtk::Button::prop_label (),
-  (const char *) _("Save Changes"));
-```
-
-[gettext with glib]: https://docs.gtk.org/glib/i18n.html
-[gettext-declaration]: https://www.gnu.org/software/gettext/manual/html_node/Interface-to-gettext.html
-[`g_value_take_string`]: https://docs.gtk.org/gobject/method.Value.take_string.html
-[`g_free`]: https://docs.gtk.org/glib/func.free.html
-
 ## Capturing `WeakPtr`
 
 blah blah
@@ -57,9 +17,9 @@ particular:
 * floating-point numbers get set to 0.0,
 * raw pointers get set to `nullptr`,
 * as an additional guarantee, peel smart pointers (such as [`RefPtr`],
-  [`WeakPtr`], [`UniquePtr`]) get set to `nullptr`.
+  [`WeakPtr`], [`UniquePtr`], [`String`]) get set to `nullptr`.
 
-However, for more complex types (for example, [`std::string`]), the C++
+However, for more complex types (for example, [`std::vector`]), the C++
 language requires the actual constructor to be invoked. This happens implicitly
 when you _do_ use a C++ constructor in your own class:
 
@@ -69,12 +29,12 @@ class MyClass
 public:
   MyClass ();
   int m_int;
-  std::string m_str;
+  std::vector<int> m_vector;
 };
 
 MyClass::MyClass ()
  : m_int (42)
- /* m_str implicitly constructed here */
+ /* m_vector implicitly constructed here */
 {
   std::cout << "My C++ constructor" << std::endl;
 }
@@ -90,7 +50,7 @@ class MyWidget : public Gtk::Widget
   /* ... */
 
   int m_int;
-  std::string m_str;
+  std::vector<int> m_vector;
 
   inline void
   init (Class *);
@@ -100,7 +60,7 @@ inline void
 MyWidget::init (Class *)
 {
   m_int = 42;
-  new (&m_str) std::string;
+  new (&m_vector) std::vector<int>;
 }
 ```
 
@@ -112,6 +72,7 @@ have to do anything explicitly to make it happen.
 [`RefPtr`]: ref-ptr.md
 [`WeakPtr`]: weak-ptr.md
 [`UniquePtr`]: unique-ptr.md
-[`std::string`]: https://en.cppreference.com/w/cpp/string/basic_string
+[`String`]: string.md
+[`std::vector`]: https://en.cppreference.com/w/cpp/container/vector.html
 [placement new]: https://en.cppreference.com/w/cpp/language/new#Placement_new
 [`finalize` vfunc]: https://docs.gtk.org/gobject/vfunc.Object.finalize.html

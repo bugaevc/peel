@@ -3,6 +3,7 @@
 - [Chapter 1](./chapter_1.md)
 
 - [Build Setup](build-setup.md)
+    - [Running peel-gen](peel-gen.md)
     - [Using peel with CMake](using-peel-with-cmake.md)
     - [Using peel with Meson](using-peel-with-meson.md)
 - [The Basics](the-basics.md)
@@ -12,6 +13,7 @@
     - [UniquePtr](unique-ptr.md)
     - [FloatPtr](float-ptr.md)
     - [WeakPtr](weak-ptr.md)
+    - [String](string.md)
     - [ArrayRef](array-ref.md)
     - [UniquePtr to array](unique-ptr-arr.md)
 - [Custom GObject Classes](custom-gobject-classes.md)
