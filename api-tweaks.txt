@@ -152,10 +152,26 @@ no-autofree GMemChunk
 no-autofree GOptionGroup
 no-autofree GPtrArray
 no-autofree GThreadPool
-include	g_access			glib/gstdio.h
-include	g_chmod				glib/gstdio.h
-include	g_open				glib/gstdio.h
-include	g_creat				glib/gstdio.h
+
+include	g_chdir				glib/gstdio.h
+include	g_close				glib/gstdio.h
+include	g_lstat				glib/gstdio.h
+include	g_rmdir				glib/gstdio.h
+include	g_stat				glib/gstdio.h
+include	g_unlink			glib/gstdio.h
+include	g_vfprintf			glib/gstdio.h
+include	g_vprintf			glib/gstdio.h
+# These are broken due to macro usage, and not useful anyway.
+skip	g_access
+skip	g_chmod
+skip	g_creat
+skip	g_fopen
+skip	g_fsync
+skip	g_mkdir
+skip	g_open
+skip	g_remove
+skip	g_rename
+
 float	GVariant
 #ref-sink GVariant			g_variant_ref_sink
 nest	GVariantType			Variant::Type
