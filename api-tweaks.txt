@@ -1272,6 +1272,7 @@ vararg	gst_bin_remove_many			argv
 nest	GstEventType			Event::Type
 nest	GstMessageType			Message::Type
 nest	GstQueryType			Query::Type
+onstack GstMapInfo
 
 # Json (json-glib)
 no-autofree JsonNode
