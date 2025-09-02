@@ -25,11 +25,16 @@ gtk_examples = [
   'simple-label',
   'type-tree',
   'bind-property',
-  'color-gradient',
-  'dialogs',
   'file-browser',
   'scrollable-widget',
 ]
+
+if gtk4.version().version_compare('>= 4.10')
+  gtk_examples += [
+    'color-gradient',
+    'dialogs',
+  ]
+endif
 
 foreach example : gtk_examples
   executable(example,

@@ -1,4 +1,5 @@
 #include <peel/Gtk/Gtk.h>
+#include <peel/Gdk/RGBA.h>
 #include <peel/Graphene/Rect.h>
 #include <peel/GLib/MainContext.h>
 #include <peel/class.h>

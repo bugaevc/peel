@@ -121,7 +121,9 @@ main ()
     [] (Gtk::SignalListItemFactory *, Object *obj)
     {
       Gtk::ListItem *item = obj->cast<Gtk::ListItem> ();
+#if GTK_CHECK_VERSION (4, 12, 0)
       item->set_focusable (false);
+#endif
       item->set_child (MainColumnCell::create ());
     });
   main_column_factory->connect_bind (
@@ -143,7 +145,9 @@ main ()
     [] (Gtk::SignalListItemFactory *, Object *obj)
     {
       Gtk::ListItem *item = obj->cast<Gtk::ListItem> ();
+#if GTK_CHECK_VERSION (4, 12, 0)
       item->set_focusable (false);
+#endif
       item->set_child (Gtk::Inscription::create (nullptr));
     });
   size_column_factory->connect_bind (
@@ -167,7 +171,9 @@ main ()
     [] (Gtk::SignalListItemFactory *, Object *obj)
     {
       Gtk::ListItem *item = obj->cast<Gtk::ListItem> ();
+#if GTK_CHECK_VERSION (4, 12, 0)
       item->set_focusable (false);
+#endif
       item->set_child (Gtk::Inscription::create (nullptr));
     });
   mtime_column_factory->connect_bind (

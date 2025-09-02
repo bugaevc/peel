@@ -1,6 +1,6 @@
 #include <peel/Gtk/Gtk.h>
 #include <peel/Gdk/Gdk.h>
-#include <peel/Gsk/Gsk.h>
+#include <peel/Gsk/RenderNode.h>
 #include <peel/Gio/Gio.h>
 #include <peel/GLib/String.h>
 
@@ -48,7 +48,9 @@ main ()
   /* Initialize some types */
   Gtk::init ();
   Type::of<Gdk::Toplevel::Size> ().ensure ();
+#if GTK_CHECK_VERSION (4, 12, 0)
   Type::of<Gdk::DragSurface::Size> ().ensure ();
+#endif
   Type::of<Value> ().ensure ();
   (void) Gtk::HeaderBar::create ();
   {
