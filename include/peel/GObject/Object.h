@@ -581,7 +581,7 @@ public:
       {
         Type type = tp;
         ConstructParam *params = reinterpret_cast<ConstructParam *> (raw_params);
-        RefPtr<Object> obj = DerivedClass::vfunc_constructor (type, ArrayRef { params, n });
+        RefPtr<Object> obj = DerivedClass::vfunc_constructor (type, ArrayRef<ConstructParam> { params, n });
         return reinterpret_cast<::GObject *> (std::move (obj).release_ref ());
       };
     }
