@@ -118,7 +118,7 @@ inline void
 Label::vfunc_snapshot (Gtk::Snapshot *snapshot)
 {
   Gdk::RGBA text_color;
-#if 0 && GTK_CHECK_VERSION (4, 10, 0)
+#if GTK_CHECK_VERSION (4, 10, 0)
   get_color (&text_color);
 #else
   get_style_context ()->get_color (&text_color);
