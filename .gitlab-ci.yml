@@ -4,7 +4,7 @@ test:
   before_script:
     - apt update && apt install -y meson libgirepository1.0-dev python3 g++ libgtk-4-dev
   script:
-    - meson setup build -Dcpp_std=c++11 -Dbuild_examples=true
+    - CXX=gcc meson setup build -Dcpp_std=c++11 -Dcpp_eh=none -Dbuild_examples=true
     - meson compile -C build
     - meson test -C build
 
