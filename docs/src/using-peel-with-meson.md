@@ -38,7 +38,12 @@ a custom target manually:
 peel_gen = find_program('peel-gen')
 
 peel_gtk = custom_target('peel-codegen',
-  command: [peel_gen, '--recursive', 'Gtk', '4.0'],
+  command: [
+    peel_gen,
+    '--recursive',
+    '--out-dir', '@OUTDIR@',
+    'Gtk', '4.0',
+  ],
   output: 'peel',
 )
 ```
@@ -73,7 +78,12 @@ peel = dependency('peel')
 
 peel_gen = find_program('peel-gen')
 peel_gtk = custom_target('peel-codegen',
-  command: [peel_gen, '--recursive', 'Gtk', '4.0'],
+  command: [
+    peel_gen,
+    '--recursive',
+    '--out-dir', '@OUTDIR@',
+    'Gtk', '4.0',
+  ],
   output: 'peel',
 )
 

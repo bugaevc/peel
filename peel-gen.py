@@ -147,12 +147,13 @@ def emit_file(repo, file_path, members):
             target_file.write('#include <{}>\n'.format(include))
     return True
 
-def emit_repo(repo):
+def emit_repo(repo, out_dir):
+    out_dir = Path(out_dir)
     for ns in repo.namespaces:
         if ns.name in peel_gen.namespace.raw_namespace_names:
             continue
         base_path = Path('peel') / ns.name
-        base_path.mkdir(parents=True, exist_ok=True)
+        (out_dir / base_path).mkdir(parents=True, exist_ok=True)
         functions = []
         emitted_files = []
         for member in ns.members:
@@ -162,16 +163,16 @@ def emit_repo(repo):
             elif not ns.should_emit_file(member):
                 continue
             file_path = member.make_file_path()
-            if emit_file(repo, file_path, [member]):
+            if emit_file(repo, out_dir / file_path, [member]):
                 emitted_files.append(file_path)
 
         if functions:
             file_path = base_path / 'functions.h'
-            if emit_file(repo, file_path, functions):
+            if emit_file(repo, out_dir / file_path, functions):
                 emitted_files.append(file_path)
 
         file_path = base_path / '{}.h'.format(ns.name)
-        emit_umbrella_header(repo, file_path, emitted_files)
+        emit_umbrella_header(repo, out_dir / file_path, emitted_files)
 
 def main():
     arg_parser = ArgumentParser(prog='peel-gen')
@@ -183,6 +184,7 @@ def main():
     arg_parser.add_argument('--raw', action='append', default=[], metavar='namespace')
     arg_parser.add_argument('--api-tweaks', action='append', default=[], metavar='path')
     arg_parser.add_argument('-r', '--recursive', action='store_true')
+    arg_parser.add_argument('--out-dir', default='.', metavar='path')
 
     args = arg_parser.parse_args()
     peel_gen.namespace.raw_namespace_names = args.raw
@@ -194,9 +196,9 @@ def main():
     repo = find_and_parse_gir_repo(args.name, args.version)
     if args.recursive:
         for repo in repository_map.values():
-            emit_repo(repo)
+            emit_repo(repo, out_dir=args.out_dir)
     else:
-        emit_repo(repo)
+        emit_repo(repo, out_dir=args.out_dir)
 
 if __name__ == '__main__':
     main()
