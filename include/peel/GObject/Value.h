@@ -441,9 +441,6 @@ struct Value::Traits<const char *>
   {
     return c;
   }
-
-  static const char *
-  cast_for_create (char *) = delete;
 };
 
 /* Allow both String and const char * as logical value types */
