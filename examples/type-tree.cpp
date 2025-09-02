@@ -47,9 +47,12 @@ main ()
 {
   /* Initialize some types */
   Gtk::init ();
-  Type::of<Gdk::Toplevel::Size> ().ensure ();
 #if GTK_CHECK_VERSION (4, 12, 0)
   Type::of<Gdk::DragSurface::Size> ().ensure ();
+#endif
+#if GTK_CHECK_VERSION (4, 16, 0)
+  /* Seemingly broken on older systems? */
+  Type::of<Gdk::Toplevel::Size> ().ensure ();
 #endif
   Type::of<Value> ().ensure ();
   (void) Gtk::HeaderBar::create ();
