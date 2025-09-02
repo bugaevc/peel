@@ -5,6 +5,8 @@
 #include <peel/Gtk/Gtk.h>
 #include <peel/Gsk/Transform.h>
 #include <peel/Graphene/Point.h>
+#include <peel/Gio/Application.h>
+#include <peel/Gio/ApplicationFlags.h>
 #include <peel/class.h>
 #include <peel/enum.h>
 
@@ -177,9 +179,9 @@ should_swap_width_and_height (Rotation rotation)
     case Rotation::LEFT:
     case Rotation::RIGHT:
       return true;
+    default:
+      g_assert_not_reached ();
     }
-
-  g_assert_not_reached ();
 }
 
 inline void
@@ -291,6 +293,8 @@ RotationBin::rotate_clockwise ()
     case Rotation::LEFT:
       new_rotation = Rotation::NORMAL;
       break;
+    default:
+      g_assert_not_reached ();
     }
 
   set_rotation (new_rotation);
@@ -315,6 +319,8 @@ RotationBin::rotate_counter_clockwise ()
     case Rotation::LEFT:
       new_rotation = Rotation::FLIP;
       break;
+    default:
+      g_assert_not_reached ();
     }
 
   set_rotation (new_rotation);

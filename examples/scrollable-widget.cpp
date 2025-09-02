@@ -288,14 +288,14 @@ Table::vfunc_snapshot (Gtk::Snapshot *snapshot)
       {
         Gdk::RGBA rgba
         {
-          ((row + (column * 2)) % 10) / 10.0,
-          (((row * 2) + column) % 10) / 10.0,
-          ((row + column) % 10) / 10.0,
-          1.0
+          ((row + (column * 2)) % 10) / 10.0f,
+          (((row * 2) + column) % 10) / 10.0f,
+          ((row + column) % 10) / 10.0f,
+          1.0f
         };
         Graphene::Rect bounds
         {
-          { column * CELL_SIZE - hadj, row * CELL_SIZE - vadj },
+          { float (column * CELL_SIZE - hadj), float (row * CELL_SIZE - vadj) },
           { CELL_SIZE, CELL_SIZE }
         };
         snapshot->append_color (&rgba, &bounds);
