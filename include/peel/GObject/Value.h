@@ -425,16 +425,12 @@ struct Value::Traits<const char *>
     take (value, std::move (str));
   }
 
-/*
-  TODO: This is bound to break. Unlike with objects, I don't think
-  any signal is actually doing this?
-
   static void
   set_marshal_return (::GValue *value, const char *str) noexcept
   {
-    g_value_take_string (value, const_cast<char *> (str));
+    /* whee! */
+    g_value_set_static_string (value, str);
   }
-*/
 
   static const char *
   cast_for_create (const char *c) noexcept
