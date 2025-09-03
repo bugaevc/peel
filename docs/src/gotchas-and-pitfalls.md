@@ -1,5 +1,35 @@
 # Gotchas and Pitfalls
 
+## using namespace peel
+
+It is often convenient to write
+
+```cpp
+using namespace peel;
+```
+
+and refer to the APIs by their natural-sounding names such as `Gtk::Button`
+(instead of `peel::Gtk::Button`). We indeed recommend that you do so, and
+examples in this documentation are written assuming `using namespace peel`.
+
+There is an issue with this however, in that the `peel::GObject` namespace has
+the same name as the C `GObject` type (which is known as `GObject::Object` in
+peel), so any reference to `GObject` in the code following
+`using namespace peel` becomes ambiguous. This is not a huge issue by itself,
+since you can just use qualified names: namely, refer to the C type as
+`::GObject` (and peel itself takes care to always do so), and to the peel
+namespace as `peel::GObject`.
+
+However, while your code may do this, the C headers of libraries you include
+will still refer to the C type as simply `GObject`. So any `#include` of a C
+header (perhaps itself coming from a peel header) following
+`using namespace peel` is likely to break.
+
+So in implementation files (`.cpp`), you should include the headers first, and
+only then write `using namespace peel`. And in headers, you cannot use
+`using namespace peel` at all (at least, not in the root namespace), because
+some other header can always be included after yours.
+
 ## Capturing `WeakPtr`
 
 blah blah
