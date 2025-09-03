@@ -1,7 +1,6 @@
 # Summary
 
-- [Chapter 1](./chapter_1.md)
-
+- [Introduction](introduction.md)
 - [Build Setup](build-setup.md)
     - [Running peel-gen](peel-gen.md)
     - [Using peel with CMake](using-peel-with-cmake.md)
@@ -21,3 +20,4 @@
 - [Gotchas and Pitfalls](gotchas-and-pitfalls.md)
 - [C++20 coroutines]()
 - [peel internals]()
+    - [Local copies](local-copies.md)
