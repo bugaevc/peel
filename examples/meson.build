@@ -16,6 +16,12 @@ peel_gtk = custom_target('peel-gtk-codegen',
   output: 'peel',
 )
 
+glib_examples = [
+  'simple-class',
+  'properties-and-signals',
+]
+# TODO: add coro/async-result.cpp with C++20 / __cpp_impl_coroutine.
+
 gtk_examples = [
   'gtk-builder',
   'hello-gtk',
@@ -35,6 +41,15 @@ if gtk4.version().version_compare('>= 4.10')
     'dialogs',
   ]
 endif
+
+foreach example : glib_examples
+  executable(example,
+    example + '.cpp',
+    peel_gtk,
+    dependencies: [glib, peel_dep],
+    install: false
+  )
+endforeach
 
 foreach example : gtk_examples
   executable(example,
