@@ -835,6 +835,7 @@ pointer	GdkDragSurfaceSize
 onstack	GdkRGBA
 onstack	GdkRectangle
 onstack	GdkTimeCoord
+onstack	GdkKeymapKey
 
 # https://gitlab.gnome.org/GNOME/gtk/-/issues/6167
 unowned	gdk_drop_read_finish		out_mime_type
