@@ -74,6 +74,14 @@ public:
   }
 
   String &
+  operator = (decltype (nullptr)) noexcept
+  {
+    do_free ();
+    str = nullptr;
+    return *this;
+  }
+
+  String &
   operator = (String &&other) noexcept
   {
     do_free ();
