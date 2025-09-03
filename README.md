@@ -1,6 +1,6 @@
 # peel
 
-Peel provides modern C++ bindings for GObject-based libraries, including the [GTK toolkit](https://gtk.org/).
+peel provides modern C++ bindings for GObject-based libraries, including the [GTK toolkit](https://gtk.org/).
 It notably makes some different design choices from the existing bindings.
 
 **Design goals** include:
@@ -15,7 +15,7 @@ It notably makes some different design choices from the existing bindings.
 * most of the wrapper code is automatically generated from GObject introspection
   data, meaning the API coverage is mostly complete and up-to-date.
 
-Peel is a header-only library providing wrappers that are intended to be completely
+peel is a header-only library providing wrappers that are intended to be completely
 inlined into your code. The peel project consists of two parts: manually written bindings
 to the few fundamental types (such as `GObject::Object`), and the code generator, a
 Python script with no external dependencies, that generates bindings to the majority
