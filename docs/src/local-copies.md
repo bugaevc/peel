@@ -53,13 +53,12 @@ baz (peel::RefPtr<GObject::Object> *out_object) noexcept
 }
 ```
 
-This way, this way, setting the value to `*out_object` goes through the C++
-`operator =`, which properly unsets the previous value, and is "less UB"
-compared to what would happen if we simply casted the pointer to `::GObject **`
-and let the C code overwrite it, without using a local copy. Again, the hope
-here is that the compiler will see through this and merge the two variables,
-especially when the `*out_object` points to a fresh, null-initialized
-`RefPtr` variable.
+This way, setting the value to `*out_object` goes through the C++ `operator =`,
+which properly unsets the previous value, and is "less UB" compared to what
+would happen if we simply casted the pointer to `::GObject **` and let the C
+code overwrite it, without using a local copy. Again, the hope here is that
+the compiler will see through this and merge the two variables, especially
+when the `*out_object` points to a fresh, null-initialized `RefPtr` variable.
 
 Another reason for needing to make a local copy is when the parameter is
 optional, but we need to pass non-null into the C function even when null is
@@ -75,7 +74,7 @@ read_some_string (peel::String *out_string, peel::UniquePtr<GLib::Error> *error)
 {
   gchar *_peel_out_string;
   ::GError *_peel_error = nullptr;
-  c_read_some_data (&_peel_out_string, &_peel_error);
+  c_read_some_string (&_peel_out_string, &_peel_error);
   if (_peel_error)
     {
       /* An error happened, _peel_out_string contains garbage */
