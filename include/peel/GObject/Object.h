@@ -197,11 +197,11 @@ protected:
 
   template<typename DerivedClass>
   static RefPtr<Object>
-  parent_vfunc_constructor (Type type, size_t n_construct_params, ConstructParam params[]) noexcept
+  parent_vfunc_constructor (Type type, ArrayRef<ConstructParam> params) noexcept
   {
     ::GObjectClass *klass = reinterpret_cast<::GObjectClass *> (TypeClass::peek<DerivedClass> ()->peek_parent ());
-    ::GObjectConstructParam *peel_params = reinterpret_cast<::GObjectConstructParam *> (params);
-    ::GObject *obj = klass->constructor (type, n_construct_params, peel_params);
+    ::GObjectConstructParam *peel_params = reinterpret_cast<::GObjectConstructParam *> (params.data ());
+    ::GObject *obj = klass->constructor (type, params.size (), peel_params);
     return RefPtr<Object>::adopt_ref (reinterpret_cast<Object *> (obj));
   }
 
