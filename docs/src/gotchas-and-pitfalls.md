@@ -30,9 +30,83 @@ only then write `using namespace peel`. And in headers, you cannot use
 `using namespace peel` at all (at least, not in the root namespace), because
 some other header can always be included after yours.
 
+C++ Core Guidelines also [warn about this](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#sf7-dont-write-using-namespace-at-global-scope-in-a-header-file):
+
+> *SF.7: Don’t write `using namespace` at global scope in a header file*
+
 ## Capturing `WeakPtr`
 
-blah blah
+For [complex reasons], C++ currently lacks a way to reliably detect _trivially
+relocatable_ types, that is, types whose values can be safely "moved" around
+in memory without having to invoke their move constructor and destructor.
+(Technically, without the standard's blessing, only primitive types are
+trivially relocatable, but in practice many others are as well.)
+
+[complex reasons]: https://quuxplusone.github.io/blog/tags/#relocatability
+
+peel sometimes uses trivial relocations when passing C++ callbacks (e.g.
+lambdas) to C APIs. Specifically, if the captured data is pointer-sized (or
+less) and certain other conditions are met, peel will pack the captured data
+into the `gpointer user_data` argument of C functions, instead of making a
+heap allocation and storing the captured data there. This is an important
+optimization, and it matches what a C programmer would do when using the C API
+directly. However, it relies on trivial relocation being valid for the
+captured data.
+
+Given that containg self-references (pointers to other parts of the same
+object) is the primary reason for a type to _not_ be trivially relocatable,
+peel is usually justified in treating pointer-sized types as trivially
+relocatable: indeed, there's just no place in a pointer-sized type to contain
+both the pointer and the pointee. However, there is an important type in peel
+itself that is pointer-sized, yet not trivially relocatable for a different
+reason, and that is [`WeakPtr`].
+
+[`WeakPtr`]: weak-ptr.md
+
+This means that code that only captures a single `WeakPtr` in a callback
+lambda is typically broken, because of this (optimistic, but in this case,
+incorrect) assumption that peel makes:
+
+```cpp
+~#include <peel/GLib/functions.h>
+~
+~using namespace peel;
+~
+Gtk::Button *button = /* ... */;
+
+GLib::idle_add_once (
+  [button = WeakPtr (button)]  /* <--- broken! */
+  {
+    if (!button)
+      return;
+
+    button->set_label ("New label");
+  });
+```
+
+The workaround is to add another capture, perhaps of a dummy variable:
+
+```cpp
+~#include <peel/GLib/functions.h>
+~
+~using namespace peel;
+~
+Gtk::Button *button = /* ... */;
+
+GLib::idle_add_once (
+  [button = WeakPtr (button), workaround = true]
+  {
+    if (!button)
+      return;
+
+    button->set_label ("New label");
+  });
+```
+
+Note also that Microsoft's MSVC compiler has a bug where it might parse
+references to `this` inside the lambda capture list (e.g.
+`self = WeakPtr (this)`) as referring to the lambda object and not an
+instance of the containing class.
 
 ## Complex fields in GObject classes
 
