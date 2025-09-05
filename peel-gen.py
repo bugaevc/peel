@@ -7,11 +7,13 @@ from pathlib import Path
 # These will be set by Meson in the installed file.
 peel_gen_module_path = r'@module_path@'
 builtin_api_tweaks_path = r'@api_tweaks_path@'
+peel_version = r'@peel_version@'
 
 if peel_gen_module_path == '@' + 'module_path' + '@':
     # Running uninstalled from the source tree.
     peel_gen_module_path = str(Path(__file__).parent)
     builtin_api_tweaks_path = Path(peel_gen_module_path) / 'api-tweaks.txt'
+    peel_version = '(uninstalled)'
 
 sys.path.insert(0, peel_gen_module_path)
 
@@ -181,6 +183,7 @@ def main():
     # TODO: Don't require version
     arg_parser.add_argument('version', metavar='repo-version')
 
+    arg_parser.add_argument('--version', action='version', version='peel ' + peel_version)
     arg_parser.add_argument('--raw', action='append', default=[], metavar='namespace')
     arg_parser.add_argument('--api-tweaks', action='append', default=[], metavar='path')
     arg_parser.add_argument('-r', '--recursive', action='store_true')

@@ -23,11 +23,13 @@ if meson.is_subproject()
   conf = {
     'module_path': join_paths(meson.current_source_dir()),
     'api_tweaks_path': meson.current_source_dir() / 'api-tweaks.txt',
+    'peel_version': meson.project_version(),
   }
 else
   conf = {
     'module_path': join_paths(py.get_install_dir()),
     'api_tweaks_path': get_option('prefix') / get_option('datadir') / 'peel' / 'api-tweaks.txt',
+    'peel_version': meson.project_version(),
   }
 endif
 
