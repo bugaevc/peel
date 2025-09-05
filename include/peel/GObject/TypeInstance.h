@@ -87,6 +87,18 @@ public:
     return G_TYPE_INSTANCE_GET_CLASS (this, this doesnt matter, TypeClass);
   }
 
+  template<typename T>
+  typename T::Class *
+  get_class () const noexcept
+  {
+    TypeClass *klass = get_class ();
+#if defined (G_DISABLE_CAST_CHECKS) || defined (__OPTIMIZE__)
+    return reinterpret_cast<typename T::Class *> (klass);
+#else
+    return G_TYPE_CHECK_CLASS_CAST (klass, Type::of<T> (), typename T::Class);
+#endif
+  }
+
   TypeInterface *
   get_interface (Type tp) const noexcept
   {

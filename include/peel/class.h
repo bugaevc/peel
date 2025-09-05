@@ -242,6 +242,7 @@ GObject::Type::of ()
 
 #define PEEL_CLASS(Subclass)                                                   \
   friend class ::peel::GObject::Object;                                        \
+  friend class ::peel::GObject::TypeInstance;                                  \
   friend class ::peel::GObject::TypeClass;                                     \
   friend struct ::peel::internals::ClassHelper<Subclass>;                      \
   template<typename, typename> /* workaround Clang bug */                      \
