@@ -804,21 +804,30 @@ class Parameter(NodeHandler):
         else:
             raise UnsupportedForNowException('no idea about ownership semantics')
 
-    def generate_rv_function_attributes(self, throws):
-        assert(self.is_rv)
-        # TODO: duplicated logic with Parameters.should_add_nonnull()
+    def should_add_nonnull(self):
         tp = chase_type_aliases(self.type)
         if isinstance(tp, (Callback, Array)):
-            return []
-        if self.ownership is not None and self.ownership != 'none':
-            return []
-        if not tp.is_passed_by_ref():
-            return []
-        if self.nullable:
-            return []
-        if throws:
-            return []
-        return ['peel_returns_nonnull']
+            return False
+        if self.closure is not None:
+            return False
+        if self.is_cpp_this() or self.name == '...':
+            return False
+        if self.direction == 'in':
+            if not tp.is_passed_by_ref() and not isinstance(tp, StrType):
+                return False
+            if self.ownership not in (None, 'none'):
+                # Cannot use peel_nonnull_args/peel_returns_nonnull on smart pointers
+                return False
+            return not self.nullable
+        else:
+            return not self.optional
+
+
+    def generate_rv_function_attributes(self, throws):
+        assert(self.is_rv)
+        if not throws and self.should_add_nonnull():
+            return ['peel_returns_nonnull']
+        return []
 
     def generate_post_call_assumes(self, thrown):
         assert(self.is_rv)

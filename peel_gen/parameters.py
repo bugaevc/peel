@@ -121,19 +121,6 @@ class Parameters(NodeHandler):
             return None
         return l
 
-    def should_add_nonnull(self, p, tp):
-        if p.is_cpp_this():
-            return False
-        if p.ownership is not None and p.ownership != 'none':
-            # Cannot use peel_nonnull_args () on smart pointers
-            return False
-        if p.direction == 'in':
-            if not tp.is_passed_by_ref():
-                return False
-            return not p.nullable
-        else:
-            return not p.optional
-
     def should_add_arg_in(self, p, tp):
         if p.is_instance:
             return False
@@ -162,10 +149,18 @@ class Parameters(NodeHandler):
                 continue
             tp = chase_type_aliases(p.type)
             if isinstance(tp, (Callback, Array)) or p.closure is not None:
-                # Do not even bother
+                # Do not even bother.
                 index += 1
                 continue
-            if self.should_add_nonnull(p, tp):
+            if (
+                len(self.params) >= 2 and
+                p is self.params[-2] and
+                self.params[-1].name == '...' and
+                self.params[-1].vararg_mode == 'object-new'
+            ):
+                # This parameter will be gone from the C++ signature.
+                continue
+            if p.should_add_nonnull():
                 nonnull_args.append(index)
             if self.should_add_arg_in(p, tp):
                 l.append('peel_arg_in ({})'.format(index))

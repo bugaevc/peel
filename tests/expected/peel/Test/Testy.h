@@ -159,7 +159,7 @@ public:
     test_testy_get_out_object (_peel_this, _peel_obj_ptr);
   }
 
-  peel_arg_out (2)
+  peel_arg_out (2) peel_nonnull_args (2)
   void
   get_out_owned_object (peel::RefPtr<GObject::Object> *obj_ptr) noexcept
   {
@@ -468,6 +468,7 @@ public:
   }
 
   template<typename... Args>
+  peel_nonnull_args (2)
   void
   argv_transfer_none_str (const char *first_str, Args &&...args) noexcept
   {
@@ -560,7 +561,7 @@ protected:
   }
 
   template<typename DerivedClass>
-  peel_arg_out (2)
+  peel_arg_out (2) peel_nonnull_args (2)
   void
   parent_vfunc_get_out_owned_object (peel::RefPtr<GObject::Object> *obj_ptr) noexcept
   {
