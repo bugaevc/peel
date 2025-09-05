@@ -1,6 +1,7 @@
 #pragma once
 
 #include <type_traits>
+#include <utility>
 
 #if defined (__has_attribute)
 #define peel_has_attribute(attr) __has_attribute (attr)
@@ -46,7 +47,9 @@
 #define peel_assume(expr) do { } while (0)
 #endif
 
-#if defined (__GNUC__)
+#if __cpp_lib_unreachable >= 202202L
+#define peel_unreachable std::unreachable ()
+#elif defined (__GNUC__)
 #define peel_unreachable __builtin_unreachable ()
 #else
 #define peel_unreachable peel_assume (false)
