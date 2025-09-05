@@ -1250,6 +1250,7 @@ float	gst_element_make_from_uri	return
 float	gst_element_class_add_pad_template	templ
 float	gst_element_add_pad	pad
 vararg	gst_element_link_many	argv
+vararg	gst_element_unlink_many	argv
 float	gst_device_create_element	return
 float	gst_parse_launch	return
 float	gst_parse_launchv	return
@@ -1268,6 +1269,18 @@ float	gst_bin_add			element
 float	gst_bin_add_many			element_1
 vararg	gst_bin_add_many			argv
 vararg	gst_bin_remove_many			argv
+vararg	gst_caps_new_full			argv
+vararg	gst_caps_features_new			argv
+vararg	gst_structure_remove_fields		argv
+vararg	gst_element_decorate_stream_id_printf	format
+vararg	gst_pad_create_stream_id_printf		format
+vararg	gst_debug_log				format
+vararg	gst_debug_log_id			format
+vararg	gst_info_strdup_printf			format
+vararg	gst_print				format
+vararg	gst_printerr				format
+vararg	gst_printerrln				format
+vararg	gst_println				format
 nest	GstEventType			Event::Type
 nest	GstMessageType			Message::Type
 nest	GstQueryType			Query::Type
