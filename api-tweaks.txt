@@ -1252,6 +1252,7 @@ float	gst_element_add_pad	pad
 vararg	gst_element_link_many	argv
 vararg	gst_element_unlink_many	argv
 float	gst_device_create_element	return
+float	GstDevice::vfunc_create_element	return
 float	gst_parse_launch	return
 float	gst_parse_launchv	return
 float	gst_parse_launch_full	return
@@ -1267,6 +1268,7 @@ float	gst_registry_add_plugin		plugin
 float	gst_registry_add_feature	feature
 float	gst_bin_add			element
 float	gst_bin_add_many			element_1
+float	GstBin::vfunc_add_element		element
 vararg	gst_bin_add_many			argv
 vararg	gst_bin_remove_many			argv
 vararg	gst_caps_new_full			argv
