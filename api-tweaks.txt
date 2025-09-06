@@ -1236,6 +1236,7 @@ skip	gst_structure_from_string
 skip	gst_type_find_peek
 # Need to use _full() variant to be able to provide destroy notify
 skip	gst_bus_add_watch
+this	gst_tag_list_copy_value		list
 float	gst_element_factory_make	return
 float	gst_element_factory_make_full	return
 vararg	gst_element_factory_make_full	object-new
