@@ -455,8 +455,9 @@ class Parameter(NodeHandler):
                     strip_refs=0,
                     for_local_copy=False,
                 )
+                cpp_name = 'static_cast<{}> (std::forward<Args> ({}))'.format(cpp_type, cpp_name)
                 cast = vararg_reference_param.generate_cast_to_c(
-                        cpp_name='static_cast<{}> (std::forward<Args> ({}))'.format(cpp_type, cpp_name),
+                        cpp_name=cpp_name,
                         context=context,
                         for_local_copy=False,
                         skip_params_casted=skip_params_casted,

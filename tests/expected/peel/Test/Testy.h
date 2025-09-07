@@ -473,7 +473,7 @@ public:
   argv_transfer_none_str (const char *first_str, Args &&...args) noexcept
   {
     ::TestTesty * _peel_this = reinterpret_cast<::TestTesty *> (this);
-    test_testy_argv_transfer_none_str (_peel_this, first_str, args..., nullptr);
+    test_testy_argv_transfer_none_str (_peel_this, first_str, static_cast<const char *> (std::forward<Args> (args))..., nullptr);
   }
 
   static peel::Property<void *>
