@@ -4,7 +4,7 @@ For _out_ and _inout_ parameters, we can frequently pass through the
 user-provided pointer directly to the C function, perhaps casting the pointer
 type:
 
-```c++
+```cpp
 peel_arg_out (1) peel_arg_out (2)
 static void
 foo (int *out_integer, GObject::Object **out_object) noexcept
@@ -20,7 +20,7 @@ pointer, and we have to create a *local copy* variable, into which we copy the
 local copy into the C function, and copy out the "out" value to user-provided
 pointer:
 
-```c++
+```cpp
 peel_arg_inout (1) peel_nonnull_args (1)
 static void
 bar (bool *inout_bool) noexcept
@@ -42,7 +42,7 @@ directly.
 
 We also use local copies for owned reference transfer:
 
-```c++
+```cpp
 peel_arg_out (1) peel_nonnull_args (1)
 static void
 baz (peel::RefPtr<GObject::Object> *out_object) noexcept
@@ -67,7 +67,7 @@ argument, because peel needs to know for sure whether or not there had been an
 error, because of other local copies which we only copy out when the C
 function succeeds:
 
-```c++
+```cpp
 peel_arg_out (1) peel_arg_out (2) peel_nonnull_args (1)
 static void
 read_some_string (peel::String *out_string, peel::UniquePtr<GLib::Error> *error) noexcept

@@ -16,6 +16,7 @@
     - [ArrayRef](array-ref.md)
     - [UniquePtr to array](unique-ptr-arr.md)
 - [Custom GObject Classes](custom-gobject-classes.md)
+    - [Naming conventions](naming-conventions.md)
 - [GTK Widget Templates](gtk-widget-templates.md)
 - [Gotchas and Pitfalls](gotchas-and-pitfalls.md)
 - [C++20 coroutines]()
