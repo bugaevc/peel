@@ -31,7 +31,7 @@ public:
 
   class Type;
   struct Builder;
-  class Iter;
+  struct Iter;
   enum class Class : std::underlying_type<::GVariantClass>::type;
 
   const Variant::Type *
