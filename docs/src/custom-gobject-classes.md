@@ -12,7 +12,7 @@ You should include `<peel/class.h>`, derive your class from a
 single[^single-inheritance] GObject base class (for example, `GObject::Object`
 or `Gtk::Widget`). Unless you're actively planning for your class to be
 derivable, you should declare it `final`, both as a general design principle,
-and beucase it enables small optimizations inside GLib.
+and because it enables small optimizations inside GLib.
 
 Then use the `PEEL_SIMPLE_CLASS` (or `PEEL_CLASS`) macro[^declare-type] as the
 first thing inside the class body. The arguments to the macro are:

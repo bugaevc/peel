@@ -6,7 +6,7 @@ To start using widget templates, you should:
 
 1. Write the template in a `.ui` file (perhaps using [Blueprint]),
 2. Call [`Gtk::Widget::Class::set_template_from_resource`] in your widget's
-   `Class::init`,
+   [class initializer],
 3. Call [`Gtk::Widget::init_template`] in your widget's `init`,
 4. Call [`Gtk::Widget::dispose_template`] with your widget's type in your
    widget's `vfunc_dispose`.
@@ -116,6 +116,7 @@ objects bound this way.
 [widget templates]: https://developer.gnome.org/documentation/tutorials/widget-templates.html
 [Blueprint]: https://jwestman.pages.gitlab.gnome.org/blueprint-compiler/
 [`Gtk::Widget::Class::set_template_from_resource`]: https://docs.gtk.org/gtk4/class_method.Widget.set_template_from_resource.html
+[class initializer]: initialization.md#class-initializer
 [`Gtk::Widget::init_template`]: https://docs.gtk.org/gtk4/method.Widget.init_template.html
 [`Gtk::Widget::dispose_template`]: https://docs.gtk.org/gtk4/method.Widget.dispose_template.html
 [`gtk_widget_class_bind_template_child`]: https://docs.gtk.org/gtk4/func.widget_class_bind_template_child.html

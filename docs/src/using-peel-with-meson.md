@@ -1,6 +1,6 @@
 # Using peel with Meson
 
-Many projects in the glib and GNOME ecosystem are built with [Meson]. peel
+Many projects in the GLib and GNOME ecosystem are built with [Meson]. peel
 itself is built with Meson as well, and provides some integration to make it
 easier to use peel in Meson projects.
 

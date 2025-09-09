@@ -17,7 +17,7 @@
     - [UniquePtr to array](unique-ptr-arr.md)
 - [Custom GObject Classes](custom-gobject-classes.md)
     - [Naming conventions](naming-conventions.md)
-    - [Initialization]()
+    - [Initialization](initialization.md)
     - [Destruction]()
     - [Virtual functions]()
     - [Properties]()
