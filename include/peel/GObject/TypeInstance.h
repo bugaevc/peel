@@ -2,6 +2,7 @@
 
 #include <peel/GObject/Type.h>
 #include <peel/lang.h>
+#include <peel/signal.h>
 #include <glib-object.h>
 
 peel_begin_header
@@ -110,6 +111,23 @@ public:
   {
     ::GTypeInstance *ti = reinterpret_cast<::GTypeInstance *> (const_cast<TypeInstance *> (this));
     return g_type_name_from_instance (ti);
+  }
+
+  template<typename Handler>
+  typename SignalConnection::Token
+  connect_signal (const char *detailed_name, Handler &&handler, bool after = false) noexcept
+  {
+    typedef typename std::remove_reference<Handler>::type H;
+    typedef typename peel::internals::DynamicSignalTypeHelper1<H>::SignalType SignalType;
+    typedef typename peel::internals::DynamicSignalTypeHelper1<H>::InstanceType InstanceType;
+    return SignalType::_peel_connect_by_name (this->cast<InstanceType> (), detailed_name, std::forward<Handler> (handler), after);
+  }
+
+  template<typename Ret = void, typename... Args>
+  Ret
+  emit_signal (const char *detailed_name, Args... args) noexcept
+  {
+    return Signal<TypeInstance, Ret (Args...)>::_peel_emit_by_name (this, detailed_name, args...);
   }
 
 protected:

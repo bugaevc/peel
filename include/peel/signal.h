@@ -1,7 +1,6 @@
 #pragma once
 
 #include <peel/GObject/Type.h>
-#include <peel/GObject/TypeInstance.h>
 #include <peel/GObject/Value.h>
 #include <peel/RefPtr.h>
 #include <peel/UniquePtr.h>
@@ -20,6 +19,7 @@ namespace GObject
 {
 enum class SignalFlags : std::underlying_type<::GSignalFlags>::type;
 struct SignalInvocationHint;
+class TypeInstance;
 }
 
 namespace internals
@@ -301,6 +301,15 @@ struct SignalHelper2
   }
 
   peel_always_inline
+  static Ret
+  emit_by_name (void *instance, const char *detailed_name, Args... args) noexcept
+  {
+    typename SignalTraits<Ret>::CType ret_c = 0;
+    g_signal_emit_by_name (instance, detailed_name, SignalTraits<Args>::to_c (args)..., &ret_c);
+    return SignalTraits<Ret>::from_c (ret_c);
+  }
+
+  peel_always_inline
   static void
   marshal (gpointer data1, gpointer data2, void *callback, ::GValue *return_value, Args... args) noexcept
   {
@@ -330,6 +339,13 @@ struct SignalHelper2<void, Args...>
   emit (void *instance, gint id, ::GQuark detail, Args... args) noexcept
   {
     g_signal_emit (instance, id, detail, SignalTraits<Args>::to_c (args)...);
+  }
+
+  peel_always_inline
+  static void
+  emit_by_name (void *instance, const char *detailed_name, Args... args) noexcept
+  {
+    g_signal_emit_by_name (instance, detailed_name, SignalTraits<Args>::to_c (args)...);
   }
 
   peel_always_inline
@@ -722,6 +738,12 @@ public:
     return emit (instance, 0, args...);
   }
 
+  static Ret
+  _peel_emit_by_name (Instance *instance, const char *detailed_name, Args... args) noexcept
+  {
+    return internals::SignalHelper2<Ret, Args...>::emit_by_name (instance, detailed_name, args...);
+  }
+
   template<typename Handler>
   SignalConnection::Token
   connect (Instance *instance, ::GQuark detail, Handler &&handler, bool after = false) noexcept
@@ -826,6 +848,42 @@ public:
     return !!g_signal_has_handler_pending (instance, id, detail, may_be_blocked);
   }
 };
+
+namespace internals
+{
+
+template<typename>
+struct DynamicSignalTypeHelper2;
+
+template<typename Ret, typename Handler, typename Instance, typename... Args>
+struct DynamicSignalTypeHelper2<Ret (Handler::*) (Instance *, Args...)>
+{
+  typedef Signal<Instance, Ret (Args...)> SignalType;
+  typedef Instance InstanceType;
+};
+
+template<typename Ret, typename Handler, typename Instance, typename... Args>
+struct DynamicSignalTypeHelper2<Ret (Handler::*) (Instance *, Args...) const>
+{
+  typedef Signal<Instance, Ret (Args...)> SignalType;
+  typedef Instance InstanceType;
+};
+
+template<typename Handler>
+struct DynamicSignalTypeHelper1
+{
+  typedef typename DynamicSignalTypeHelper2<decltype (&Handler::operator ())>::SignalType SignalType;
+  typedef typename DynamicSignalTypeHelper2<decltype (&Handler::operator ())>::InstanceType InstanceType;
+};
+
+template<typename Ret, typename Instance, typename... Args>
+struct DynamicSignalTypeHelper1<Ret (*) (Instance *, Args...)>
+{
+  typedef Signal<Instance, Ret (Args...)> SignalType;
+  typedef Instance InstanceType;
+};
+
+} /* namespace internals */
 
 } /* namespace peel */
 
