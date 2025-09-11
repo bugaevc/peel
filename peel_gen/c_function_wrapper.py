@@ -1,5 +1,5 @@
 from peel_gen import api_tweaks
-from peel_gen.utils import extract_constness_from_c_type
+from peel_gen.utils import extract_constness_from_c_type, make_simple_decl
 from peel_gen.exceptions import UnsupportedForNowException
 
 def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=None, templates=None, attributes=None):
@@ -162,7 +162,7 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
                             indent + '    {} = {};'.format(casted_name, cast_to_c),
                         ])
                     else:
-                        l.append(indent + '  {} {} = {};'.format(c_type, casted_name, cast_to_c))
+                        l.append(indent + '  {} = {};'.format(make_simple_decl(c_type, casted_name), cast_to_c))
                     if not needs_local_copy:
                         args.append(casted_name)
                     elif not p.optional:
@@ -172,7 +172,7 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
             else:
                 casted_name = p.generate_casted_name()
                 c_type = p.generate_c_type(for_local_copy=True)
-                l.append(indent + '  {} {};'.format(c_type, casted_name))
+                l.append(indent + '  {};'.format(make_simple_decl(c_type, casted_name)))
                 if p.optional:
                     args.append('{} ? &{} : nullptr'.format(p.name, casted_name))
                 else:

@@ -3,6 +3,7 @@ from peel_gen.parameter import Parameter
 from peel_gen.exceptions import UnsupportedForNowException
 from peel_gen.array import Array
 from peel_gen.alias import chase_type_aliases
+from peel_gen.utils import make_simple_decl
 
 class Parameters(NodeHandler):
     def __init__(self, attrs, ns):
@@ -55,10 +56,7 @@ class Parameters(NodeHandler):
             if p.name == '...':
                 raise UnsupportedForNowException('varargs')
             c_type = p.generate_c_type()
-            if not c_type.endswith('*'):
-                l.append(c_type + ' ' + p.name)
-            else:
-                l.append(c_type + p.name)
+            l.append(make_simple_decl(c_type, p.name))
         return ', '.join(l)
 
     def resolve_stuff(self, has_typed_tweak):

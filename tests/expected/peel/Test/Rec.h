@@ -42,14 +42,14 @@ public:
   void
   pass_inout_int (int *i) noexcept
   {
-    ::TestRec * _peel_this = reinterpret_cast<::TestRec *> (this);
+    ::TestRec *_peel_this = reinterpret_cast<::TestRec *> (this);
     test_rec_pass_inout_int (_peel_this, i);
   }
 
   void
   const_self () const noexcept
   {
-    const ::TestRec * _peel_this = reinterpret_cast<const ::TestRec *> (this);
+    const ::TestRec *_peel_this = reinterpret_cast<const ::TestRec *> (this);
     test_rec_const_self (_peel_this);
   }
 

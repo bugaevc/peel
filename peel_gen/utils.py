@@ -22,6 +22,12 @@ def add_asterisk(tp):
         return tp + '*'
     return tp + ' *'
 
+def make_simple_decl(tp, name):
+    if tp.endswith('*') or tp.endswith('&'):
+        return tp + name
+    else:
+        return tp + ' ' + name
+
 def escape_cpp_name(name):
     if name in (
         'delete',
