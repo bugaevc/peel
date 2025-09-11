@@ -321,6 +321,9 @@ class Parameter(NodeHandler):
                 if not s.endswith('*'):
                     s = s + ' '
                 return s + out_asterisk + name
+            elif strip_refs:
+                assert(name is None)
+                return s
             elif tp.fixed_size is not None:
                 if name is None:
                     return '{} (&)[{}]'.format(s, tp.fixed_size)
@@ -332,9 +335,18 @@ class Parameter(NodeHandler):
                     array_type = 'peel::ArrayRef<{}>'.format(s)
                 elif self.ownership in ('container', 'full'):
                     array_type = 'peel::UniquePtr<{}[]>'.format(s)
-                if strip_refs:
-                    assert(name is None)
-                    return s
+                if name is None:
+                    return array_type
+                return '{} {}{}'.format(array_type, out_asterisk, name)
+            elif tp.zero_terminated:
+                if self.ownership in ('none', None):
+                    if s == 'const char * const':
+                        array_type = 'peel::StrvRef'
+                    else:
+                        array_type = 'peel::ZArrayRef<{}>'.format(s)
+                else:
+                    # TODO ZUniquePtr<T[]>
+                    raise UnsupportedForNowException('owned zero-terminated array')
                 if name is None:
                     return array_type
                 return '{} {}{}'.format(array_type, out_asterisk, name)
@@ -346,7 +358,6 @@ class Parameter(NodeHandler):
             #        return s
             #    return s + name
             else:
-                # TODO support null-terminated arrays
                 raise UnsupportedForNowException('Complex array')
 
         if isinstance(itp, DefinedType) and itp.ns.emit_raw:
@@ -612,7 +623,7 @@ class Parameter(NodeHandler):
                 raise UnsupportedForNowException('array of bool')
             if tp.fixed_size is not None:
                 return 'reinterpret_cast<{}> ({})'.format(c_type, cpp_name)
-            elif tp.length is not None:
+            elif tp.length is not None or tp.zero_terminated:
                 def make_call(call):
                     if cpp_name.startswith('*'):
                         return '{}->{}'.format(cpp_name[1:], call)
@@ -622,6 +633,14 @@ class Parameter(NodeHandler):
                     ptr_expr = make_call('data ()')
                 else:
                     ptr_expr = 'std::move ({}).release_ref ()'.format(cpp_name)
+
+                if c_type == 'char **' and self.ownership in (None, 'none'):
+                    cast_expr = 'const_cast<char **> ({})'.format(ptr_expr)
+                else:
+                    cast_expr = 'reinterpret_cast<{}> ({})'.format(c_type, ptr_expr)
+
+                if tp.length is None and tp.zero_terminated:
+                    return cast_expr
 
                 if skip_params_casted:
                     length_param_place = tp.length_param.generate_casted_name()
@@ -643,10 +662,6 @@ class Parameter(NodeHandler):
                         make_call('size ()'),
                     )
 
-                if c_type == 'char **' and self.ownership in (None, 'none'):
-                    cast_expr = 'const_cast<char **> ({})'.format(ptr_expr)
-                else:
-                    cast_expr = 'reinterpret_cast<{}> ({})'.format(c_type, ptr_expr)
                 return '({}, {})'.format(set_length_param, cast_expr)
             #elif not tp.zero_terminated and self.ownership in ('none', None):
             #    param_cpp_type = self.generate_cpp_type(
@@ -737,6 +752,15 @@ class Parameter(NodeHandler):
                         ptr_expr,
                         length_param_name,
                     )
+            elif tp.zero_terminated:
+                if self.c_type == add_asterisk(plain_cpp_type):
+                    ptr_expr = c_name
+                else:
+                    ptr_expr = 'reinterpret_cast<{}> ({})'.format(add_asterisk(plain_cpp_type), c_name)
+                if self.ownership in ('none', None):
+                    return 'peel::ZArrayRef<{}>::adopt ({})'.format(plain_cpp_type, ptr_expr)
+                else:
+                    raise UnsupportedForNowException('Owned zero-terminated array')
             #elif not tp.zero_terminated and self.ownership in ('none', None):
             #    if self.c_type == add_asterisk(plain_cpp_type):
             #        return None
