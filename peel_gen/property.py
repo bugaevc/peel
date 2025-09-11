@@ -1,7 +1,8 @@
 from peel_gen.alias import chase_type_aliases
 from peel_gen.node_handler import NodeHandler
 from peel_gen.parameter import Parameter
-from peel_gen.type import PlainType
+from peel_gen.type import PlainType, StrType
+from peel_gen.array import Array
 from peel_gen.exceptions import UnsupportedForNowException
 
 class Property(NodeHandler):
@@ -31,7 +32,16 @@ class Property(NodeHandler):
         if isinstance(tp, PlainType) and tp.gname in ['glong', 'gulong']:
             raise UnsupportedForNowException('glong / gulong properties not supported')
 
-        param_cpp_type = self.type_param.generate_cpp_type(name=None, context=self.cpp_class, strip_refs=1)
+        # TODO: This is not super nice, we should rather have an explicit flag
+        # in generate_cpp_type() to generate the logical type, rather than stripping refs.
+        if isinstance(tp, Array) and isinstance(chase_type_aliases(tp.item_type), StrType) and tp.zero_terminated:
+            param_cpp_type = 'peel::Strv'
+        else:
+            param_cpp_type = self.type_param.generate_cpp_type(
+                name=None,
+                context=self.cpp_class,
+                strip_refs=1,
+            )
         l = [
             '  static peel::Property<{}>'.format(param_cpp_type),
             '  prop_{} ()'.format(self.name.replace('-', '_')),

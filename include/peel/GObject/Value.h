@@ -4,6 +4,7 @@
 #include <peel/GObject/EnumClass.h>
 #include <peel/GObject/FlagsClass.h>
 #include <peel/String.h>
+#include <peel/Strv.h>
 #include <peel/lang.h>
 #include <glib-object.h>
 #include <utility>
@@ -579,6 +580,45 @@ struct Value::Traits<const char *>
 template<>
 struct Value::Traits<String> : Value::Traits<const char *>
 { };
+
+template<>
+struct Value::Traits<Strv>
+{
+  typedef StrvRef UnownedType;
+  typedef Strv OwnedType;
+
+  G_GNUC_CONST
+  static StrvRef
+  get (const ::GValue *value) noexcept
+  {
+    void *p = g_value_get_boxed (value);
+    return StrvRef::adopt (reinterpret_cast<const char * const *> (p));
+  }
+
+  static Strv
+  dup (const ::GValue *value) noexcept
+  {
+    return Strv::adopt_ref (reinterpret_cast<String *> (g_value_dup_boxed (value)));
+  }
+
+  static void
+  set (::GValue *value, StrvRef strv) noexcept
+  {
+    g_value_set_boxed (value, strv.data ());
+  }
+
+  static void
+  take (::GValue *value, Strv &&strv) noexcept
+  {
+    g_value_take_boxed (value, std::move (strv).release_ref ());
+  }
+
+  static const char * const *
+  cast_for_create (StrvRef strv) noexcept
+  {
+    return strv.data ();
+  }
+};
 
 template<>
 struct Value::Traits<Type>

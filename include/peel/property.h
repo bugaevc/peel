@@ -12,6 +12,9 @@ namespace peel
 
 class String;
 
+template<typename>
+class ZTUniquePtr;
+
 namespace GObject
 {
 class Object;
@@ -261,6 +264,19 @@ template<>
 struct PspecTraits<String> : PspecTraits<const char *>
 {
   using PspecTraits<const char *>::PspecTraits;
+};
+
+template<>
+struct PspecTraits</* Strv */ ZTUniquePtr<String[]>>
+{
+  constexpr PspecTraits ()
+  { }
+
+  ::GParamSpec *
+  create_pspec (PspecBasics basics)
+  {
+    return g_param_spec_boxed (basics.name, basics.nick, basics.blurb, G_TYPE_STRV, basics.flags);
+  }
 };
 
 template<>

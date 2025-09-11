@@ -135,7 +135,7 @@ private:
     if (!std::is_trivially_destructible<T>::value)
       {
         for (size_t i = 0; i < c; i++)
-          ptr[i].~T();
+          ptr[i].~T ();
       }
 #ifdef __GNUC__
     /* It is safe to call g_free (nullptr), so don't emit an extra

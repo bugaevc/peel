@@ -364,6 +364,17 @@ class Parameter(NodeHandler):
             else:
                 constness = ['const']
 
+        # Don't trust the C signature for constness of zero-terminated arrays:
+        # they commonly use 'char **' even for transfer none arrays.
+        # TODO: Could do this for more than just strings.
+        if isinstance(tp, Array) and isinstance(itp, StrType) and tp.zero_terminated and tp.length is None:
+            if not c_type:
+                constness = [True, True]
+            elif self.ownership in ('none', None):
+                constness[0] = constness[1] = True
+            elif self.ownership == 'container':
+                constness[0] = True
+
         constness0 = 'const ' if constness and constness[0] else ''
         constness1 = ' const' if len(constness) >= 2 and constness[1] else ''
 
@@ -412,13 +423,19 @@ class Parameter(NodeHandler):
                     return array_type
                 return '{} {}{}'.format(array_type, out_asterisk, name)
             elif tp.zero_terminated:
-                # TODO: https://gitlab.gnome.org/bugaevc/peel/-/issues/1
-                if not self.is_record_field:
-                    raise UnsupportedForNowException('Zero-terminated array')
-
-                assert(not out_asterisk)
-                assert(name is not None)
-                return make_simple_decl(add_asterisk(s), name)
+                if self.ownership in ('none', None):
+                    if s == 'const char * const':
+                        array_type = 'peel::StrvRef'
+                    else:
+                        array_type = 'peel::ZTArrayRef<{}>'.format(s)
+                else:
+                    if s == 'peel::String' and self.ownership == 'full':
+                        array_type = 'peel::Strv'
+                    else:
+                        array_type = 'peel::ZTUniquePtr<{}[]>'.format(s)
+                if name is None:
+                    return array_type
+                return '{} {}{}'.format(array_type, out_asterisk, name)
             #elif not tp.zero_terminated and self.ownership in ('none', None):
             #    # A conceptual array, but there's no way to know the length.
             #    # Use a plain pointer to the item type.
@@ -705,7 +722,7 @@ class Parameter(NodeHandler):
                 raise UnsupportedForNowException('array of bool')
             if tp.fixed_size is not None:
                 return 'reinterpret_cast<{}> ({})'.format(c_type, cpp_name)
-            elif tp.length is not None:
+            elif tp.length is not None or tp.zero_terminated:
                 def make_call(call):
                     if cpp_name.startswith('*'):
                         return '{}->{}'.format(cpp_name[1:], call)
@@ -715,6 +732,14 @@ class Parameter(NodeHandler):
                     ptr_expr = make_call('data ()')
                 else:
                     ptr_expr = 'std::move ({}).release_ref ()'.format(cpp_name)
+
+                if c_type in ('char **', 'gchar **', 'const char **', 'const gchar **') and self.ownership in (None, 'none'):
+                    cast_expr = 'const_cast<{}> ({})'.format(c_type, ptr_expr)
+                else:
+                    cast_expr = 'reinterpret_cast<{}> ({})'.format(c_type, ptr_expr)
+
+                if tp.length is None and tp.zero_terminated:
+                    return cast_expr
 
                 if skip_params_casted:
                     length_param_place = tp.length_param.generate_casted_name()
@@ -736,14 +761,7 @@ class Parameter(NodeHandler):
                         make_call('size ()'),
                     )
 
-                if c_type == 'char **' and self.ownership in (None, 'none'):
-                    cast_expr = 'const_cast<char **> ({})'.format(ptr_expr)
-                else:
-                    cast_expr = 'reinterpret_cast<{}> ({})'.format(c_type, ptr_expr)
                 return '({}, {})'.format(set_length_param, cast_expr)
-            elif tp.zero_terminated:
-                # TODO: https://gitlab.gnome.org/bugaevc/peel/-/issues/1
-                raise UnsupportedForNowException('Zero-terminated array')
             #elif not tp.zero_terminated and self.ownership in ('none', None):
             #    param_cpp_type = self.generate_cpp_type(
             #        name='',
@@ -836,8 +854,16 @@ class Parameter(NodeHandler):
                         length_param_name,
                     )
             elif tp.zero_terminated:
-                # TODO: https://gitlab.gnome.org/bugaevc/peel/-/issues/1
-                raise UnsupportedForNowException('Zero-terminated array')
+                if self.c_type == add_asterisk(plain_cpp_type):
+                    ptr_expr = c_name
+                elif self.c_type in ('char **', 'gchar **') and self.ownership in ('none', None):
+                    ptr_expr = 'const_cast<{}*> ({})'.format(plain_cpp_type, c_name)
+                else:
+                    ptr_expr = 'reinterpret_cast<{}> ({})'.format(add_asterisk(plain_cpp_type), c_name)
+                if self.ownership in ('none', None):
+                    return 'peel::ZTArrayRef<{}>::adopt ({})'.format(plain_cpp_type, ptr_expr)
+                else:
+                    return 'peel::ZTUniquePtr<{}[]>::adopt_ref ({})'.format(plain_cpp_type, ptr_expr)
             #elif not tp.zero_terminated and self.ownership in ('none', None):
             #    if self.c_type == add_asterisk(plain_cpp_type):
             #        return None
