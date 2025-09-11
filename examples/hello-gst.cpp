@@ -6,7 +6,7 @@ using namespace peel;
 int
 main (int argc, char *argv[])
 {
-  Gst::init (nullptr);
+  Gst::init (&argc, &argv);
 
   RefPtr<GLib::MainLoop> loop = GLib::MainLoop::create (nullptr, false);
 

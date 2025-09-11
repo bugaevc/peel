@@ -227,6 +227,5 @@ int
 main (int argc, char *argv[])
 {
   RefPtr<Demo::Application> app = Demo::Application::create ();
-  ArrayRef<const char *> args { const_cast<const char **> (argv), static_cast<unsigned> (argc) };
-  return app->run (args);
+  return app->run (argc, argv);
 }

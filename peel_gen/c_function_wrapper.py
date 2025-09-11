@@ -2,7 +2,7 @@ from peel_gen import api_tweaks
 from peel_gen.utils import extract_constness_from_c_type, make_simple_decl
 from peel_gen.exceptions import UnsupportedForNowException
 
-def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=None, templates=None, attributes=None):
+def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=None, templates=None, attributes=None, raw_param_names=()):
     """
     Common helper for function-likes that need to wrap a C callee into a C++ function.
     """
@@ -22,10 +22,15 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
     if params is not None:
         templates = templates or []
         has_typed_tweak = typed_tweak_callee is not None
-        cpp_signature = params.generate_cpp_signature(context=context, typed_tweak='T' if has_typed_tweak else None)
+        cpp_signature = params.generate_cpp_signature(
+            context=context,
+            typed_tweak='T' if has_typed_tweak else None,
+            raw_param_names=raw_param_names,
+        )
         more_templates = params.generate_cpp_signature_templates(has_typed_tweak)
         if more_templates:
             templates.extend(more_templates)
+        # FIXME attribute indexes for raw params
         attributes.extend(params.generate_function_attributes(has_typed_tweak))
         if templates:
             # TODO: handle both at the same time
@@ -101,10 +106,14 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
     if params is not None:
         # First, declare the skip params.
         for p in params.params:
-            if p in params.skip_params:
+            if p in params.skip_params and not p.name in raw_param_names:
                 needs_local_copy = p.direction != 'in'
                 l.append(indent + '  {} {};'.format(p.generate_c_type(for_local_copy=needs_local_copy), p.generate_casted_name()))
         for p in params.params:
+            if p.name in raw_param_names:
+                assert(not p.is_cpp_this())
+                args.append(p.name)
+                continue
             if p in params.skip_params:
                 casted_name = p.generate_casted_name()
                 if p.direction == 'in':
@@ -247,7 +256,7 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
 
     if params is not None:
         for p in params.params:
-            if p in params.skip_params:
+            if p in params.skip_params or p.name in raw_param_names:
                 continue
             if not p.needs_local_copy():
                 continue

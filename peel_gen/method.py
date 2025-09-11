@@ -28,6 +28,19 @@ class Method(FunctionLike):
             throws=self.throws,
             indent=indent,
         ))
+        for tweak in api_tweaks.lookup(self.c_ident, 'raw-params-overload'):
+            raw_param_names = tweak[1].split(',')
+            l.append('')
+            l.append(c_function_wrapper.generate(
+                name=escape_cpp_name(self.name),
+                c_callee=self.c_ident,
+                context=self.containing_type,
+                rv=self.rv,
+                params=self.params,
+                throws=self.throws,
+                indent=indent,
+                raw_param_names=raw_param_names,
+            ))
         s = api_tweaks.endif_if_needed(self.c_ident)
         if s:
             l.append(s)

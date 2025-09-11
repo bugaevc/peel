@@ -172,14 +172,14 @@ class Parameters(NodeHandler):
             l.append('peel_nonnull_args ({})'.format(', '.join(str(ind) for ind in nonnull_args)))
         return l
 
-    def generate_cpp_signature(self, context, typed_tweak=None):
+    def generate_cpp_signature(self, context, typed_tweak=None, raw_param_names=()):
         from peel_gen.type import StrType
         self.resolve_stuff(has_typed_tweak=typed_tweak is not None)
         l = []
         for p in self.params:
             if p.is_cpp_this():
                 continue
-            if p in self.skip_params:
+            if p in self.skip_params and not p.name in raw_param_names:
                 continue
             if typed_tweak and p is self.params[-2]:
                 l.append('typename GObject::Value::Traits<{}>::UnownedType value'.format(typed_tweak))
@@ -192,6 +192,10 @@ class Parameters(NodeHandler):
                     assert(len(self.params) > 1)
                     assert(isinstance(self.params[-2].type, StrType))
                     l.pop()
+            elif name in raw_param_names:
+                c_type = p.generate_c_type()
+                l.append(make_simple_decl(c_type, name))
+                continue
             l.append(p.generate_cpp_type(name, context))
         return ', '.join(l)
 

@@ -419,6 +419,5 @@ main (int argc, char **argv)
 {
   RefPtr<Gtk::Application> app = Gtk::Application::create ("org.example.rotation_bin", Gio::Application::Flags::NON_UNIQUE);
   app->connect_activate (build_ui);
-  ArrayRef<const char *> args { const_cast<const char **> (argv), static_cast<unsigned> (argc) };
-  return app->run (args);
+  return app->run (argc, argv);
 }

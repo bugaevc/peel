@@ -215,9 +215,10 @@ vararg	g_printerr			format
 #vararg	fprintf				format
 vararg	g_strdup_printf			format
 
-# Not actually argv, but close enough:
 vararg	g_build_filename		argv
 vararg	g_build_path			argv
+
+raw-params-overload	g_option_context_parse	argc,argv
 
 #ifdef	GUnixFDSourceFunc		G_OS_UNIX
 #ifdef	GUnixPipe			G_OS_UNIX
@@ -448,6 +449,8 @@ vararg	g_notification_add_button_with_target	variant-new
 vararg	g_notification_set_default_action_and_target variant-new
 vararg	g_initable_new			object-new
 vararg	g_async_initable_new_async	object-new
+
+raw-params-overload	g_application_run	argc,argv
 
 onstack	GInputVector
 onstack	GOutputVector
@@ -1335,6 +1338,9 @@ nest	GstLogContextFlags		LogContext::Flags
 nest	GstIteratorResult		Iterator::Result
 nest	GstIteratorItem			Iterator::Item
 onstack GstMapInfo
+
+raw-params-overload	gst_init	argc,argv
+raw-params-overload	gst_init_check	argc,argv
 
 # Json (json-glib)
 no-autofree JsonNode
