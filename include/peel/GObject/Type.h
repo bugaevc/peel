@@ -13,6 +13,9 @@ namespace peel
 
 class String;
 
+template<typename T>
+class ZArrayRef;
+
 namespace GObject
 {
 
@@ -378,6 +381,13 @@ constexpr inline Type
 Type::of<String> ()
 {
   return G_TYPE_STRING;
+}
+
+template<>
+inline Type
+Type::of</* StrvRef */ ZArrayRef<const char * const>> ()
+{
+  return G_TYPE_STRV;
 }
 
 template<>
