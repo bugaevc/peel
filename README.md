@@ -41,7 +41,7 @@ build_ui (Gio::Application *app)
 }
 
 int
-main (int argc, const char **argv)
+main (int argc, char **argv)
 {
   auto app = Gtk::Application::create ("org.example.App", Gio::Application::Flags::DEFAULT_FLAGS);
   app->connect_activate (build_ui);
