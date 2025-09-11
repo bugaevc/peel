@@ -27,6 +27,7 @@ Here's a very simple GTK application:
 
 ```c++
 #include <peel/Gtk/Gtk.h>
+#include <peel/Gio/ApplicationFlags.h>
 
 using namespace peel;
 
@@ -40,11 +41,11 @@ build_ui (Gio::Application *app)
 }
 
 int
-main (unsigned argc, const char **argv)
+main (int argc, const char **argv)
 {
   auto app = Gtk::Application::create ("org.example.App", Gio::Application::Flags::DEFAULT_FLAGS);
   app->connect_activate (build_ui);
-  app->run ({ argv, argc });
+  app->run (argc, argv);
 }
 ```
 
