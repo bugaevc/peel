@@ -145,3 +145,15 @@ def is_type_element(name, attrs):
         # e.g. <array name="GLib.ByteArray" c:type="GByteArray*">
         return 'name' in attrs
     return False
+
+def strip_c_symbol_prefix(s, ns):
+    for prefix in ns.c_symbol_prefixes:
+        if s.startswith(prefix):
+            return s.removeprefix(prefix + '_')
+    return s
+
+def strip_c_identifier_prefix(s, ns):
+    for prefix in ns.c_identifier_prefixes:
+        if s.startswith(prefix):
+            return s.removeprefix(prefix)
+    return s

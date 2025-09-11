@@ -24,6 +24,17 @@ class Namespace(NodeHandler):
             self.emit_raw = True
             raw_namespace_names.append(self.name)
         self.shared_library = attrs.get('shared-library', None)
+
+        self.c_identifier_prefixes = []
+        c_identifier_prefixes = attrs.get('c:identifier-prefixes', None)
+        if c_identifier_prefixes is not None:
+            self.c_identifier_prefixes = c_identifier_prefixes.split(',')
+
+        self.c_symbol_prefixes = []
+        c_symbol_prefixes = attrs.get('c:symbol-prefixes', None)
+        if c_symbol_prefixes is not None:
+            self.c_symbol_prefixes = c_symbol_prefixes.split(',')
+
         self.members = []
         self.c_includes = []
 

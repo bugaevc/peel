@@ -1,7 +1,9 @@
 from peel_gen.defined_type import DefinedType
+from peel_gen.function import Function
 from peel_gen.node_handler import NodeHandler
-from peel_gen.utils import escape_cpp_name
+from peel_gen.utils import escape_cpp_name, strip_c_symbol_prefix
 from peel_gen.specializations import generate_get_type_specialization, generate_value_traits_specialization
+from peel_gen.exceptions import UnsupportedForNowException
 from peel_gen import api_tweaks
 
 class Enumeration(DefinedType):
@@ -9,12 +11,20 @@ class Enumeration(DefinedType):
         super().__init__(attrs, ns)
         self.get_type = attrs.get('glib:get-type', None)
         self.members = []
+        self.methods = []
 
     def start_child_element(self, name, attrs):
         if name == 'member':
             m = EnumMember(attrs)
             self.members.append(m)
             return m
+        elif name == 'function':
+            f = Function(attrs, self.ns)
+            # Prefix the function name with the type name as enum classes
+            # don't support methods and this has to become a plain function.
+            f.name = strip_c_symbol_prefix(f.c_ident, self.ns)
+            self.methods.append(f)
+            return f
 
     def resolve_stuff(self):
         if self.has_resolved_stuff:
@@ -23,15 +33,47 @@ class Enumeration(DefinedType):
 
     def generate_extra_include_members(self):
         self.resolve_stuff()
+        s = set()
+        for member in self.methods:
+            try:
+                s.update(member.generate_extra_include_members())
+            except UnsupportedForNowException:
+                pass
         if self.nested_in:
-            return { self.nested_in }
-        return set()
+            s.add(self.nested_in)
+        # If self got into the set due to a nested type being mentioned,
+        # get rid of it, since there's no point in including ourselves.
+        s.discard(self)
+        for nested_type in self.nested_types:
+            assert(nested_type not in s)
+        return s
 
     def generate_extra_forward_members(self):
-        return set()
+        self.resolve_stuff()
+        s = set()
+        for member in self.methods:
+            try:
+                s.update(member.generate_extra_forward_members())
+            except UnsupportedForNowException:
+                pass
+        # We already forward-declare self and nested types.
+        s.discard(self)
+        for nested_type in self.nested_types:
+            s.discard(nested_type)
+        # Forward-declare the underlying type for nested type aliases.
+        for nested_type in self.nested_type_aliases:
+            s.add(nested_type)
+        return s
 
     def generate_extra_include_at_end_members(self):
-        return set()
+        self.resolve_stuff()
+        s = set()
+        for member in self.methods:
+            try:
+                s.update(member.generate_extra_include_at_end_members())
+            except UnsupportedForNowException:
+                pass
+        return s
 
     def generate_forward_decl(self, for_nested=False):
         if self.nested_in and not for_nested:
@@ -49,6 +91,15 @@ class Enumeration(DefinedType):
         for member in self.members:
             l.append(member.generate())
         l.append('}}; /* enum {} */'.format(self.emit_name))
+        l.append('')
+
+        for method in self.methods:
+            try:
+                l.append(method.generate())
+            except UnsupportedForNowException as e:
+                l.append('/* Unsupported for now: {}: {} */'.format(method.name, e.reason))
+            l.append('')
+
         return '\n'.join(l)
 
     def generate_specializations(self):
