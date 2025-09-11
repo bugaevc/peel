@@ -395,6 +395,14 @@ float	g_dbus_connection_register_object_with_closures2	get_property_closure
 float	g_dbus_connection_register_object_with_closures2	set_property_closure
 float	g_settings_bind_with_mapping_closures	get_mapping
 float	g_settings_bind_with_mapping_closures	set_mapping
+# See https://gitlab.gnome.org/GNOME/glib/-/merge_requests/4798
+out	g_dbus_error_register_error_domain	quark_volatile
+out	g_dbus_error_set_dbus_error		error
+owned	g_dbus_error_set_dbus_error		error
+optional g_dbus_error_set_dbus_error		error
+out	g_dbus_error_set_dbus_error_valist	error
+owned	g_dbus_error_set_dbus_error_valist	error
+optional g_dbus_error_set_dbus_error_valist	error
 
 float	g_action_change_state		value
 float	GAction::vfunc_change_state	value
@@ -416,6 +424,7 @@ vararg	g_application_command_line_print	format
 vararg	g_application_command_line_printerr	format
 vararg	g_dbus_method_invocation_return_error	format
 vararg	g_dbus_message_new_method_error	format
+vararg	g_dbus_error_set_dbus_error	format
 vararg	g_task_report_new_error		format
 vararg	g_task_return_new_error		format
 vararg	g_task_return_prefixed_error	format
