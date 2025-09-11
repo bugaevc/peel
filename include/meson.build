@@ -11,10 +11,13 @@ static_headers = files(
 
   'peel/UniquePtr.h',
   'peel/ArrayRef.h',
+  'peel/ZTArrayRef.h',
+  'peel/ZTUniquePtr.h',
   'peel/RefPtr.h',
   'peel/FloatPtr.h',
   'peel/WeakPtr.h',
   'peel/String.h',
+  'peel/Strv.h',
 
   'peel/coro/SimpleTask.h',
   'peel/coro/AsyncResult.h',

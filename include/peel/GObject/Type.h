@@ -13,6 +13,9 @@ namespace peel
 
 class String;
 
+template<typename>
+class ZTUniquePtr;
+
 namespace GObject
 {
 
@@ -378,6 +381,13 @@ constexpr inline Type
 Type::of<String> ()
 {
   return G_TYPE_STRING;
+}
+
+template<>
+inline Type
+Type::of</* Strv */ ZTUniquePtr<String[]>> ()
+{
+  return G_TYPE_STRV;
 }
 
 template<>
