@@ -103,6 +103,13 @@ class Record(DefinedType):
             if not f.we_support_this:
                 self.all_fields_supported = False
 
+            # If a field name conflicts with a method we need to
+            # rename the field.
+            for m in self.methods:
+                if m.name == f.name:
+                    f.name = f.name + '_'
+                    break
+
     def should_generate_fields(self):
         return self.all_fields_supported and not self.opaque and not self.incomplete and not self.is_private
 
