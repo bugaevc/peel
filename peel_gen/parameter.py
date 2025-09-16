@@ -93,8 +93,16 @@ class Parameter(NodeHandler):
                 # one it is by interrogating the C type. extract_constness_from_c_type()
                 # groks the number of indirections in the C type, so if it's non-zero,
                 # we're looking at a by-pointer stored field.
-                constness = extract_constness_from_c_type(self.c_type)
-                self.is_inline_record_field = not constness
+                #
+                # Also some types are typedef'd pointers in C and as such
+                # guessing from the C type does not work. These are however
+                # marked as pointer types so guessing is not necessary.
+                from peel_gen.record import Record
+                if isinstance(itp, Record) and itp.pointer:
+                    self.is_inline_record_field = False
+                else:
+                    constness = extract_constness_from_c_type(self.c_type)
+                    self.is_inline_record_field = not constness
             else:
                 self.is_inline_record_field = False
 

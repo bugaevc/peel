@@ -26,6 +26,7 @@ class Record(DefinedType):
         self.constructors = []
         self.incomplete = True # Will be unset if we see any fields
         self.opaque = attrs.get('opaque', None) == '1'
+        self.pointer = attrs.get('pointer', None) == '1'
         self.is_pointer_type = False
         self.onstack = False
         self.is_initially_floating = False
