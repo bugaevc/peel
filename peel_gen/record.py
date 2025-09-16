@@ -215,7 +215,7 @@ class Record(DefinedType):
             l.append('')
         if self.should_generate_fields():
             for field in self.fields:
-                visibility.switch('private' if field.private else 'public')
+                visibility.switch('private' if field.private or not field.we_support_this_public else 'public')
                 l.append(field.generate())
             if self.fields:
                 l.append('')

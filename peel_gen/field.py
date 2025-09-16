@@ -1,3 +1,6 @@
+from peel_gen.alias import chase_type_aliases
+from peel_gen.array import Array
+from peel_gen.callback import Callback
 from peel_gen.node_handler import NodeHandler
 from peel_gen.parameter import Parameter
 from peel_gen.exceptions import UnsupportedForNowException
@@ -12,6 +15,7 @@ class Field(NodeHandler):
         self.param = Parameter({ 'name': self.name }, ns=self.cpp_record.ns)
         self.param.is_record_field = True
         self.we_support_this = True
+        self.we_support_this_public = True
 
     def __repr__(self):
         return 'Field({}.{})'.format(self.cpp_record, self.param)
@@ -30,12 +34,26 @@ class Field(NodeHandler):
         if self.param.type is None:
             self.we_support_this = False
 
+        tp = chase_type_aliases(self.param.type)
+        if isinstance(tp, Array):
+            # Dynamic-sized arrays are not generated publicly currently as they would
+            # ideally be represented as an `ArrayRef` or `UniquePtr<T[]>`
+            # instead of a pointer and size field.
+            #
+            # Similarly zero-terminated arrays would have to be represented by
+            # some kind of array type instead of a plain pointer.
+            if tp.length is not None or tp.zero_terminated:
+                self.we_support_this_public = False
+            # Apart from that only fixed-size arrays are supported right now
+            # and generated as public fields
+            elif tp.fixed_size is None:
+                self.we_support_this = False
+        elif isinstance(tp, Callback):
+            # Callbacks operate on plain C types
+            self.we_support_this_public = False
+
     def start_child_element(self, name, attrs):
-        if is_type_element(name, attrs):
-            return self.param.start_child_element(name, attrs)
-        elif name in ('callback', 'array'):
-            self.we_support_this = False
-            return
+        return self.param.start_child_element(name, attrs)
 
     def generate_extra_include_members(self):
         if not self.we_support_this:
