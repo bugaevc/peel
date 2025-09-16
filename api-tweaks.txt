@@ -801,12 +801,15 @@ onstack	graphene_plane_t
 onstack	graphene_sphere_t
 onstack	graphene_quaternion_t
 onstack	graphene_quad_t
+opaque	graphene_quad_t
 onstack	graphene_ray_t
 onstack	graphene_euler_t
 onstack	graphene_simd4f_t
 opaque	graphene_simd4f_t
 onstack	graphene_simd4x4f_t
 opaque	graphene_simd4x4f_t
+onstack	graphene_frustum_t
+opaque	graphene_frustum_t
 
 # GdkPixbuf
 skip	gdk_pixbuf_read_pixels

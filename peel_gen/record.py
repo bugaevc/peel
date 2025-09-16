@@ -31,6 +31,7 @@ class Record(DefinedType):
         self.onstack = False
         self.is_initially_floating = False
         self.all_fields_supported = True
+        self.any_fields_exposed = False
         self.struct_kw = 'class /* record */'
         assert('glib:is-gtype-struct-for' not in attrs)
         self.is_private = self.gir_name.endswith('Private')
@@ -103,6 +104,8 @@ class Record(DefinedType):
             f.resolve_stuff()
             if not f.we_support_this:
                 self.all_fields_supported = False
+            elif not f.private:
+                self.any_fields_exposed = True
 
             # If a field name conflicts with a method we need to
             # rename the field.
@@ -112,7 +115,7 @@ class Record(DefinedType):
                     break
 
     def should_generate_fields(self):
-        return self.all_fields_supported and not self.opaque and not self.incomplete and not self.is_private
+        return not self.opaque and not self.incomplete and not self.is_private and self.any_fields_exposed
 
     def generate_extra_include_members(self):
         self.resolve_stuff()
@@ -191,7 +194,7 @@ class Record(DefinedType):
         s = api_tweaks.ifdef_for_non_opaque(self.c_type)
         if s:
             l.append(s)
-        if (self.opaque or not self.all_fields_supported) and not self.incomplete:
+        if not self.incomplete and not self.should_generate_fields():
             l.extend([
                 '  ::{} inner peel_no_warn_unused;'.format(self.c_type),
                 ''
@@ -215,7 +218,7 @@ class Record(DefinedType):
             l.append('')
         if self.should_generate_fields():
             for field in self.fields:
-                visibility.switch('private' if field.private else 'public')
+                visibility.switch('private' if field.private or not field.we_support_this else 'public')
                 l.append(field.generate())
             if self.fields:
                 l.append('')

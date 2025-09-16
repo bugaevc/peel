@@ -1,7 +1,7 @@
 from peel_gen.node_handler import NodeHandler
 from peel_gen.array import Array
 from peel_gen.alias import chase_type_aliases
-from peel_gen.utils import massage_c_type, extract_constness_from_c_type, add_asterisk, add_root_namespace, is_type_element
+from peel_gen.utils import make_simple_decl, massage_c_type, extract_constness_from_c_type, add_asterisk, add_root_namespace, is_type_element
 from peel_gen.type import lookup_type, PlainType, VoidType, StrType, VaListType, VoidAliasType, SmuggledPointerType
 from peel_gen.callback import Callback
 from peel_gen.enumeration import Enumeration
@@ -328,14 +328,25 @@ class Parameter(NodeHandler):
                     return s
                 if not s.endswith('*'):
                     s = s + ' '
+
                 return s + out_asterisk + name
             elif tp.fixed_size is not None:
+                if self.is_record_field:
+                    assert(name is not None)
+                    assert(not out_asterisk)
+                    return '{}[{}]'.format(make_simple_decl(s, name), tp.fixed_size)
+
                 if name is None:
                     return '{} (&)[{}]'.format(s, tp.fixed_size)
                 if out_asterisk:
                     raise UnsupportedForNowException('out fixed-size array')
                 return '{} (&{})[{}]'.format(s, name, tp.fixed_size)
             elif tp.length is not None:
+                if self.is_record_field:
+                    assert(name is not None)
+                    assert(not out_asterisk)
+                    return make_simple_decl(add_asterisk(s), name)
+
                 if self.ownership == 'none' or self.ownership is None:
                     array_type = 'peel::ArrayRef<{}>'.format(s)
                 elif self.ownership in ('container', 'full'):
@@ -346,6 +357,14 @@ class Parameter(NodeHandler):
                 if name is None:
                     return array_type
                 return '{} {}{}'.format(array_type, out_asterisk, name)
+            elif tp.zero_terminated:
+                # TODO: https://gitlab.gnome.org/bugaevc/peel/-/issues/1
+                if not self.is_record_field:
+                    raise UnsupportedForNowException('Zero-terminated array')
+
+                assert(not out_asterisk)
+                assert(name is not None)
+                return make_simple_decl(add_asterisk(s), name)
             #elif not tp.zero_terminated and self.ownership in ('none', None):
             #    # A conceptual array, but there's no way to know the length.
             #    # Use a plain pointer to the item type.
@@ -354,7 +373,6 @@ class Parameter(NodeHandler):
             #        return s
             #    return s + name
             else:
-                # TODO support null-terminated arrays
                 raise UnsupportedForNowException('Complex array')
 
         if isinstance(itp, DefinedType) and itp.ns.emit_raw:
@@ -656,6 +674,9 @@ class Parameter(NodeHandler):
                 else:
                     cast_expr = 'reinterpret_cast<{}> ({})'.format(c_type, ptr_expr)
                 return '({}, {})'.format(set_length_param, cast_expr)
+            elif tp.zero_terminated:
+                # TODO: https://gitlab.gnome.org/bugaevc/peel/-/issues/1
+                raise UnsupportedForNowException('Zero-terminated array')
             #elif not tp.zero_terminated and self.ownership in ('none', None):
             #    param_cpp_type = self.generate_cpp_type(
             #        name='',
@@ -745,6 +766,9 @@ class Parameter(NodeHandler):
                         ptr_expr,
                         length_param_name,
                     )
+            elif tp.zero_terminated:
+                # TODO: https://gitlab.gnome.org/bugaevc/peel/-/issues/1
+                raise UnsupportedForNowException('Zero-terminated array')
             #elif not tp.zero_terminated and self.ownership in ('none', None):
             #    if self.c_type == add_asterisk(plain_cpp_type):
             #        return None

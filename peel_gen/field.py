@@ -1,7 +1,10 @@
+from peel_gen.alias import chase_type_aliases
+from peel_gen.array import Array
+from peel_gen.callback import Callback
 from peel_gen.node_handler import NodeHandler
 from peel_gen.parameter import Parameter
 from peel_gen.exceptions import UnsupportedForNowException
-from peel_gen.utils import is_type_element
+from peel_gen.utils import is_type_element, make_simple_decl
 
 class Field(NodeHandler):
     def __init__(self, attrs, cpp_record):
@@ -30,31 +33,54 @@ class Field(NodeHandler):
         if self.param.type is None:
             self.we_support_this = False
 
-    def start_child_element(self, name, attrs):
-        if is_type_element(name, attrs):
-            return self.param.start_child_element(name, attrs)
-        elif name in ('callback', 'array'):
+        tp = chase_type_aliases(self.param.type)
+        if isinstance(tp, Array):
+            # Dynamic-sized arrays are not generated publicly currently as they would
+            # ideally be represented as an `ArrayRef` or `UniquePtr<T[]>`
+            # instead of a pointer and size field.
+            #
+            # Similarly zero-terminated arrays would have to be represented by
+            # some kind of array type instead of a plain pointer.
+            if tp.length is not None or tp.zero_terminated:
+                self.we_support_this = False
+            # Apart from that only fixed-size arrays are supported right now
+            # and generated as public fields
+            elif tp.fixed_size is None:
+                self.we_support_this = False
+        elif isinstance(tp, Callback):
+            # Callbacks operate on plain C types
             self.we_support_this = False
-            return
+
+    def start_child_element(self, name, attrs):
+        return self.param.start_child_element(name, attrs)
 
     def generate_extra_include_members(self):
-        if not self.we_support_this:
+        if not self.we_support_this or self.private:
             return set()
         return self.param.generate_extra_include_members()
 
     def generate_extra_forward_members(self):
-        if not self.we_support_this:
+        if not self.we_support_this or self.private:
             return set()
         return self.param.generate_extra_forward_members()
 
     def generate_extra_include_at_end_members(self):
-        if not self.we_support_this:
+        if not self.we_support_this or self.private:
             return set()
         return self.param.generate_extra_include_at_end_members()
 
     def generate(self):
-        assert(self.we_support_this)
-        s = self.param.generate_cpp_type(name=self.name, context=self.cpp_record)
+        if self.we_support_this and not self.private:
+            s = self.param.generate_cpp_type(name=self.name, context=self.cpp_record)
+        else:
+            try:
+                c_type = self.param.generate_c_type()
+            except UnsupportedForNowException:
+                # Does our record at least have a C type?
+                if self.cpp_record.c_type is None:
+                    raise
+                c_type = 'decltype (::{}::{})'.format(self.cpp_record.c_type, self.name)
+            s = make_simple_decl(c_type, self.name)
         if self.bits is not None:
             s = '{} : {}'.format(s, self.bits)
         return '  {};'.format(s)
