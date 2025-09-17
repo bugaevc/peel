@@ -297,6 +297,14 @@ ref-sink GObject			g_object_ref_sink
 skip	GTypeInstance			GObject		manual
 skip	GTypeClass			GObject		manual
 skip	GTypeInterface			GObject		manual
+skip	GEnumClass			GObject		manual
+skip	g_enum_get_value
+skip	g_enum_get_value_by_name
+skip	g_enum_get_value_by_nick
+skip	GFlagsClass			GObject		manual
+skip	g_flags_get_first_value
+skip	g_flags_get_value_by_name
+skip	g_flags_get_value_by_nick
 type-struct-for GTypeClass		GObject.TypeInstance
 # The following line is a lie, but close enough.
 type-struct	GTypeInstance		GObject.TypeClass
