@@ -185,6 +185,12 @@ onstack	GDate
 onstack	GLogField
 onstack	GPollFD
 onstack	GOptionEntry
+onstack	GMutex
+owned	g_mutex_new	return
+onstack	GCond
+owned	g_cond_new	return
+onstack	GRecMutex
+onstack	GRWLock
 opaque	GSource
 
 onstack	GHashTableIter
