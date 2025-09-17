@@ -63,18 +63,17 @@ class Record(DefinedType):
             m = Method(attrs, self)
             self.methods.append(m)
             return m
-        elif name == 'field':
+        elif name in ('field', 'union', 'record'):
             self.incomplete = False
             if not self.opaque:
                 self.struct_kw = 'struct'
-            f = Field(attrs, self)
+            # TODO: fully anonymous unions/records.
+            if 'name' not in attrs:
+                self.all_fields_supported = False
+                return
+            f = Field(attrs, self, element_name=name)
             self.fields.append(f)
             return f
-        elif name == 'union':
-            self.incomplete = False
-            self.all_fields_supported = False
-            if not self.opaque:
-                self.struct_kw = 'struct'
 
     def resolve_stuff(self):
         if self.has_resolved_stuff:

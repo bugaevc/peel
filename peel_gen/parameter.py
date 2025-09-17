@@ -154,7 +154,7 @@ class Parameter(NodeHandler):
             return tp.generate_extra_include_members()
         elif not isinstance(tp, DefinedType):
             return set()
-        elif tp.ns.emit_raw:
+        elif tp.ns.emit_raw or tp.gir_name is None:
             return set()
         s = set()
         if tp.nested_in:
@@ -178,7 +178,7 @@ class Parameter(NodeHandler):
             return tp.generate_extra_forward_members()
         elif not isinstance(tp, DefinedType):
             return set()
-        elif tp.ns.emit_raw:
+        elif tp.ns.emit_raw or tp.gir_name is None:
             return set()
         else:
             return { tp }
@@ -192,7 +192,7 @@ class Parameter(NodeHandler):
             return tp.generate_extra_include_at_end_members()
         elif not isinstance(tp, DefinedType):
             return set()
-        elif tp.ns.emit_raw:
+        elif tp.ns.emit_raw or tp.gir_name is None:
             return set()
         elif not tp.is_passed_by_ref():
             return set()
@@ -226,9 +226,11 @@ class Parameter(NodeHandler):
             raise UnsupportedForNowException('no type for ' + self.name)
         tp = chase_type_aliases(self.type)
         # Handle the case where we don't have a C type and need to make one up
-        # completely. This happens in signals.
+        # completely. This happens in signals and in anonymous inline unions/records.
         if self.c_type is None:
             if isinstance(tp, DefinedType):
+                if tp.c_type is None:
+                    raise UnsupportedForNowException('anonymous C type')
                 type_name = '::' + tp.c_type
             elif isinstance(tp, PlainType):
                 type_name = tp.gname
@@ -269,6 +271,8 @@ class Parameter(NodeHandler):
         if self.type is None:
             raise UnsupportedForNowException('no type for ' + self.name)
         tp = chase_type_aliases(self.type)
+        if isinstance(tp, DefinedType) and tp.gir_name is None:
+            raise UnsupportedForNowException('anonymous type')
 
         if self.direction == 'in' or for_local_copy:
             out_asterisk = ''

@@ -7,7 +7,7 @@ from peel_gen.exceptions import UnsupportedForNowException
 from peel_gen.utils import is_type_element, make_simple_decl
 
 class Field(NodeHandler):
-    def __init__(self, attrs, cpp_record):
+    def __init__(self, attrs, cpp_record, element_name):
         self.cpp_record = cpp_record
         self.name = attrs['name']
         self.c_name = self.name
@@ -16,6 +16,27 @@ class Field(NodeHandler):
         self.param = Parameter({ 'name': self.name }, ns=self.cpp_record.ns)
         self.param.is_record_field = True
         self.we_support_this = True
+        self.element_name = element_name
+
+        if element_name == 'field':
+            return
+
+        # Otherwise, this field represents an inline anonymous union or struct.
+        assert(element_name in ('union', 'record'))
+        self.we_support_this = False
+        self.param.c_type = None
+        self.param.type_name = None
+        tp_attrs = dict(attrs)
+        # name is the field's name, c:type is a lie.
+        tp_attrs['name'] = None
+        tp_attrs.pop('c:type', None)
+        tp_attrs['peel-fake-defined-type'] = '1'
+        if element_name == 'union':
+            from peel_gen.union import Union
+            self.param.type = Union(tp_attrs, ns=self.cpp_record.ns)
+        elif element_name == 'record':
+            from peel_gen.record import Record
+            self.param.type = Record(tp_attrs, ns=self.cpp_record.ns)
 
     def __repr__(self):
         return 'Field({}.{})'.format(self.cpp_record, self.param)
@@ -53,7 +74,12 @@ class Field(NodeHandler):
             self.we_support_this = False
 
     def start_child_element(self, name, attrs):
-        return self.param.start_child_element(name, attrs)
+        if self.element_name == 'field':
+            # Forward nested elements to the parameter.
+            return self.param.start_child_element(name, attrs)
+        else:
+            # Forward nested elements to the parameter's type.
+            return self.param.type.start_child_element(name, attrs)
 
     def generate_extra_include_members(self):
         if not self.we_support_this or self.private:
