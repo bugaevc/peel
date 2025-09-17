@@ -121,15 +121,11 @@ class Class(DefinedType):
             v = Vfunc(attrs, self)
             self.vfuncs.append(v)
             return v
-        elif name == 'field':
+        elif name in ('field', 'union', 'record'):
             self.sealed = False
-            f = Field(attrs, self)
+            f = Field(attrs, self, element_name=name)
             self.fields.append(f)
             return f
-        elif name == 'union':
-            self.sealed = False
-            self.fields.append('union')
-            return
         elif name == 'glib:signal':
             s = Signal(attrs, self)
             self.signals.append(s)

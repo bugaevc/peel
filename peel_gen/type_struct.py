@@ -34,15 +34,11 @@ class TypeStruct(DefinedType):
             m = Method(attrs, self)
             self.methods.append(m)
             return m
-        elif name == 'field':
+        elif name in ('field', 'union', 'record'):
             self.incomplete = False
-            f = Field(attrs, self)
+            f = Field(attrs, self, element_name=name)
             self.fields.append(f)
             return f
-        elif name == 'union':
-            self.incomplete = False
-            self.fields.append('union')
-            return
 
     def resolve_stuff(self):
         if self.has_resolved_stuff:
