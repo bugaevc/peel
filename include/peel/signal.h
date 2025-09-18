@@ -198,6 +198,44 @@ struct SignalTraits<UniquePtr<T>>
   }
 };
 
+template<>
+struct SignalTraits<peel::GObject::Enum>
+{
+  typedef int CType;
+  typedef peel::GObject::Enum PlainCppType;
+
+  static int
+  to_c (peel::GObject::Enum b)
+  {
+    return b.value;
+  }
+
+  static peel::GObject::Enum
+  from_c (int v)
+  {
+    return peel::GObject::Enum (v);
+  }
+};
+
+template<>
+struct SignalTraits<peel::GObject::Flags>
+{
+  typedef unsigned CType;
+  typedef peel::GObject::Flags PlainCppType;
+
+  static unsigned
+  to_c (peel::GObject::Flags b)
+  {
+    return b.value;
+  }
+
+  static peel::GObject::Flags
+  from_c (unsigned v)
+  {
+    return peel::GObject::Flags (v);
+  }
+};
+
 template<typename T>
 struct SignalTraits<T *>
 {

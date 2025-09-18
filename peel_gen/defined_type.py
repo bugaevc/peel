@@ -51,7 +51,23 @@ class DefinedType(NodeHandler, AnyType):
         self.has_resolved_stuff = True
         # Look up the type we're nested in.
         if self.nested_in_name:
-            self.nested_in = lookup_type(self.nested_in_name, self.ns)
+            # GEnumClass / GFlagsClass are special in the sense that the
+            # instance types don't exist in .gir and resolution would fail
+            # later, so we create dummy types here now
+            if self.c_type == 'GEnumClass':
+                attrs = dict()
+                attrs['name'] = 'Enum'
+                attrs['c:type'] = 'GEnum'
+                attrs['peel-fake-defined-type'] = '1'
+                self.nested_in = DefinedType(attrs, self.ns)
+            elif self.c_type == 'GFlagsClass':
+                attrs = dict()
+                attrs['name'] = 'Flags'
+                attrs['c:type'] = 'GFlags'
+                attrs['peel-fake-defined-type'] = '1'
+                self.nested_in = DefinedType(attrs, self.ns)
+            else:
+                self.nested_in = lookup_type(self.nested_in_name, self.ns)
             self.nested_in.nested_types.append(self)
         elif self.nested_in_alias_name:
             nested_in = lookup_type(self.nested_in_alias_name, self.ns)

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <peel/GObject/Type.h>
+#include <peel/GObject/EnumClass.h>
+#include <peel/GObject/FlagsClass.h>
 #include <peel/String.h>
 #include <peel/lang.h>
 #include <glib-object.h>
@@ -662,6 +664,66 @@ struct Value::Traits<Value>
   cast_for_create (const Value *v) noexcept
   {
     return reinterpret_cast<const ::GValue *> (v);
+  }
+};
+
+template<>
+struct GObject::Value::Traits<Enum>
+{
+  typedef Enum UnownedType;
+
+  static Enum
+  get (const ::GValue *value)
+  {
+    return Enum (g_value_get_enum (value));
+  }
+
+  static void
+  set (::GValue *value, Enum m)
+  {
+    g_value_set_enum (value, m.value);
+  }
+
+  static void
+  set_marshal_return (::GValue *value, Enum m)
+  {
+    set (value, m);
+  }
+
+  static Enum
+  cast_for_create (Enum m) noexcept
+  {
+    return m;
+  }
+};
+
+template<>
+struct GObject::Value::Traits<Flags>
+{
+  typedef Flags UnownedType;
+
+  static Flags
+  get (const ::GValue *value)
+  {
+    return Flags (g_value_get_flags (value));
+  }
+
+  static void
+  set (::GValue *value, Flags m)
+  {
+    g_value_set_flags (value, m.value);
+  }
+
+  static void
+  set_marshal_return (::GValue *value, Flags m)
+  {
+    set (value, m);
+  }
+
+  static Flags
+  cast_for_create (Flags m) noexcept
+  {
+    return m;
   }
 };
 

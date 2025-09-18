@@ -18,59 +18,80 @@ struct EnumValue;
 
 namespace GObject
 {
-class EnumClass : public TypeClass
+struct Enum final
 {
-private:
-  EnumClass () = delete;
-  EnumClass (const EnumClass &) = delete;
-  EnumClass (EnumClass &&) = delete;
-  ~EnumClass ();
-
 public:
-  int minimum;
-  int maximum;
-private:
-  unsigned n_values;
-  EnumValue *values;
+  int value;
 
-public:
-  peel::ArrayRef<EnumValue>
-  get_values () noexcept
+  constexpr
+  Enum (int value) noexcept
+    : value (value)
+  {  }
+
+  Enum (const EnumValue *value) noexcept
+    : value (reinterpret_cast<const ::GEnumValue *> (value)->value)
+  {  }
+
+  constexpr
+  operator int () const noexcept
   {
-      return peel::ArrayRef<EnumValue> (this->values, this->n_values);
+    return value;
   }
 
-  const EnumValue *
-  get_value (int value) noexcept
+  class Class : public TypeClass
   {
-      return reinterpret_cast<const EnumValue *> (g_enum_get_value (reinterpret_cast<::GEnumClass*> (this), value));
-  }
+  private:
+    Class () = delete;
+    Class (const Class &) = delete;
+    Class (Class &&) = delete;
+    ~Class ();
 
-  peel_nonnull_args (2)
-  const EnumValue *
-  get_value_by_name (const char *name) noexcept
-  {
-      return reinterpret_cast<const EnumValue *> (g_enum_get_value_by_name (reinterpret_cast<::GEnumClass*> (this), name));
-  }
+  public:
+    int minimum;
+    int maximum;
+  private:
+    unsigned n_values;
+    EnumValue *values;
 
-  peel_nonnull_args (2)
-  const EnumValue *
-  get_value_by_nick (const char *nick) noexcept
-  {
-      return reinterpret_cast<const EnumValue *> (g_enum_get_value_by_name (reinterpret_cast<::GEnumClass*> (this), nick));
-  }
+  public:
+    peel::ArrayRef<EnumValue>
+    get_values () noexcept
+    {
+        return peel::ArrayRef<EnumValue> (this->values, this->n_values);
+    }
 
-  peel::String
-  to_string (int value) noexcept
-  {
-      return peel::String::adopt_string (g_enum_to_string (this->get_type (), value));
-  }
-}; /* record EnumClass */
+    const EnumValue *
+    get_value (int value) noexcept
+    {
+        return reinterpret_cast<const EnumValue *> (g_enum_get_value (reinterpret_cast<::GEnumClass*> (this), value));
+    }
 
-static_assert (sizeof (EnumClass) == sizeof (::GEnumClass),
-               "EnumClass size mismatch");
-static_assert (alignof (EnumClass) == alignof (::GEnumClass),
-               "EnumClass align mismatch");
+    peel_nonnull_args (2)
+    const EnumValue *
+    get_value_by_name (const char *name) noexcept
+    {
+        return reinterpret_cast<const EnumValue *> (g_enum_get_value_by_name (reinterpret_cast<::GEnumClass*> (this), name));
+    }
+
+    peel_nonnull_args (2)
+    const EnumValue *
+    get_value_by_nick (const char *nick) noexcept
+    {
+        return reinterpret_cast<const EnumValue *> (g_enum_get_value_by_name (reinterpret_cast<::GEnumClass*> (this), nick));
+    }
+
+    peel::String
+    to_string (int value) noexcept
+    {
+        return peel::String::adopt_string (g_enum_to_string (this->get_type (), value));
+    }
+  }; /* class Class */
+}; /* struct Enum */
+
+static_assert (sizeof (Enum::Class) == sizeof (::GEnumClass),
+               "Enum::Class size mismatch");
+static_assert (alignof (Enum::Class) == alignof (::GEnumClass),
+               "Enum::Class align mismatch");
 
 } /* namespace GObject */
 } /* namespace peel */

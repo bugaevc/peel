@@ -298,10 +298,12 @@ skip	GTypeInstance			GObject		manual
 skip	GTypeClass			GObject		manual
 skip	GTypeInterface			GObject		manual
 skip	GEnumClass			GObject		manual
+nest	GEnumClass			Enum::Class
 skip	g_enum_get_value
 skip	g_enum_get_value_by_name
 skip	g_enum_get_value_by_nick
 skip	GFlagsClass			GObject		manual
+nest	GFlagsClass			Flags::Class
 skip	g_flags_get_first_value
 skip	g_flags_get_value_by_name
 skip	g_flags_get_value_by_nick

@@ -5,6 +5,7 @@
 #include <peel/GObject/TypeInstance.h>
 #include <peel/GObject/TypeClass.h>
 #include <peel/GObject/BindingFlags.h>
+#include <peel/GObject/ParamSpec.h>
 #include <peel/RefPtr.h>
 #include <peel/FloatPtr.h>
 #include <peel/lang.h>
@@ -275,7 +276,25 @@ public:
   typename GetPropertyHelper<T>::GetType
   get_property (const char *name) noexcept
   {
-    Value value { Type::of<T> () };
+    Type tp;
+
+    if (std::is_same<T, Enum>::value || std::is_same<T, Flags>::value)
+      {
+        ::GParamSpec *pspec = g_object_class_find_property (G_OBJECT_GET_CLASS (this), name);
+        if (pspec)
+          tp = static_cast<Type> (pspec->value_type);
+        else
+          {
+            if (std::is_same<T, Enum>::value)
+              tp = G_TYPE_ENUM;
+            else if (std::is_same<T, Flags>::value)
+              tp = G_TYPE_FLAGS;
+          }
+      }
+    else
+      tp = Type::of<T> ();
+
+    Value value { tp };
     get_property (name, &value);
     return GetPropertyHelper<T>::get (&value);
   }
@@ -301,7 +320,25 @@ public:
   void
   set_property (const char *name, U &&value) noexcept
   {
-    Value v { Type::of<T> () };
+    Type tp;
+
+    if (std::is_same<T, Enum>::value || std::is_same<T, Flags>::value)
+      {
+        ::GParamSpec *pspec = g_object_class_find_property (G_OBJECT_GET_CLASS (this), name);
+        if (pspec)
+          tp = static_cast<Type> (pspec->value_type);
+        else
+          {
+            if (std::is_same<T, Enum>::value)
+              tp = G_TYPE_ENUM;
+            else if (std::is_same<T, Flags>::value)
+              tp = G_TYPE_FLAGS;
+          }
+      }
+    else
+      tp = Type::of<T> ();
+
+    Value v { tp };
     v.set<T> (std::forward<U> (value));
     set_property (name, &v);
   }
