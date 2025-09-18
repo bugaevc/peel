@@ -2,6 +2,7 @@
 
 #include <peel/GObject/TypeClass.h>
 #include <peel/ArrayRef.h>
+#include <peel/String.h>
 #include <peel/lang.h>
 #include <glib-object.h>
 
@@ -56,6 +57,12 @@ public:
   get_value_by_nick (const char *nick) noexcept
   {
       return reinterpret_cast<const FlagsValue *> (g_flags_get_value_by_name (reinterpret_cast<::GFlagsClass*> (this), nick));
+  }
+
+  peel::String
+  to_string (int value) noexcept
+  {
+      return peel::String::adopt_string (g_flags_to_string (this->get_type (), value));
   }
 }; /* record FlagsClass */
 
