@@ -16,6 +16,9 @@ class Bitfield(DefinedType):
     def start_child_element(self, name, attrs):
         if name == 'member':
             m = BitfieldMember(attrs)
+            # See https://gitlab.gnome.org/GNOME/gobject-introspection/-/issues/264
+            if any(m2.name == m.name for m2 in self.members):
+                return
             self.members.append(m)
             return m
         elif name == 'function':
