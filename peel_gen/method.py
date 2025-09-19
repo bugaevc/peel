@@ -1,3 +1,4 @@
+from peel_gen.exceptions import UnsupportedForNowException
 from peel_gen.function_like import FunctionLike
 from peel_gen.utils import escape_cpp_name
 from peel_gen import c_function_wrapper
@@ -14,6 +15,9 @@ class Method(FunctionLike):
         return 'Method({}.{}, c_ident={})'.format(self.containing_type, self.name, self.c_ident)
 
     def generate(self, indent):
+        if not self.name:
+            raise UnsupportedForNowException('No name for method')
+
         api_tweaks.skip_if_needed(self.c_ident, self.ns)
         l = []
         s = api_tweaks.ifdef_if_needed(self.c_ident)
