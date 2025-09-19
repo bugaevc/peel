@@ -1363,6 +1363,22 @@ onstack GstMapInfo
 raw-params-overload	gst_init	argc,argv
 raw-params-overload	gst_init_check	argc,argv
 
+# GstBase
+
+# See https://gitlab.gnome.org/GNOME/gobject-introspection/-/issues/563
+in	gst_adapter_map	size
+in	gst_adapter_take	nbytes
+in	gst_byte_reader_get_data	size
+in	gst_byte_reader_dup_data	size
+in	gst_byte_reader_peek_data	size
+# Has both free and ref/unref functions
+skip	gst_flow_combiner_free
+no-autofree GstFlowCombiner
+# Deprecated since forever, let's not generate it
+skip	GstCollectPads
+skip	GstCollectData
+skip	GstCollectPadsStateFlags
+
 # Json (json-glib)
 no-autofree JsonNode
 nest	JsonNodeType			Node::Type
