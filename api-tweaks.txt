@@ -1380,6 +1380,22 @@ skip	GstCollectPads
 skip	GstCollectData
 skip	GstCollectPadsStateFlags
 
+# GstAudio
+onstack GstAudioInfo
+onstack GstAudioBuffer
+
+# GstVideo
+# Deprecated since forever, let's not generate it
+skip	GstVideoGLTextureUploadMeta
+skip	gst_buffer_add_video_gl_texture_upload_meta
+skip	gst_video_sink_center_rect
+skip	gst_video_meta_set_alignment
+onstack GstVideoInfo
+onstack GstVideoMasteringDisplayInfoCoordinates
+onstack GstVideoColorimetry
+onstack GstVideoTileInfo
+onstack GstVideoFrame
+
 # Json (json-glib)
 no-autofree JsonNode
 nest	JsonNodeType			Node::Type
