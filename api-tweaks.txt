@@ -1359,6 +1359,7 @@ nest	GstLogContextFlags		LogContext::Flags
 nest	GstIteratorResult		Iterator::Result
 nest	GstIteratorItem			Iterator::Item
 onstack GstMapInfo
+onstack GstSegment
 
 raw-params-overload	gst_init	argc,argv
 raw-params-overload	gst_init_check	argc,argv
