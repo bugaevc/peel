@@ -78,14 +78,20 @@ class Parameter(NodeHandler):
         if self.is_record_field:
             assert(self.ownership is None)
             # Work out self.is_inline_record_field
+            c_type = self.c_type
             tp = chase_type_aliases(self.type)
             if isinstance(tp, Array):
                 itp = chase_type_aliases(tp.item_type)
+                # For fixed-size arrays as record fields they can be inline
+                # fields and the item's C type is what we have to look at
+                # below.
+                if tp.fixed_size is not None:
+                    c_type = tp.item_c_type
             else:
                 itp = tp
-            if not itp.is_passed_by_ref() or (tp is not tp and itp.can_be_allocated_by_value()):
+            if not tp.is_passed_by_ref():
                 self.is_inline_record_field = True
-            elif self.c_type:
+            elif c_type:
                 # In record fields, even some types that cannot be normally allocated by
                 # value, still are.
                 #
@@ -101,7 +107,7 @@ class Parameter(NodeHandler):
                 if isinstance(itp, Record) and itp.pointer:
                     self.is_inline_record_field = False
                 else:
-                    constness = extract_constness_from_c_type(self.c_type)
+                    constness = extract_constness_from_c_type(c_type)
                     self.is_inline_record_field = not constness
             else:
                 self.is_inline_record_field = False
