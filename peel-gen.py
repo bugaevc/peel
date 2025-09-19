@@ -186,10 +186,7 @@ def emit_repo(repo, out_dir):
 
 def main():
     arg_parser = ArgumentParser(prog='peel-gen')
-    # TODO: Make it possible to specify multiple repos
-    arg_parser.add_argument('name', metavar='repo-name')
-    # TODO: Don't require version
-    arg_parser.add_argument('version', metavar='repo-version')
+    arg_parser.add_argument('repos', nargs='+', metavar='repo-name repo-version')
 
     arg_parser.add_argument('--version', action='version', version='peel ' + peel_version)
     arg_parser.add_argument('--raw', action='append', default=[], metavar='namespace')
@@ -204,12 +201,29 @@ def main():
     for path in args.api_tweaks:
         api_tweaks.load_from_file(path)
 
-    repo = find_and_parse_gir_repo(args.name, args.version)
+    if len(args.repos) % 2 != 0:
+        arg_parser.error("Each repository needs both a name and a version")
+
+    requested_repos = []
+
+    for i in range(0, len(args.repos), 2):
+        name = args.repos[i]
+        version = args.repos[i+1]
+
+        # The repo could have already found as a dependency of another repository,
+        # and added to the repository map. Let's add it to our requested list from
+        # the map in this case.
+        if (name, version) not in repository_map:
+            requested_repos.append(find_and_parse_gir_repo(name, version))
+        else:
+            requested_repos.append(repository_map[(name, version)])
+
     if args.recursive:
         for repo in repository_map.values():
             emit_repo(repo, out_dir=args.out_dir)
     else:
-        emit_repo(repo, out_dir=args.out_dir)
+        for repo in requested_repos:
+          emit_repo(repo, out_dir=args.out_dir)
 
 if __name__ == '__main__':
     main()
