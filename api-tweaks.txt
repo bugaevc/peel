@@ -834,6 +834,7 @@ nest	GdkFrameClockPhase		FrameClock::Phase
 nest	GdkPaintableFlags		Paintable::Flags
 nest	GdkSeatCapabilities		Seat::Capabilities
 nest	GdkToplevelState		Toplevel::State
+nest	GdkToplevelCapabilities		Toplevel::Capabilities
 
 nest	GdkTextureError			Texture::Error
 
@@ -871,6 +872,7 @@ skip	GskBroadwayRenderer
 nest	GskPathDirection		Path::Direction
 nest	GskPathOperation		Path::Operation
 nest	GskPathForeachFlags		Path::ForeachFlags
+nest	GskPathIntersection		Path::Intersection
 nest	GskRenderNodeType		RenderNode::Type
 nest	GskTransformCategory		Transform::Category
 
@@ -1098,6 +1100,7 @@ nest	GtkSpinButtonUpdatePolicy	SpinButton::UpdatePolicy
 nest	GtkStackTransitionType		Stack::TransitionType
 nest	GtkStringFilterMatchMode	StringFilter::MatchMode
 nest	GtkTextViewLayer		TextView::Layer
+nest	GtkWindowGravity		Window::Gravity
 
 nest	GtkTreeViewColumnSizing		TreeView::ColumnSizing
 nest	GtkTreeViewDropPosition		TreeView::DropPosition
