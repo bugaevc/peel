@@ -2,7 +2,7 @@ test:
   stage: test
   image: "debian:12"
   before_script:
-    - apt update && apt install -y meson libgirepository1.0-dev python3 g++ libgtk-4-dev
+    - apt update && apt install -y meson libgirepository1.0-dev python3 g++ libgtk-4-dev libadwaita-1-dev libsoup-3.0-dev
   script:
     - CXX=gcc meson setup build -Dcpp_std=c++11 -Dcpp_eh=none -Dbuild_examples=true
     - meson compile -C build
