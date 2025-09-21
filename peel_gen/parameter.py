@@ -332,8 +332,8 @@ class Parameter(NodeHandler):
                 return s + out_asterisk + name
             elif tp.fixed_size is not None:
                 if self.is_record_field:
-                    assert name is not None
-                    assert not out_asterisk
+                    assert(name is not None)
+                    assert(not out_asterisk)
                     return '{}[{}]'.format(make_simple_decl(s, name), tp.fixed_size)
 
                 if name is None:
@@ -343,8 +343,8 @@ class Parameter(NodeHandler):
                 return '{} (&{})[{}]'.format(s, name, tp.fixed_size)
             elif tp.length is not None:
                 if self.is_record_field:
-                    assert name is not None
-                    assert not out_asterisk
+                    assert(name is not None)
+                    assert(not out_asterisk)
                     return make_simple_decl(add_asterisk(s), name)
 
                 if self.ownership == 'none' or self.ownership is None:
@@ -362,8 +362,8 @@ class Parameter(NodeHandler):
                 if not self.is_record_field:
                     raise UnsupportedForNowException('Zero-terminated array')
 
-                assert not out_asterisk
-                assert name is not None
+                assert(not out_asterisk)
+                assert(name is not None)
                 return make_simple_decl(add_asterisk(s), name)
             #elif not tp.zero_terminated and self.ownership in ('none', None):
             #    # A conceptual array, but there's no way to know the length.
