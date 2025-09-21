@@ -6,13 +6,27 @@ libadwaita = dependency('libadwaita-1', required: false)
 libsoup = dependency('libsoup-3.0', required: false)
 libdex = dependency('libdex-1.0', required: false)
 
-peel_gtk = custom_target('peel-gtk-codegen',
-  command: [
-    py, meson.project_source_root() / 'peel-gen.py',
-    '--recursive',
-    '--out-dir', '@OUTDIR@',
-    'Gtk', '4.0',
-  ],
+peel_gen_command = [
+  py, meson.project_source_root() / 'peel-gen.py',
+  '--recursive',
+  '--out-dir', '@OUTDIR@',
+  'Gtk', '4.0',
+]
+
+if libadwaita.found()
+  peel_gen_command += ['Adw', '1']
+endif
+
+if libsoup.found()
+  peel_gen_command += ['Soup', '3.0']
+endif
+
+if libdex.found()
+  peel_gen_command += ['Dex', '1']
+endif
+
+peel_headers = custom_target('peel-codegen',
+  command: peel_gen_command,
   output: 'peel',
 )
 
@@ -35,6 +49,12 @@ gtk_examples = [
   'scrollable-widget',
 ]
 
+adw_examples = ['adwaita']
+
+soup_examples = ['soup']
+
+dex_examples = ['libdex']
+
 if gtk4.version().version_compare('>= 4.10')
   gtk_examples += [
     'color-gradient',
@@ -45,17 +65,50 @@ endif
 foreach example : glib_examples
   executable(example,
     example + '.cpp',
-    peel_gtk,
+    peel_headers,
     dependencies: [glib, peel_dep],
-    install: false
+    install: false,
   )
 endforeach
 
 foreach example : gtk_examples
   executable(example,
     example + '.cpp',
-    peel_gtk,
+    peel_headers,
     dependencies: [gtk4, peel_dep],
-    install: false
+    install: false,
   )
 endforeach
+
+if libadwaita.found()
+  foreach example : adw_examples
+    executable(example,
+      example + '.cpp',
+      peel_headers,
+      dependencies: [libadwaita, gtk4, peel_dep],
+      install: false,
+    )
+  endforeach
+endif
+
+if libsoup.found()
+  foreach example : soup_examples
+    executable(example,
+      example + '.cpp',
+      peel_headers,
+      dependencies: [libsoup, peel_dep],
+      install: false,
+    )
+  endforeach
+endif
+
+if libdex.found()
+  foreach example : dex_examples
+    executable(example,
+      example + '.cpp',
+      peel_headers,
+      dependencies: [libdex, peel_dep],
+      install: false,
+    )
+  endforeach
+endif
