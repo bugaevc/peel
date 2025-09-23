@@ -10,6 +10,7 @@ class Field(NodeHandler):
     def __init__(self, attrs, cpp_record):
         self.cpp_record = cpp_record
         self.name = attrs['name']
+        self.c_name = self.name
         self.private = attrs.get('private', None) == '1'
         self.bits = attrs.get('bits', None)
         self.param = Parameter({ 'name': self.name }, ns=self.cpp_record.ns)
@@ -79,7 +80,7 @@ class Field(NodeHandler):
                 # Does our record at least have a C type?
                 if self.cpp_record.c_type is None:
                     raise
-                c_type = 'decltype (::{}::{})'.format(self.cpp_record.c_type, self.name)
+                c_type = 'decltype (::{}::{})'.format(self.cpp_record.c_type, self.c_name)
             s = make_simple_decl(c_type, self.name)
         if self.bits is not None:
             s = '{} : {}'.format(s, self.bits)
