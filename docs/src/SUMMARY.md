@@ -5,6 +5,7 @@
     - [Running peel-gen](peel-gen.md)
     - [Using peel with CMake](using-peel-with-cmake.md)
     - [Using peel with Meson](using-peel-with-meson.md)
+    - [Using peel with Flatpak](using-peel-with-flatpak.md)
 - [The Basics](the-basics.md)
     - [Value](value.md)
 - [Smart Pointers]()
