@@ -1,5 +1,8 @@
+from peel_gen.alias import chase_type_aliases
 from peel_gen.node_handler import NodeHandler
 from peel_gen.parameter import Parameter
+from peel_gen.type import PlainType
+from peel_gen.exceptions import UnsupportedForNowException
 
 class Property(NodeHandler):
     def __init__(self, attrs, cpp_class):
@@ -24,6 +27,10 @@ class Property(NodeHandler):
         return self.type_param.generate_extra_include_at_end_members()
 
     def generate(self):
+        tp = chase_type_aliases(self.type_param.type)
+        if isinstance(tp, PlainType) and tp.gname in ['glong', 'gulong']:
+            raise UnsupportedForNowException('glong / gulong properties not supported')
+
         param_cpp_type = self.type_param.generate_cpp_type(name=None, context=self.cpp_class, strip_refs=1)
         l = [
             '  static peel::Property<{}>'.format(param_cpp_type),

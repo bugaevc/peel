@@ -1,4 +1,7 @@
+from peel_gen.alias import chase_type_aliases
 from peel_gen.function_like import FunctionLike
+from peel_gen.type import PlainType
+from peel_gen.exceptions import UnsupportedForNowException
 
 class Signal(FunctionLike):
     def __init__(self, attrs, containing_type):
@@ -12,6 +15,12 @@ class Signal(FunctionLike):
 
     def generate(self):
         connect_signal_name = self.name.replace('-', '_')
+
+        for param in ([self.rv] if self.rv else []) + (self.params.params if self.params else []):
+            tp = chase_type_aliases(param.type)
+            if isinstance(tp, PlainType) and tp.gname in ['glong', 'gulong']:
+                raise UnsupportedForNowException('Signals with glong / gulong return type or parameters not supported')
+
         rv_cpp_type = self.rv.generate_cpp_type(name=None, context=self.containing_type)
         if self.params is not None:
             param_types = [p.generate_cpp_type(name=None, context=self.containing_type) for p in self.params.params]

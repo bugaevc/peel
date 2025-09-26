@@ -112,6 +112,44 @@ struct SignalTraits<String>
 };
 
 template<>
+struct SignalTraits<GObject::Long>
+{
+  typedef long CType;
+  typedef GObject::Long PlainCppType;
+
+  static long
+  to_c (GObject::Long l)
+  {
+    return l;
+  }
+
+  static GObject::Long
+  from_c (long l)
+  {
+    return l;
+  }
+};
+
+template<>
+struct SignalTraits<GObject::ULong>
+{
+  typedef unsigned long CType;
+  typedef GObject::ULong PlainCppType;
+
+  static unsigned long
+  to_c (GObject::ULong l)
+  {
+    return l;
+  }
+
+  static GObject::ULong
+  from_c (unsigned long l)
+  {
+    return l;
+  }
+};
+
+template<>
 struct SignalTraits<GObject::Type>
 {
   typedef ::GType CType;

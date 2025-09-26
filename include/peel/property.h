@@ -121,6 +121,86 @@ struct PspecTraits<unsigned>
 };
 
 template<>
+struct PspecTraits<GObject::Long>
+{
+  GObject::Long minimum;
+  GObject::Long maximum;
+  GObject::Long default_value;
+
+  constexpr PspecTraits (GObject::Long minimum, GObject::Long maximum, GObject::Long default_value)
+    : minimum (minimum)
+    , maximum (maximum)
+    , default_value (default_value)
+  { }
+
+  ::GParamSpec *
+  create_pspec (PspecBasics basics)
+  {
+    return g_param_spec_long (basics.name, basics.nick, basics.blurb, minimum, maximum, default_value, basics.flags);
+  }
+};
+
+template<>
+struct PspecTraits<GObject::ULong>
+{
+  GObject::ULong minimum;
+  GObject::ULong maximum;
+  GObject::ULong default_value;
+
+  constexpr PspecTraits (GObject::ULong minimum, GObject::ULong maximum, GObject::ULong default_value)
+    : minimum (minimum)
+    , maximum (maximum)
+    , default_value (default_value)
+  { }
+
+  ::GParamSpec *
+  create_pspec (PspecBasics basics)
+  {
+    return g_param_spec_ulong (basics.name, basics.nick, basics.blurb, minimum, maximum, default_value, basics.flags);
+  }
+};
+
+template<>
+struct PspecTraits<int64_t>
+{
+  int64_t minimum;
+  int64_t maximum;
+  int64_t default_value;
+
+  constexpr PspecTraits (int64_t minimum, int64_t maximum, int64_t default_value)
+    : minimum (minimum)
+    , maximum (maximum)
+    , default_value (default_value)
+  { }
+
+  ::GParamSpec *
+  create_pspec (PspecBasics basics)
+  {
+    return g_param_spec_int64 (basics.name, basics.nick, basics.blurb, minimum, maximum, default_value, basics.flags);
+  }
+};
+
+template<>
+struct PspecTraits<uint64_t>
+{
+  uint64_t minimum;
+  uint64_t maximum;
+  uint64_t default_value;
+
+  constexpr PspecTraits (uint64_t minimum, uint64_t maximum, uint64_t default_value)
+    : minimum (minimum)
+    , maximum (maximum)
+    , default_value (default_value)
+  { }
+
+  ::GParamSpec *
+  create_pspec (PspecBasics basics)
+  {
+    return g_param_spec_uint64 (basics.name, basics.nick, basics.blurb, minimum, maximum, default_value, basics.flags);
+  }
+};
+
+template<>
 struct PspecTraits<float>
 {
   float minimum;

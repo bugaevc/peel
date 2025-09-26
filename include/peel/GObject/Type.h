@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 #include <peel/lang.h>
 #include <peel/UniquePtr.h>
 #include <glib-object.h>
@@ -13,6 +15,38 @@ class String;
 
 namespace GObject
 {
+
+struct Long final
+{
+  long value;
+
+  constexpr
+  Long (long value) noexcept
+    : value (value)
+  { }
+
+  constexpr
+  operator long () const noexcept
+  {
+    return value;
+  }
+};
+
+struct ULong final
+{
+  unsigned long value;
+
+  constexpr
+  ULong (unsigned long value) noexcept
+    : value (value)
+  { }
+
+  constexpr
+  operator unsigned long () const noexcept
+  {
+    return value;
+  }
+};
 
 class Type final
 {
@@ -292,19 +326,31 @@ Type::of<unsigned int> ()
 
 template<>
 constexpr inline Type
-Type::of<long> ()
+Type::of<Long> ()
 {
   return G_TYPE_LONG;
 }
 
 template<>
 constexpr inline Type
-Type::of<unsigned long> ()
+Type::of<ULong> ()
 {
   return G_TYPE_ULONG;
 }
 
-/* TODO: int64, uint64 might be same as long, what do we do? */
+template<>
+constexpr inline Type
+Type::of<int64_t> ()
+{
+  return G_TYPE_INT64;
+}
+
+template<>
+constexpr inline Type
+Type::of<uint64_t> ()
+{
+  return G_TYPE_UINT64;
+}
 
 template<>
 constexpr inline Type

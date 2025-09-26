@@ -394,7 +394,128 @@ struct Value::Traits<double>
   }
 };
 
-// long, unsigned long...
+template<>
+struct Value::Traits<Long>
+{
+  typedef Long UnownedType;
+
+  G_GNUC_CONST
+  static Long
+  get (const ::GValue *value) noexcept
+  {
+    return Long (g_value_get_long (value));
+  }
+
+  static void
+  set (::GValue *value, Long l) noexcept
+  {
+    g_value_set_long (value, l.value);
+  }
+
+  static void
+  set_marshal_return (::GValue *value, Long l) noexcept
+  {
+    return set (value, l);
+  }
+
+  static gulong
+  cast_for_create (Long l) noexcept
+  {
+    return l.value;
+  }
+};
+
+template<>
+struct Value::Traits<ULong>
+{
+  typedef ULong UnownedType;
+
+  G_GNUC_CONST
+  static ULong
+  get (const ::GValue *value) noexcept
+  {
+    return ULong (g_value_get_ulong (value));
+  }
+
+  static void
+  set (::GValue *value, ULong l) noexcept
+  {
+    g_value_set_ulong (value, l.value);
+  }
+
+  static void
+  set_marshal_return (::GValue *value, ULong l) noexcept
+  {
+    return set (value, l);
+  }
+
+  static gulong
+  cast_for_create (ULong l) noexcept
+  {
+    return l.value;
+  }
+};
+template<>
+struct Value::Traits<int64_t>
+{
+  typedef int64_t UnownedType;
+
+  G_GNUC_CONST
+  static int64_t
+  get (const ::GValue *value) noexcept
+  {
+    return g_value_get_int64 (value);
+  }
+
+  static void
+  set (::GValue *value, int64_t i) noexcept
+  {
+    g_value_set_int64 (value, i);
+  }
+
+  static void
+  set_marshal_return (::GValue *value, int64_t i) noexcept
+  {
+    return set (value, i);
+  }
+
+  static gint64
+  cast_for_create (int64_t i) noexcept
+  {
+    return i;
+  }
+};
+
+template<>
+struct Value::Traits<uint64_t>
+{
+  typedef uint64_t UnownedType;
+
+  G_GNUC_CONST
+  static uint64_t
+  get (const ::GValue *value) noexcept
+  {
+    return g_value_get_uint64 (value);
+  }
+
+  static void
+  set (::GValue *value, uint64_t i) noexcept
+  {
+    g_value_set_uint64 (value, i);
+  }
+
+  static void
+  set_marshal_return (::GValue *value, uint64_t i) noexcept
+  {
+    return set (value, i);
+  }
+
+  static guint64
+  cast_for_create (uint64_t i) noexcept
+  {
+    return i;
+  }
+};
 
 template<>
 struct Value::Traits<const char *>
