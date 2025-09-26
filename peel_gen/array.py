@@ -1,6 +1,6 @@
 from peel_gen.node_handler import NodeHandler
 from peel_gen.type import AnyType, lookup_type
-from peel_gen.utils import is_type_element
+from peel_gen.utils import is_type_element, massage_c_type
 
 # Not a defined type!
 class Array(NodeHandler, AnyType):
@@ -10,6 +10,7 @@ class Array(NodeHandler, AnyType):
         self.length = attrs.get('length', None)
         self.zero_terminated = attrs.get('zero-terminated', '0') == '1'
         self.item_type_name = None
+        self.item_c_type = None
         self.item_type = None
         self.has_resolved_stuff = False
 
@@ -19,8 +20,10 @@ class Array(NodeHandler, AnyType):
     def start_child_element(self, name, attrs):
         if is_type_element(name, attrs):
             self.item_type_name = attrs['name']
+            self.item_c_type = attrs.get('c:type', None)
         elif name == 'array':
             self.item_type = Array(attrs, ns=self.ns)
+            self.item_c_type = attrs.get('c:type', None)
             return self.item_type
 
     def is_passed_by_ref(self):
