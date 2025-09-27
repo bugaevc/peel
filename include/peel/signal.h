@@ -174,7 +174,7 @@ struct SignalTraits<RefPtr<T>>
   typedef T *CType;
   typedef T PlainCppType;
 
-  /* No conversion to C, as this should never be needed. */
+  /* No conversion to C, as this would cause an use-after-free. */
 
   static RefPtr<T>
   from_c (T *ptr)
@@ -189,7 +189,7 @@ struct SignalTraits<UniquePtr<T>>
   typedef T *CType;
   typedef T PlainCppType;
 
-  /* No conversion to C, as this should never be needed. */
+  /* No conversion to C, as this would cause an use-after-free. */
 
   static UniquePtr<T>
   from_c (T *ptr)
@@ -333,7 +333,7 @@ struct SignalHelper2
   static Ret
   emit (void *instance, gint id, ::GQuark detail, Args... args) noexcept
   {
-    typename SignalTraits<Ret>::CType ret_c = 0;
+    typename SignalTraits<Ret>::CType ret_c;
     g_signal_emit (instance, id, detail, SignalTraits<Args>::to_c (args)..., &ret_c);
     return SignalTraits<Ret>::from_c (ret_c);
   }
@@ -342,7 +342,7 @@ struct SignalHelper2
   static Ret
   emit_by_name (void *instance, const char *detailed_name, Args... args) noexcept
   {
-    typename SignalTraits<Ret>::CType ret_c = 0;
+    typename SignalTraits<Ret>::CType ret_c;
     g_signal_emit_by_name (instance, detailed_name, SignalTraits<Args>::to_c (args)..., &ret_c);
     return SignalTraits<Ret>::from_c (ret_c);
   }
