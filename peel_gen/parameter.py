@@ -347,11 +347,20 @@ class Parameter(NodeHandler):
                     assert(not out_asterisk)
                     return '{}[{}]'.format(make_simple_decl(s, name), tp.fixed_size)
 
-                if name is None:
-                    return '{} (&)[{}]'.format(s, tp.fixed_size)
                 if out_asterisk:
                     raise UnsupportedForNowException('out fixed-size array')
-                return '{} (&{})[{}]'.format(s, name, tp.fixed_size)
+                if self.nullable:
+                    # TODO: Perhaps we should have a FixedArrayRef<T, N> that would be
+                    # initializable either from nullptr or an array reference?
+                    if name:
+                        return make_simple_decl(s, '*' + name)
+                    else:
+                        return add_asterisk(s)
+                else:
+                    if name:
+                        return make_simple_decl(s, '(&{})[{}]'.format(name, tp.fixed_size))
+                    else:
+                        return '{} (&)[{}]'.format(s, tp.fixed_size)
             elif tp.length is not None:
                 if self.is_record_field:
                     assert(name is not None)

@@ -323,6 +323,14 @@ public:
     return reinterpret_cast<const float (&)[4]> (*_peel_return);
   }
 
+  const float *
+  return_nullable_fixed_size_array () noexcept
+  {
+    ::TestTesty *_peel_this = reinterpret_cast<::TestTesty *> (this);
+    const float * _peel_return = test_testy_return_nullable_fixed_size_array (_peel_this);
+    return reinterpret_cast<const float *> (*_peel_return);
+  }
+
   peel::ArrayRef<const GObject::Binding::Flags>
   return_flags_array () noexcept
   {
@@ -726,6 +734,16 @@ protected:
     const float * _peel_return = _peel_class->return_fixed_size_array (_peel_this);
     peel_assume (_peel_return);
     return reinterpret_cast<const float (&)[4]> (*_peel_return);
+  }
+
+  template<typename DerivedClass>
+  const float *
+  parent_vfunc_return_nullable_fixed_size_array () noexcept
+  {
+    ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (GObject::TypeClass::peek<DerivedClass> ()->peek_parent ());
+    ::TestTesty *_peel_this = reinterpret_cast<::TestTesty *> (this);
+    const float * _peel_return = _peel_class->return_nullable_fixed_size_array (_peel_this);
+    return reinterpret_cast<const float *> (*_peel_return);
   }
 
   template<typename DerivedClass>
@@ -1152,6 +1170,19 @@ public:
       {
         DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
         const float (&_peel_return)[4] = _peel_this->DerivedClass::vfunc_return_fixed_size_array ();
+        return reinterpret_cast<const float *> (_peel_return);
+      };
+    }
+
+    template<typename DerivedClass>
+    void
+    override_vfunc_return_nullable_fixed_size_array ()
+    {
+      ::TestTestyClass *klass = reinterpret_cast<::TestTestyClass *> (this);
+      klass->return_nullable_fixed_size_array = +[] (::TestTesty *self) -> const float *
+      {
+        DerivedClass *_peel_this = reinterpret_cast<DerivedClass *> (self);
+        const float *_peel_return = _peel_this->DerivedClass::vfunc_return_nullable_fixed_size_array ();
         return reinterpret_cast<const float *> (_peel_return);
       };
     }

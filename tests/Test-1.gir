@@ -726,6 +726,30 @@
           </instance-parameter>
         </parameters>
       </virtual-method>
+      <method name="return_nullable_fixed_size_array" c:identifier="test_testy_return_nullable_fixed_size_array">
+        <return-value transfer-ownership="none" nullable="1">
+          <array zero-terminated="0" c:type="const float*" fixed-size="4">
+            <type name="gfloat" c:type="float"/>
+          </array>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+        </parameters>
+      </method>
+      <virtual-method name="return_nullable_fixed_size_array">
+        <return-value transfer-ownership="none" nullable="1">
+          <array zero-terminated="0" c:type="const float*" fixed-size="4">
+            <type name="gfloat" c:type="float"/>
+          </array>
+        </return-value>
+        <parameters>
+          <instance-parameter name="self" transfer-ownership="none">
+            <type name="Testy" c:type="TestTesty*"/>
+          </instance-parameter>
+        </parameters>
+      </virtual-method>
       <method name="return_flags_array" c:identifier="test_testy_return_flags_array">
         <return-value transfer-ownership="none">
           <array length="0" c:type="const GBindingFlags*">
