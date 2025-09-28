@@ -16,20 +16,27 @@
 #include <cstdint>
 #include <utility>
 #include <peel-test/peel-test.h>
+#include <peel/GObject/Value.h>
 
 peel_begin_header
 
 namespace peel
 {
+namespace GObject
+{
+class Object;
+struct Value;
+} /* namespace GObject */
+
 namespace Test
 {
-class /* record */ Rec;
+struct Rec;
 } /* namespace Test */
 
 
 namespace Test
 {
-class /* record */ Rec
+struct Rec
 {
 private:
   Rec () = delete;
@@ -38,6 +45,16 @@ private:
   ~Rec ();
 
 public:
+  int int_field;
+  gboolean bool_field;
+  GObject::Value inline_value_field;
+  GObject::Value *value_pointer_field;
+  GObject::Object *object_field;
+  int array_of_ints[4];
+  GObject::Value array_of_inline_values[4];
+  GObject::Value *array_of_value_pointers[4];
+  GObject::Object *array_of_object_pointers[4];
+
   peel_arg_inout (2) peel_nonnull_args (2)
   void
   pass_inout_int (int *i) noexcept
@@ -67,6 +84,11 @@ public:
     test_rec_self_gpointer (_peel_this);
   }
 }; /* record Rec */
+
+static_assert (sizeof (Rec) == sizeof (::TestRec),
+               "Rec size mismatch");
+static_assert (alignof (Rec) == alignof (::TestRec),
+               "Rec align mismatch");
 
 } /* namespace Test */
 } /* namespace peel */

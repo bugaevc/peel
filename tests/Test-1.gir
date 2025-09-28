@@ -1262,6 +1262,41 @@
       </field>
     </record>
     <record name="Rec" c:type="TestRec">
+      <field name="int_field">
+        <type name="gint" c:type="int"/>
+      </field>
+      <field name="bool_field">
+        <type name="gboolean" c:type="gboolean"/>
+      </field>
+      <field name="inline_value_field">
+        <type name="GObject.Value" c:type="GValue"/>
+      </field>
+      <field name="value_pointer_field">
+        <type name="GObject.Value" c:type="GValue*"/>
+      </field>
+      <field name="object_field">
+        <type name="GObject.Object" c:type="GObject*"/>
+      </field>
+      <field name="array_of_ints">
+        <array zero-terminated="0" fixed-size="4">
+          <type name="gint" c:type="int"/>
+        </array>
+      </field>
+      <field name="array_of_inline_values">
+        <array zero-terminated="0" fixed-size="4">
+          <type name="GObject.Value" c:type="GValue"/>
+        </array>
+      </field>
+      <field name="array_of_value_pointers">
+        <array zero-terminated="0" fixed-size="4">
+          <type name="GObject.Value" c:type="GValue*"/>
+        </array>
+      </field>
+      <field name="array_of_object_pointers">
+        <array zero-terminated="0" fixed-size="4">
+          <type name="GObject.Object" c:type="GObject*"/>
+        </array>
+      </field>
       <method name="pass_inout_int" c:identifier="test_rec_pass_inout_int">
         <return-value>
           <type name="none" c:type="void"/>
