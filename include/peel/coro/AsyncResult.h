@@ -2,6 +2,7 @@
 
 #include <coroutine>
 #include <atomic>
+#include <peel/lang.h>
 
 peel_begin_header
 

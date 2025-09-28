@@ -1,6 +1,7 @@
 #pragma once
 
 #include <coroutine>
+#include <peel/lang.h>
 
 peel_begin_header
 
