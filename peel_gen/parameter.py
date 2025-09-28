@@ -78,14 +78,19 @@ class Parameter(NodeHandler):
         if self.is_record_field:
             assert(self.ownership is None)
             # Work out self.is_inline_record_field
+            c_type = self.c_type
             tp = chase_type_aliases(self.type)
             if isinstance(tp, Array):
                 itp = chase_type_aliases(tp.item_type)
+                # For fixed-size arrays as record fields they can be inline
+                # fields and the item's C type is what we have to look at
+                # below.
+                if tp.fixed_size is not None:
+                    c_type = tp.item_c_type
             else:
                 itp = tp
-            if not itp.is_passed_by_ref() or (tp is not tp and itp.can_be_allocated_by_value()):
-                self.is_inline_record_field = True
-            elif self.c_type:
+
+            if c_type:
                 # In record fields, even some types that cannot be normally allocated by
                 # value, still are.
                 #
@@ -101,8 +106,10 @@ class Parameter(NodeHandler):
                 if isinstance(itp, Record) and itp.pointer:
                     self.is_inline_record_field = False
                 else:
-                    constness = extract_constness_from_c_type(self.c_type)
+                    constness = extract_constness_from_c_type(c_type)
                     self.is_inline_record_field = not constness
+            elif not tp.is_passed_by_ref() or (tp is not itp and itp.can_be_allocated_by_value()):
+                self.is_inline_record_field = True
             else:
                 self.is_inline_record_field = False
 
@@ -427,18 +434,18 @@ class Parameter(NodeHandler):
             strip_refs -= 1
             return make_type(constness0 + type_name)
 
+        if self.is_record_field:
+            if self.is_inline_record_field:
+                return make_type(type_name)
+            else:
+                return make_type(constness0 + add_asterisk(type_name) + constness1)
+
         if itp.can_be_allocated_by_value():
             # Even if we're normally passed by ref, inside arrays (or for record fields)
             # we're not behind an additional pointer. In this case ownership would apply
             # to the array, not the item.
             if itp is not tp:
                 return make_type(constness0 + type_name)
-
-        if self.is_record_field:
-            if self.is_inline_record_field:
-                return make_type(type_name)
-            else:
-                return make_type(constness0 + add_asterisk(type_name) + constness1)
 
         if self.ownership in ('none', None) or self.caller_allocates or isinstance(itp, VoidAliasType):
             return make_type(constness0 + add_asterisk(type_name) + constness1)
