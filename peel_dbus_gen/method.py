@@ -219,14 +219,20 @@ class Method:
 
     def generate_proxy_vfuncs(self):
         self.generate_arg_lists()
+        num_in_args = len([arg for arg in self.arguments if arg.direction == 'in'])
+        in_args = ',\n'.join('      ' + arg.generate_make_variant() for arg in self.arguments if arg.direction == 'in')
         return '\n'.join([
             'static void',
             '{}_proxy_{}_async ({} *self, {}'.format(self.iface.emit_name, self.cpp_name, self.iface.emit_name, self.in_args.strip()),
             '  ::GAsyncReadyCallback callback, gpointer user_data, ::peel::Gio::Cancellable *cancellable, ::peel::Gio::DBusCallFlags bus_call_flags, int bus_call_timeout_msec)',
             '{',
             '  ::GDBusProxy *proxy = G_DBUS_PROXY (self);',
-            '  g_dbus_proxy_call (proxy, "{}", nullptr /* TODO: in args */,'.format(self.dbus_name),
-            '    static_cast<::GDBusCallFlags> (bus_call_flags), bus_call_timeout_msec, reinterpret_cast<::GCancellable *> (cancellable), callback, user_data);'
+            '  ::GVariant *_peel_args[{}]'.format(num_in_args),
+            '    {',
+            in_args,
+            '    };',
+            '  g_dbus_proxy_call (proxy, "{}", g_variant_new_tuple (_peel_args, {}),'.format(self.dbus_name, num_in_args),
+            '    static_cast<::GDBusCallFlags> (bus_call_flags), bus_call_timeout_msec, reinterpret_cast<::GCancellable *> (cancellable), callback, user_data);',
             '}',
             '',
             'static bool',
@@ -244,11 +250,23 @@ class Method:
             '{}_proxy_{}_sync ({} *self, {}'.format(self.iface.emit_name, self.cpp_name, self.iface.emit_name, (self.in_args + self.out_args).strip()),
             '  ::peel::UniquePtr<::peel::GLib::Error> *error, ::peel::Gio::Cancellable *cancellable, ::peel::Gio::DBusCallFlags bus_call_flags, int bus_call_timeout_msec)',
             '{',
-            '  ::peel::Gio::DBusProxy *proxy = self->cast<::peel::Gio::DBusProxy> ();',
-            '  ::peel::RefPtr<::peel::GLib::Variant> out_v = proxy->call_sync ("{}", nullptr /* TODO: in args */, bus_call_flags, bus_call_timeout_msec, cancellable, error);'.format(self.dbus_name),
-            '  // TODO: out args',
+            '  ::GDBusProxy *proxy = G_DBUS_PROXY (self);',
+            '  ::GVariant *_peel_args[{}]'.format(num_in_args),
+            '    {',
+            in_args,
+            '    };',
+            '  ::GError *_peel_error = nullptr;',
+            '  ::GVariant *out_v = g_dbus_proxy_call_sync (proxy, "{}", g_variant_new_tuple (_peel_args, {}),'.format(self.dbus_name, num_in_args),
+            '    static_cast<::GDBusCallFlags> (bus_call_flags), bus_call_timeout_msec, reinterpret_cast<::GCancellable *> (cancellable), &_peel_error);',
             '  if (!out_v)',
-            '    return false;',
+            '    {'
+            '      if (error)',
+            '        *error = ::peel::UniquePtr<::peel::GLib::Error>::adopt_ref (reinterpret_cast<::peel::GLib::Error *> (_peel_error));',
+            '      return false;',
+            '    }',
+            '  if (error)',
+            '    *error = nullptr;',
+            '  // TODO: out args',
             '  return true;',
             '}',
         ])
