@@ -16,4 +16,15 @@ class Argument:
             return '::peel::String ' + out_asterisk + self.name
         else:
             # TODO
-            return '::peel::RefPtr<::peel::GLib::Variant> ' + out_asterisk + self.name
+            return '::peel::GLib::Variant *' + out_asterisk + self.name
+
+    def generate_make_variant(self):
+        if self.type == 'b':
+            return 'g_variant_new_boolean ({})'.format(self.name)
+        elif self.type == 's':
+            return 'g_variant_new_take_string (std::move ({}).release_string ())'.format(self.name)
+        elif self.type == 'o':
+            return 'g_variant_new_object_path ({})'.format(self.name)
+        else:
+            # TODO
+            return 'reinterpret_cast<::GVariant *> ({})'.format(self.name)
