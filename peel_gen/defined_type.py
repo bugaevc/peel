@@ -82,7 +82,7 @@ class DefinedType(NodeHandler, AnyType):
 
     def make_file_path(self):
         name = self.emit_name.replace('::', '')
-        return (Path('peel') / self.ns.name / name).with_suffix('.h')
+        return (Path('peel') / self.ns.name / name).with_suffix('.h').as_posix()
 
     def generate_nested_type_defs(self):
         l = []
