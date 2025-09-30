@@ -17,7 +17,7 @@ class Parameter(NodeHandler):
         self.type_name = None
         self.type = None
         # self.is_rv = None
-        # self.is_instance = None
+        self.is_instance = False
         self.is_record_field = False
         self.ownership = attrs.get('transfer-ownership', None)
         self.direction = attrs.get('direction', 'in')
@@ -329,7 +329,35 @@ class Parameter(NodeHandler):
             itp = tp
         assert(not isinstance(itp, Array))
 
-        constness = extract_constness_from_c_type(self.c_type) if self.c_type else []
+        if isinstance(tp, Array) and self.c_type is None:
+            c_type = add_asterisk(tp.item_c_type) if tp.item_c_type else None
+        else:
+            c_type = self.c_type
+
+        if c_type is not None:
+            constness = extract_constness_from_c_type(c_type)
+        else:
+            # If we don't have a C type (e.g. signal parameters) then guess constness
+            # based on direction, ownership and whether it's a refcounted record/union.
+            from peel_gen.record import Record
+            from peel_gen.union import Union
+            if not isinstance(itp, (Record, Union)):
+                constness = []
+            elif itp.is_pointer_type:
+                constness = []
+            elif self.ownership not in ('none', None):
+                constness = []
+            elif self.direction != 'in':
+                constness = []
+            elif itp.ref_func or itp.unref_func:
+                constness = []
+            elif self.is_instance:
+                constness = []
+            elif self.name == 'property-value':
+                constness = []
+            else:
+                constness = ['const']
+
         constness0 = 'const ' if constness and constness[0] else ''
         constness1 = ' const' if len(constness) >= 2 and constness[1] else ''
 

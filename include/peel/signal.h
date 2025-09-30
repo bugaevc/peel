@@ -199,7 +199,7 @@ struct SignalTraits<UniquePtr<T>>
 };
 
 template<typename T>
-struct SignalTraits<T * /*, peel::enable_if_derived<GObject::TypeInstance, T, void> */>
+struct SignalTraits<T *>
 {
   typedef T *CType;
   typedef T PlainCppType;
@@ -212,6 +212,25 @@ struct SignalTraits<T * /*, peel::enable_if_derived<GObject::TypeInstance, T, vo
 
   static T *
   from_c (T *obj)
+  {
+    return obj;
+  }
+};
+
+template<typename T>
+struct SignalTraits<const T *>
+{
+  typedef const T *CType;
+  typedef T PlainCppType;
+
+  static const T *
+  to_c (const T *obj)
+  {
+    return obj;
+  }
+
+  static const T *
+  from_c (const T *obj)
   {
     return obj;
   }
