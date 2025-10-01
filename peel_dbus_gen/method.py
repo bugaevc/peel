@@ -221,6 +221,19 @@ class Method:
         self.generate_arg_lists()
         num_in_args = len([arg for arg in self.arguments if arg.direction == 'in'])
         in_args = ',\n'.join('      ' + arg.generate_make_variant() for arg in self.arguments if arg.direction == 'in')
+
+        out_args = []
+        index = 0
+        for arg in self.arguments:
+            if arg.direction != 'out':
+                continue
+            out_args.extend([
+              '  _peel_out_arg = g_variant_get_child_value (_peel_return, {});'.format(index),
+              '  ' + arg.generate_set_from_variant('_peel_out_arg') + ';',
+              '  g_variant_unref (_peel_out_arg);',
+            ])
+            index += 1
+        out_args = '\n'.join(out_args)
         return '\n'.join([
             'static void',
             '{}_proxy_{}_async ({} *self, {}'.format(self.iface.emit_name, self.cpp_name, self.iface.emit_name, self.in_args.strip()),
@@ -239,10 +252,20 @@ class Method:
             '{}_proxy_{}_finish ({} *self, {}'.format(self.iface.emit_name, self.cpp_name, self.iface.emit_name, self.out_args.strip()),
             '  ::peel::Gio::AsyncResult *async_result, ::peel::UniquePtr<::peel::GLib::Error> *error)',
             '{',
-            '  ::peel::Gio::DBusProxy *proxy = self->cast<::peel::Gio::DBusProxy> ();',
-            '  ::peel::RefPtr<::peel::GLib::Variant> out_v = proxy->call_finish (async_result, error);',
-            '  if (!out_v)',
-            '    return false;',
+            '  ::GDBusProxy *proxy = G_DBUS_PROXY (self);',
+            '  ::GError *_peel_error = nullptr;',
+            '  ::GVariant *_peel_return = g_dbus_proxy_call_finish (proxy, reinterpret_cast<::GAsyncResult *> (async_result), error ? &_peel_error : nullptr);',
+            '  if (!_peel_return)',
+            '    {',
+            '      if (error)',
+            '        *error = ::peel::UniquePtr<::peel::GLib::Error>::adopt_ref (reinterpret_cast<::peel::GLib::Error *> (_peel_error));',
+            '      return false;',
+            '    }',
+            '  if (error)',
+            '    *error = nullptr;',
+            '  ::GVariant *_peel_out_arg;',
+            out_args,
+            '  g_variant_unref (_peel_return);',
             '  return true;',
             '}',
             '',
@@ -256,17 +279,19 @@ class Method:
             in_args,
             '    };',
             '  ::GError *_peel_error = nullptr;',
-            '  ::GVariant *out_v = g_dbus_proxy_call_sync (proxy, "{}", g_variant_new_tuple (_peel_args, {}),'.format(self.dbus_name, num_in_args),
-            '    static_cast<::GDBusCallFlags> (bus_call_flags), bus_call_timeout_msec, reinterpret_cast<::GCancellable *> (cancellable), &_peel_error);',
-            '  if (!out_v)',
-            '    {'
+            '  ::GVariant *_peel_return = g_dbus_proxy_call_sync (proxy, "{}", g_variant_new_tuple (_peel_args, {}),'.format(self.dbus_name, num_in_args),
+            '    static_cast<::GDBusCallFlags> (bus_call_flags), bus_call_timeout_msec, reinterpret_cast<::GCancellable *> (cancellable), error ? &_peel_error : nullptr);',
+            '  if (!_peel_return)',
+            '    {',
             '      if (error)',
             '        *error = ::peel::UniquePtr<::peel::GLib::Error>::adopt_ref (reinterpret_cast<::peel::GLib::Error *> (_peel_error));',
             '      return false;',
             '    }',
             '  if (error)',
             '    *error = nullptr;',
-            '  // TODO: out args',
+            '  ::GVariant *_peel_out_arg;',
+            out_args,
+            '  g_variant_unref (_peel_return);',
             '  return true;',
             '}',
         ])
