@@ -191,6 +191,10 @@ onstack	GCond
 owned	g_cond_new	return
 onstack	GRecMutex
 onstack	GRWLock
+skip	GMutexLocker			GLib		manual
+skip	GRecMutexLocker			GLib		manual
+skip	GRWLockWriterLocker		GLib		manual
+skip	GRWLockReaderLocker		GLib		manual
 opaque	GSource
 
 onstack	GHashTableIter
