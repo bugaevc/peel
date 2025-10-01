@@ -219,7 +219,21 @@ class Interface:
             '      }',
             '    return ::peel::RefPtr<{}>::adopt_ref (reinterpret_cast<{} *> (object));'.format(self.emit_name, self.emit_name),
             '  }',
-            '};'
+            '};',
+            '',
+            'template<>',
+            'inline ::peel::GObject::Type',
+            'peel::GObject::Type::of<{}> ()'.format(self.emit_name),
+            '{',
+            '  return {}::_peel_get_type ();'.format(self.emit_name),
+            '}',
+            '',
+            'template<>',
+            'inline ::peel::GObject::Type',
+            'peel::GObject::Type::of<{}::Proxy> ()'.format(self.emit_name),
+            '{',
+            '  return {}::Proxy::_peel_get_type ();'.format(self.emit_name),
+            '}',
         ])
         return '\n'.join(l)
 
