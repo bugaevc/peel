@@ -179,7 +179,7 @@ def emit_repo(repo, out_dir):
         if functions:
             file_path = base_path / 'functions.h'
             if emit_file(repo, out_dir / file_path, functions):
-                emitted_files.append(file_path)
+                emitted_files.append(file_path.as_posix())
 
         file_path = base_path / '{}.h'.format(ns.name)
         emit_umbrella_header(repo, out_dir / file_path, emitted_files)
