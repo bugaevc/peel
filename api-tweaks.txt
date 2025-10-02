@@ -303,6 +303,7 @@ skip	GObjectConstructParam		GObject		manual
 nest-alias GBindingFlags		Binding::Flags
 skip	GValue				GObject		manual
 onstack	GValue
+skip	_Value__data__union
 float	GInitiallyUnowned
 skip	g_gtype_get_type
 skip	g_type_check_instance
