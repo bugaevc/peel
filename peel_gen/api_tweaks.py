@@ -26,7 +26,7 @@ def load_from_file(path):
 def should_skip(tweak_ident, ns, keep_manual=False):
     for tweak in lookup(tweak_ident, 'skip'):
         # If an explicit namespace is given,
-        # only skip it in that namesapce.
+        # only skip it in that namespace.
         if ns is not None and len(tweak) > 1 and tweak[1] != ns.name:
             continue
         if keep_manual and len(tweak) > 2 and tweak[2] == 'manual':
