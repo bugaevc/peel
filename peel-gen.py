@@ -162,7 +162,15 @@ def emit_repo(repo, out_dir):
             if isinstance(member, Function):
                 functions.append(member)
                 continue
-            elif not ns.should_emit_file(member):
+
+            # Include manually implemented members in the umbrella header
+            # but don't emit files for them
+            if ns.is_manual_member(member):
+                file_path = member.make_file_path()
+                emitted_files.append(file_path)
+                continue
+
+            if not ns.should_emit_file(member):
                 continue
             file_path = member.make_file_path()
             if emit_file(repo, out_dir / file_path, [member]):

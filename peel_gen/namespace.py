@@ -102,3 +102,16 @@ class Namespace(NodeHandler):
         if api_tweaks.should_skip(member.c_type, ns=self, keep_manual=True):
             return False
         return True
+
+    def is_manual_member(self, member):
+        # Same list of types as above but we also include Alias here
+        if not isinstance(member, (Class, Interface, Record, Enumeration, Bitfield, Union, Alias)):
+            return False
+
+        for tweak in api_tweaks.lookup(member.c_type, 'skip'):
+            if len(tweak) > 1 and tweak[1] != self.name:
+                continue
+            if len(tweak) > 2 and tweak[2] == 'manual':
+                return True
+
+        return False
