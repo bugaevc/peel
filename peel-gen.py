@@ -73,7 +73,7 @@ def emit_file(repo, file_path, members):
         if isinstance(extra_include_member, str):
             extra_includes.append(extra_include_member)
             continue
-        if not extra_include_member.ns.should_emit_file(extra_include_member):
+        if not extra_include_member.ns.should_emit_file(extra_include_member) and not extra_include_member.ns.is_manual_member(extra_include_member):
             continue
         extra_include_at_end_members.discard(extra_include_member)
         # extra_forward_members.discard(extra_include_member)

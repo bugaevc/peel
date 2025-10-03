@@ -1,6 +1,6 @@
 from peel_gen.node_handler import NodeHandler
 from peel_gen.array import Array
-from peel_gen.alias import chase_type_aliases
+from peel_gen.alias import Alias, chase_type_aliases
 from peel_gen.utils import make_simple_decl, massage_c_type, extract_constness_from_c_type, add_asterisk, add_root_namespace, is_type_element
 from peel_gen.type import lookup_type, PlainType, VoidType, StrType, VaListType, VoidAliasType, SmuggledPointerType
 from peel_gen.callback import Callback
@@ -169,7 +169,10 @@ class Parameter(NodeHandler):
             # We have to fully include the containing type
             # to forward-declare the nested type.
             s.add(tp.nested_in)
-        if not tp.is_passed_by_ref():
+        if isinstance(tp, Alias):
+            s.add(tp)
+            return s
+        elif not tp.is_passed_by_ref():
             return s
         elif self.is_record_field and self.is_inline_record_field:
             s.add(tp)
@@ -465,6 +468,8 @@ class Parameter(NodeHandler):
                     return make_type('const char *' + constness1)
             elif isinstance(itp, (Enumeration, Bitfield)):
                 return make_type(constness0 + type_name)
+            elif isinstance(itp, Alias):
+                return make_type(type_name)
             else:
                 raise UnsupportedForNowException('unsupported type {}'.format(itp))
 
@@ -853,6 +858,8 @@ class Parameter(NodeHandler):
                 return 'static_cast<{}> ({})'.format(plain_cpp_type, c_name)
             if isinstance(tp, StrType) and self.ownership == 'full':
                 return 'peel::String::adopt_string ({})'.format(c_name)
+            if isinstance(tp, Alias):
+                return 'static_cast<{}> ({})'.format(plain_cpp_type, c_name)
             return None
 
         if isinstance(tp, DefinedType) and tp.ns.emit_raw:
