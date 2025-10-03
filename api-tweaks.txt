@@ -197,6 +197,8 @@ skip	GRWLockWriterLocker		GLib		manual
 skip	GRWLockReaderLocker		GLib		manual
 opaque	GSource
 
+skip	GQuark		GLib		manual
+
 onstack	GHashTableIter
 opaque	GHashTableIter
 nest	GHashTableIter			HashTable::Iter

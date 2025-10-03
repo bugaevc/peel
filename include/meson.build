@@ -29,6 +29,7 @@ static_headers = files(
   'peel/GObject/Object.h',
   'peel/GObject/ObjectConstructParam.h',
   'peel/GLib/Variant.h',
+  'peel/GLib/Quark.h',
 )
 
 if not meson.is_subproject()
