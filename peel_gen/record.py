@@ -9,7 +9,7 @@ from peel_gen.specializations import (
     generate_unique_traits_specialization
 )
 from peel_gen.exceptions import UnsupportedForNowException
-from peel_gen.utils import intern_get_type_map, VisibilityTracker
+from peel_gen.utils import add_asterisk, intern_get_type_map, VisibilityTracker
 from peel_gen import api_tweaks
 
 class Record(DefinedType):
@@ -29,6 +29,8 @@ class Record(DefinedType):
         self.pointer = attrs.get('pointer', None) == '1'
         self.is_pointer_type = False
         self.onstack = False
+        self.init_func = None
+        self.clear_func = None
         self.is_initially_floating = False
         self.all_fields_supported = True
         self.any_fields_exposed = False
@@ -98,6 +100,10 @@ class Record(DefinedType):
                 self.is_pointer_type = True
             elif tweak[0] == 'onstack':
                 self.onstack = True
+                if len(tweak) > 1:
+                    self.init_func = tweak[1]
+                if len(tweak) > 2:
+                    self.clear_func = tweak[2]
             elif tweak[0] == 'opaque':
                 self.opaque = True
             elif tweak[0] == 'float':
@@ -200,8 +206,9 @@ class Record(DefinedType):
         l = [
             '{} {}'.format(self.struct_kw, self.emit_def_name),
             '{',
-            'private:',
         ]
+        visibility = VisibilityTracker(l, 'private' if self.struct_kw != 'struct' else 'public')
+        visibility.switch('private')
         s = api_tweaks.ifdef_for_non_opaque(self.c_type)
         if s:
             l.append(s)
@@ -213,7 +220,54 @@ class Record(DefinedType):
         s = api_tweaks.endif_for_non_opaque(self.c_type)
         if s:
             l.append(s)
-        if not self.onstack:
+
+        if self.onstack:
+            visibility.switch('public')
+            if self.init_func is not None:
+                # Zero-initialize
+                if self.init_func == 'memset':
+                    l.extend([
+                        '  {} () noexcept'.format(self.own_name),
+                        '  {',
+                        '    memset (reinterpret_cast<::{}> (this), 0, sizeof (::{}));'.format(add_asterisk(self.c_type), self.c_type),
+                        '  }',
+                        '',
+                    ])
+                # Initialization macro
+                elif self.init_func[0].isupper():
+                    l.extend([
+                        '  {} () noexcept'.format(self.own_name),
+                        '  {',
+                        '    *(reinterpret_cast<::{}> (this)) = {};'.format(add_asterisk(self.c_type), self.init_func),
+                        '  }',
+                        '',
+                    ])
+                # Initialization function
+                else:
+                    l.extend([
+                        '  {} () noexcept'.format(self.own_name),
+                        '  {',
+                        '    {} (reinterpret_cast<::{}> (this));'.format(self.init_func, add_asterisk(self.c_type)),
+                        '  }',
+                        '',
+                    ])
+
+                if self.clear_func is not None:
+                    l.extend([
+                        '  ~{} () noexcept'.format(self.own_name),
+                        '  {',
+                        '    {} (reinterpret_cast<::{}> (this));'.format(self.clear_func, add_asterisk(self.c_type)),
+                        '  }',
+                        '',
+                    ])
+                    visibility.switch('private')
+                    l.extend([
+                        '  {} (const {} &) = delete;'.format(self.own_name, self.own_name),
+                        '  {} ({} &&) = delete;'.format(self.own_name, self.own_name),
+                    ])
+                else:
+                    visibility.switch('private')
+        else:
             l.extend([
                 '  {} () = delete;'.format(self.own_name),
                 '  {} (const {} &) = delete;'.format(self.own_name, self.own_name),
@@ -221,7 +275,6 @@ class Record(DefinedType):
                 '  ~{} ();'.format(self.own_name),
             ])
         l.append('')
-        visibility = VisibilityTracker(l, 'private')
         for nested_type in self.nested_types:
             visibility.switch('public')
             l.append('  ' + nested_type.generate_forward_decl(for_nested=True))
@@ -250,6 +303,14 @@ class Record(DefinedType):
                 continue
             elif method.c_ident == self.free_func:
                 l.append('  /* {} bound as UniqueTraits */'.format(method.name))
+                l.append('')
+                continue
+            elif method.c_ident == self.init_func:
+                l.append('  /* {} bound as constructor */'.format(method.name))
+                l.append('')
+                continue
+            elif method.c_ident == self.clear_func:
+                l.append('  /* {} bound as destructor */'.format(method.name))
                 l.append('')
                 continue
             try:

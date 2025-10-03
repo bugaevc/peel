@@ -2,7 +2,7 @@ from peel_gen.constructor import Constructor
 from peel_gen.defined_type import DefinedType
 from peel_gen.method import Method
 from peel_gen.specializations import generate_get_type_specialization, generate_ref_traits_specialization, generate_unique_traits_specialization, generate_value_traits_specialization
-from peel_gen.utils import VisibilityTracker
+from peel_gen.utils import VisibilityTracker, add_asterisk
 from peel_gen.exceptions import UnsupportedForNowException
 from peel_gen import api_tweaks
 
@@ -20,6 +20,8 @@ class Union(DefinedType):
         self.pointer = attrs.get('pointer', None) == '1'
         self.is_pointer_type = False
         self.onstack = False
+        self.init_func = None
+        self.clear_func = None
         assert('glib:is-gtype-struct-for' not in attrs)
         self.is_private = self.gir_name is not None and self.gir_name.endswith('Private')
         self.extra_includes = []
@@ -62,6 +64,10 @@ class Union(DefinedType):
                 self.is_pointer_type = True
             elif tweak[0] == 'onstack':
                 self.onstack = True
+                if len(tweak) > 1:
+                    self.init_func = tweak[1]
+                if len(tweak) > 2:
+                    self.clear_func = tweak[2]
             elif tweak[0] == 'include':
                 self.extra_includes.append(tweak[1])
 
@@ -140,19 +146,67 @@ class Union(DefinedType):
         l = [
             'union {}'.format(self.emit_def_name),
             '{',
-            'private:',
-            '  ::{} inner peel_no_warn_unused;'.format(self.c_type),
         ]
+        visibility = VisibilityTracker(l, 'public')
+        visibility.switch('private')
+        l.append('  ::{} inner peel_no_warn_unused;'.format(self.c_type))
 
-        if not self.onstack:
+        if self.onstack:
+            if self.init_func is not None:
+                visibility.switch('public')
+
+                # Zero-initialize
+                if self.init_func == 'memset':
+                    l.extend([
+                        '  {} () noexcept'.format(self.own_name),
+                        '  {',
+                        '    memset (reinterpret_cast<::{}> (this), 0, sizeof (::{}));'.format(add_asterisk(self.c_type), self.c_type),
+                        '  }',
+                        '',
+                    ])
+                # Initialization macro
+                elif self.init_func[0].isupper():
+                    l.extend([
+                        '  {} () noexcept'.format(self.own_name),
+                        '  {',
+                        '    *(reinterpret_cast<::{}> (this)) = {};'.format(add_asterisk(self.c_type), self.init_func),
+                        '  }',
+                        '',
+                    ])
+                # Initialization function
+                else:
+                    l.extend([
+                        '  {} () noexcept'.format(self.own_name),
+                        '  {',
+                        '    {} (reinterpret_cast<::{}> (this));'.format(self.init_func, add_asterisk(self.c_type)),
+                        '  }',
+                        '',
+                    ])
+
+                if self.clear_func is not None:
+                    l.extend([
+                        '  ~{} () noexcept'.format(self.own_name),
+                        '  {',
+                        '    {} (reinterpret_cast<::{}> (this));'.format(self.clear_func, add_asterisk(self.c_type)),
+                        '  }',
+                        '',
+                    ])
+                    visibility.switch('private')
+                    l.extend([
+                        '  {} (const {} &) = delete;'.format(self.own_name, self.own_name),
+                        '  {} ({} &&) = delete;'.format(self.own_name, self.own_name),
+                    ])
+                else:
+                    visibility.switch('private')
+
+        else:
             l.extend([
                 '  {} () = delete;'.format(self.own_name),
                 '  {} (const {} &) = delete;'.format(self.own_name, self.own_name),
                 '  {} ({} &&) = delete;'.format(self.own_name, self.own_name),
                 '  ~{} () = delete;'.format(self.own_name),
             ])
-
-        visibility = VisibilityTracker(l, 'private')
+        l.append('')
 
         for nested_type in self.nested_types:
             visibility.switch('public')
@@ -176,6 +230,14 @@ class Union(DefinedType):
                 continue
             elif method.c_ident == self.free_func:
                 l.append('  /* {} bound as UniqueTraits */'.format(method.name))
+                l.append('')
+                continue
+            elif method.c_ident == self.init_func:
+                l.append('  /* {} bound as constructor */'.format(method.name))
+                l.append('')
+                continue
+            elif method.c_ident == self.clear_func:
+                l.append('  /* {} bound as destructor */'.format(method.name))
                 l.append('')
                 continue
             try:

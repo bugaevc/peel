@@ -195,12 +195,12 @@ onstack	GDate
 onstack	GLogField
 onstack	GPollFD
 onstack	GOptionEntry
-onstack	GMutex
+onstack	GMutex		g_mutex_init	g_mutex_clear
 owned	g_mutex_new	return
-onstack	GCond
+onstack	GCond		g_cond_init	g_cond_clear
 owned	g_cond_new	return
-onstack	GRecMutex
-onstack	GRWLock
+onstack	GRecMutex	g_rec_mutex_init	g_rec_mutex_clear
+onstack	GRWLock		g_rw_lock_init		g_rw_lock_clear
 skip	GMutexLocker			GLib		manual
 skip	GRecMutexLocker			GLib		manual
 skip	GRWLockWriterLocker		GLib		manual
@@ -1500,8 +1500,11 @@ nest	GstLogContextHashFlags		LogContext::HashFlags
 nest	GstLogContextFlags		LogContext::Flags
 nest	GstIteratorResult		Iterator::Result
 nest	GstIteratorItem			Iterator::Item
-onstack GstMapInfo
-onstack GstSegment
+onstack GstMapInfo	GST_MAP_INFO_INIT	gst_map_info_clear
+onstack GstSegment	memset
+onstack GstAllocationParams	gst_allocation_params_init
+onstack GstPollFD	gst_poll_fd_init
+onstack GstIdStr	gst_id_str_init	gst_id_str_clear
 
 # See https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/12913
 opaque	GstParamSpecArray
@@ -1534,6 +1537,11 @@ in	gst_byte_reader_dup_data	size
 in	gst_byte_reader_peek_data	size
 # Has both free and ref/unref functions
 skip	gst_flow_combiner_free
+onstack GstByteReader	memset
+onstack GstByteWriter	gst_byte_writer_init	gst_byte_writer_reset
+onstack GstBitReader	memset
+onstack GstBitWriter	gst_bit_writer_init	gst_bit_writer_reset
+onstack GstDataQueueSize
 no-autofree GstFlowCombiner
 float	GstAggregator::vfunc_create_new_pad	return
 # Deprecated since forever, let's not generate it
@@ -1542,8 +1550,9 @@ skip	GstCollectData
 skip	GstCollectPadsStateFlags
 
 # GstAudio
-onstack GstAudioInfo
-onstack GstAudioBuffer
+onstack GstAudioInfo	gst_audio_info_init
+onstack GstDsdInfo	gst_dsd_info_init
+onstack GstAudioBuffer	GST_AUDIO_BUFFER_INIT	gst_audio_buffer_unmap
 
 # GstVideo
 # Deprecated since forever, let's not generate it
@@ -1551,11 +1560,20 @@ skip	GstVideoGLTextureUploadMeta
 skip	gst_buffer_add_video_gl_texture_upload_meta
 skip	gst_video_sink_center_rect
 skip	gst_video_meta_set_alignment
-onstack GstVideoInfo
+onstack GstVideoInfo	gst_video_info_init
+onstack GstVideoInfoDmaDrm	gst_video_info_dma_drm_init
 onstack GstVideoMasteringDisplayInfoCoordinates
 onstack GstVideoColorimetry
 onstack GstVideoTileInfo
-onstack GstVideoFrame
+onstack GstVideoFrame	GST_VIDEO_FRAME_INIT	gst_video_frame_unmap
+onstack GstVideoTimeCodeConfig
+onstack GstVideoTimeCode	memset	gst_video_time_code_clear
+onstack GstVideoTimeCodeInterval	memset	gst_video_time_code_interval_clear
+onstack GstVideoHDR10Plus
+onstack GstVideoColorVolumeTransformation
+onstack GstVideoMasteringDisplayInfo	gst_video_mastering_display_info_init
+onstack GstVideoRectangle
+onstack GstVideoAncillary
 
 # GstCuda
 
