@@ -149,11 +149,12 @@ def is_type_element(name, attrs):
 def strip_c_symbol_prefix(s, ns):
     for prefix in ns.c_symbol_prefixes:
         if s.startswith(prefix):
-            return s.removeprefix(prefix + '_')
+            # +1 to also strip the following underscore.
+            return s[len(prefix) + 1:]
     return s
 
 def strip_c_identifier_prefix(s, ns):
     for prefix in ns.c_identifier_prefixes:
         if s.startswith(prefix):
-            return s.removeprefix(prefix)
+            return s[len(prefix):]
     return s
