@@ -288,6 +288,8 @@ skip	GScanner
 # GObject
 # These all have (or should have) explicit bindings.
 skip	GType				GObject		manual
+# Apparently GType is also sometimes in GLib-2.0.gir as alias
+skip	GType				GLib
 skip	GObject				GObject		manual
 ref	GObject				g_object_ref
 unref	GObject				g_object_unref
