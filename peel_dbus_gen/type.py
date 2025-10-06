@@ -2,7 +2,7 @@ class Type:
     def __init__(self, signature):
         self.signature = signature
 
-    def generate_cpp_type(self, flavor='arg'):
+    def generate_cpp_type(self, direction, flavor='arg'):
         if self.signature == 'b':
             return 'bool'
         elif self.signature == 'y':
@@ -26,7 +26,10 @@ class Type:
         else:
             # TODO
             if flavor in ('arg', 'signal'):
-                return '::peel::GLib::Variant *'
+                if direction == 'in':
+                    return '::peel::GLib::Variant *'
+                else:
+                    return '::peel::RefPtr<::peel::GLib::Variant>'
             elif flavor == 'property':
                 return '::peel::GLib::Variant'
 
@@ -81,4 +84,4 @@ class Type:
             return '::peel::String::adopt_string (g_variant_dup_string ({}, nullptr))'.format(variant_expr)
         else:
             # TODO
-            return 'reinterpret_cast<::GVariant *> ({})'.format(variant_expr)
+            return 'reinterpret_cast<::peel::GLib::Variant *> ({})'.format(variant_expr)

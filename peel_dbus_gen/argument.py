@@ -12,7 +12,7 @@ class Argument:
         else:
             out_asterisk = '*'
 
-        s = self.type.generate_cpp_type()
+        s = self.type.generate_cpp_type(direction=self.direction)
         if s.endswith('*'):
             return s + out_asterisk + self.name
         else:
