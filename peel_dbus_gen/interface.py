@@ -7,7 +7,7 @@ class Interface:
         self.properties = []
         self.signals = []
 
-        # FIXME: This s wrong, but we hae to start somewhere.
+        # FIXME: This s wrong, but we have to start somewhere.
         self.gtype_name = self.own_name = self.emit_name = self.interface_name.split('.')[-1]
 
     def generate_header(self):
@@ -262,6 +262,8 @@ class Interface:
         ])
         for method in self.methods:
             l.append(method.generate_iface_init('iface'))
+        for property in self.properties:
+            l.append(property.generate_iface_init('iface'))
         l.extend([
             '}',
             '',
@@ -283,6 +285,56 @@ class Interface:
             '  return {}_type;'.format(self.emit_name),
             '}',
             '',
+            'enum',
+            '{',
+            '  {}_PROP_0,'.format(self.emit_name),
+            '\n'.join('  {},'.format(property.generate_enum_member()) for property in self.properties),
+            '};',
+            '',
+        ])
+        for method in self.methods:
+            l.append(method.generate_proxy_vfuncs())
+        for property in self.properties:
+            l.append(property.generate_proxy_accessors())
+        l.extend([
+            'static void',
+            '{}_proxy_get_property (::GObject *object, guint prop_id, ::GValue *value, ::GParamSpec *pspec)'.format(self.emit_name),
+            '{',
+            '  {}::Proxy *proxy = reinterpret_cast<{}::Proxy *> (object);'.format(self.emit_name, self.emit_name),
+            '',
+            '  switch (prop_id)',
+            '  {',
+        ])
+        for property in self.properties:
+            call = property.generate_proxy_get_property_call(proxy_expr='proxy', value_expr='value')
+            if call:
+                l.append(call)
+        l.extend([
+            '  default:',
+            '    G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);',
+            '    break;',
+            '  }',
+            '}',
+            '',
+            'static void',
+            '{}_proxy_set_property (::GObject *object, guint prop_id, const ::GValue *value, ::GParamSpec *pspec)'.format(self.emit_name),
+            '{',
+            '  {}::Proxy *proxy = reinterpret_cast<{}::Proxy *> (object);'.format(self.emit_name, self.emit_name),
+            '',
+            '  switch (prop_id)',
+            '  {',
+        ])
+        for property in self.properties:
+            call = property.generate_proxy_set_property_call(proxy_expr='proxy', value_expr='value')
+            if call:
+                l.append(call)
+        l.extend([
+            '  default:',
+            '    G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);',
+            '    break;',
+            '  }',
+            '}',
+            '',
             'static void',
             '{}_proxy_properties_changed (::GDBusProxy *proxy, ::GVariant *changed_properties, const char * const *invalidated_properties)'.format(self.emit_name),
             '{',
@@ -300,15 +352,17 @@ class Interface:
             '{',
             '  ::GObjectClass *object_class = G_OBJECT_CLASS (g_class);',
             '  ::GDBusProxyClass *proxy_class = G_DBUS_PROXY_CLASS (g_class);',
+            '',
+            '  object_class->get_property = {}_proxy_get_property;'.format(self.emit_name),
+            '  object_class->set_property = {}_proxy_set_property;'.format(self.emit_name),
+            '',
             '  proxy_class->g_properties_changed = {}_proxy_properties_changed;'.format(self.emit_name),
             '  proxy_class->g_signal = {}_proxy_signal;'.format(self.emit_name),
-            # TODO: override interface properties here
-            '}',
-            '',
         ])
-        for method in self.methods:
-            l.append(method.generate_proxy_vfuncs())
+        for property in self.properties:
+            l.append(property.generate_proxy_override_pspec(class_expr='object_class'))
         l.extend([
+            '}',
             '',
             'static void',
             '{}_proxy_iface_init (gpointer g_iface, gpointer)'.format(self.emit_name),

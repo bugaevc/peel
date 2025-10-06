@@ -80,7 +80,7 @@ class SaxHandler(xml.sax.handler.ContentHandler):
             assert(self.signal is None)
             assert(self.arg is None)
             assert(self.property is None)
-            self.property = Property(attrs)
+            self.property = Property(attrs, iface=self.interface)
             self.interface.properties.append(self.property)
         else:
             print('Unhandled tag', name, file=sys.stderr)
@@ -147,6 +147,8 @@ def main():
         s = interface.generate_cpp(generated_header_name=args.output_header)
         with open(args.output_cpp, 'w') as f:
             f.write(s)
+        # FIXME
+        break
 
 if __name__ == '__main__':
     main()
