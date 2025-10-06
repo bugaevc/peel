@@ -53,6 +53,9 @@ class Interface:
             '  unsigned',
             '  export_on_bus (::peel::Gio::DBusConnection *connection, const char *object_path, ::peel::UniquePtr<::peel::GLib::Error> *error) noexcept;',
             '',
+            '  static const ::peel::Gio::DBusInterface::Info *',
+            '  get_interface_info () noexcept;',
+            '',
         ])
         for method in self.methods:
             l.append(method.generate_header())
@@ -118,7 +121,7 @@ class Interface:
             '      "g-name", name,',
             '      "g-object-path", object_path,',
             '      "g-interface-name", "{}",'.format(self.interface_name),
-            # TODO: "g-interface-info"
+            '      "g-interface-info", {}::get_interface_info (),'.format(self.emit_name),
             '      nullptr);',
             '  }',
             '',
@@ -145,7 +148,7 @@ class Interface:
             '      "g-name", name,',
             '      "g-object-path", object_path,',
             '      "g-interface-name", "{}",'.format(self.interface_name),
-            # TODO: "g-interface-info"
+            '      "g-interface-info", {}::get_interface_info (),'.format(self.emit_name),
             '      nullptr);',
             '  }',
             '',
@@ -181,7 +184,7 @@ class Interface:
             '      "g-name", name,',
             '      "g-object-path", object_path,',
             '      "g-interface-name", "{}",'.format(self.interface_name),
-            # TODO: "g-interface-info"
+            '      "g-interface-info", {}::get_interface_info (),'.format(self.emit_name),
             '      nullptr);',
             '    if (error)',
             '      {',
@@ -207,7 +210,7 @@ class Interface:
             '      "g-name", name,',
             '      "g-object-path", object_path,',
             '      "g-interface-name", "{}",'.format(self.interface_name),
-            # TODO: "g-interface-info"
+            '      "g-interface-info", {}::get_interface_info (),'.format(self.emit_name),
             '      nullptr);',
             '    if (error)',
             '      {',
@@ -239,6 +242,10 @@ class Interface:
 
     def generate_cpp(self, generated_header_name):
         l = [
+            '#ifdef __GNUC__',
+            '#pragma GCC optimize "no-exceptions"',
+            '#endif',
+            '',
             '#include "{}"'.format(generated_header_name),
             '#include <peel/Gio/Task.h>',
             '#include <peel/GLib/MainContext.h>',
@@ -249,6 +256,49 @@ class Interface:
         l.extend([
             'static ::GType {}_type;'.format(self.emit_name),
             'static ::GType {}_Proxy_type;'.format(self.emit_name),
+            '',
+        ])
+        method_infos = []
+        for method in self.methods:
+            name, s = method.generate_method_info()
+            l.append(s)
+            method_infos.append('  &{},'.format(name))
+        property_infos = []
+        for property in self.properties:
+            name, s = property.generate_property_info()
+            l.append(s)
+            property_infos.append('  &{},'.format(name))
+        l.extend([
+            'static const ::GDBusMethodInfo *',
+            '{}_method_infos[] ='.format(self.emit_name),
+            '{',
+            '\n'.join(method_infos),
+            '  nullptr',
+            '};',
+            '',
+            'static const ::GDBusPropertyInfo *',
+            '{}_property_infos[] ='.format(self.emit_name),
+            '{',
+            '\n'.join(property_infos),
+            '  nullptr,',
+            '};',
+            '',
+            'static const ::GDBusInterfaceInfo',
+            '{}_interface_info ='.format(self.emit_name),
+            '{',
+            '  -1, /* ref_count */',
+            '  const_cast<char *> ("{}"),'.format(self.interface_name),
+            '  const_cast<::GDBusMethodInfo **> ({}_method_infos),'.format(self.emit_name),
+            '  nullptr /* {}_signal_infos */,'.format(self.emit_name),
+            '  const_cast<::GDBusPropertyInfo **> ({}_property_infos),'.format(self.emit_name),
+            '  nullptr /* annotations */',
+            '};',
+            '',
+            'const ::peel::Gio::DBusInterface::Info *',
+            '{}::get_interface_info () noexcept'.format(self.emit_name),
+            '{',
+            '  return reinterpret_cast<const ::peel::Gio::DBusInterface::Info *> (&{}_interface_info);'.format(self.emit_name),
+            '}',
             '',
         ])
         for method in self.methods:
