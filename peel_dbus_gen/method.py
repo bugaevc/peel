@@ -295,3 +295,18 @@ class Method:
             '  return true;',
             '}',
         ])
+
+    def generate_method_info(self):
+        name = '{}_{}_method_info'.format(self.iface.emit_name, self.cpp_name)
+        l = [
+            'static const ::GDBusMethodInfo',
+            '{} ='.format(name),
+            '{',
+            '  -1, /* ref_count */',
+            '  const_cast<char *> ("{}"),'.format(self.dbus_name),
+            '  nullptr,',
+            '  nullptr,',
+            '  nullptr',
+            '};',
+        ]
+        return name, '\n'.join(l)
