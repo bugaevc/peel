@@ -22,6 +22,7 @@ class Union(DefinedType):
         self.onstack = False
         assert('glib:is-gtype-struct-for' not in attrs)
         self.is_private = self.gir_name is not None and self.gir_name.endswith('Private')
+        self.extra_includes = []
 
     def start_child_element(self, name, attrs):
         if name == 'constructor':
@@ -61,6 +62,8 @@ class Union(DefinedType):
                 self.is_pointer_type = True
             elif tweak[0] == 'onstack':
                 self.onstack = True
+            elif tweak[0] == 'include':
+                self.extra_includes.append(tweak[1])
 
         self.is_refcounted = bool(self.ref_func)
 
@@ -84,6 +87,7 @@ class Union(DefinedType):
         s.discard(self)
         for nested_type in self.nested_types:
             assert(nested_type not in s)
+        s.update(self.extra_includes)
         return s
 
     def generate_extra_forward_members(self):

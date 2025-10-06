@@ -35,6 +35,7 @@ class Record(DefinedType):
         self.struct_kw = 'class /* record */'
         assert('glib:is-gtype-struct-for' not in attrs)
         self.is_private = self.gir_name.endswith('Private')
+        self.extra_includes = []
 
     def is_passed_by_ref(self):
         return True
@@ -97,6 +98,8 @@ class Record(DefinedType):
                 self.opaque = True
             elif tweak[0] == 'float':
                 self.is_initially_floating = True
+            elif tweak[0] == 'include':
+                self.extra_includes.append(tweak[1])
 
         self.is_refcounted = bool(self.ref_func)
         for f in self.fields:
@@ -135,6 +138,7 @@ class Record(DefinedType):
         s.discard(self)
         for nested_type in self.nested_types:
             assert(nested_type not in s)
+        s.update(self.extra_includes)
         return s
 
     def generate_extra_forward_members(self):

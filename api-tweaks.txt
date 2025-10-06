@@ -305,6 +305,7 @@ skip	GObjectConstructParam		GObject		manual
 nest-alias GBindingFlags		Binding::Flags
 skip	GValue				GObject		manual
 onstack	GValue
+include	GTypeCValue			gobject/gvaluecollector.h
 skip	_Value__data__union
 float	GInitiallyUnowned
 skip	g_gtype_get_type
