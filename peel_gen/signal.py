@@ -37,6 +37,7 @@ class Signal(FunctionLike):
             rv_cpp_type,
             ', '.join(param_types)
         )
+
         l = [
             '  template<typename Handler>',
             '  peel::SignalConnection::Token',
@@ -62,6 +63,59 @@ class Signal(FunctionLike):
             ),
             '  }',
         ]
+
+        if self.detailed:
+            l += [
+                '  template<typename Handler>',
+                '  peel::SignalConnection::Token',
+                '  connect_{} (const char *detail, Handler &&handler, bool after = false) noexcept'.format(connect_signal_name),
+                '  {',
+                '    GLib::Quark detail_quark { detail };',
+                '    return {}::lookup ("{}").connect (this, detail_quark, static_cast<Handler &&> (handler), after);'.format(
+                    signal_type,
+                    self.name,
+                ),
+                '  }',
+                '',
+                '  template<typename Handler>',
+                '  peel::SignalConnection::Token',
+                '  connect_{} (GLib::Quark detail, Handler &&handler, bool after = false) noexcept'.format(connect_signal_name),
+                '  {',
+                '    return {}::lookup ("{}").connect (this, detail, static_cast<Handler &&> (handler), after);'.format(
+                    signal_type,
+                    self.name,
+                ),
+                '  }',
+                '',
+                '  template<typename HandlerObject>',
+                '  peel::enable_if_derived<GObject::Object, HandlerObject, peel::SignalConnection::Token>',
+                '  connect_{} (const char *detail, HandlerObject *object, {} (HandlerObject::*handler_method) ({}), bool after = false) noexcept'.format(
+                    connect_signal_name,
+                    rv_cpp_type,
+                    ', '.join([self.containing_type.emit_name + ' *'] + param_types)
+                ),
+                '  {',
+                '    GLib::Quark detail_quark { detail };',
+                '    return {}::lookup ("{}") .connect (this, detail_quark, object, handler_method, after);'.format(
+                    signal_type,
+                    self.name,
+                ),
+                '  }',
+                '',
+                '  template<typename HandlerObject>',
+                '  peel::enable_if_derived<GObject::Object, HandlerObject, peel::SignalConnection::Token>',
+                '  connect_{} (GLib::Quark detail, HandlerObject *object, {} (HandlerObject::*handler_method) ({}), bool after = false) noexcept'.format(
+                    connect_signal_name,
+                    rv_cpp_type,
+                    ', '.join([self.containing_type.emit_name + ' *'] + param_types)
+                ),
+                '  {',
+                '    return {}::lookup ("{}") .connect (this, detail, object, handler_method, after);'.format(
+                    signal_type,
+                    self.name,
+                ),
+                '  }',
+            ]
 
         if self.action:
             l += [
