@@ -198,6 +198,7 @@ skip	GRWLockReaderLocker		GLib		manual
 opaque	GSource
 
 skip	GQuark		GLib		manual
+newtype	GQuark		struct
 
 onstack	GHashTableIter
 opaque	GHashTableIter

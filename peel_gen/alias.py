@@ -11,6 +11,7 @@ class Alias(DefinedType):
         self.aliased_name = None
         self.aliased_c_type = None
         self.aliased_type = None
+        self.newtype = None
 
     def start_child_element(self, name, attrs):
         if is_type_element(name, attrs):
@@ -28,10 +29,19 @@ class Alias(DefinedType):
         if isinstance(self.aliased_type, VoidType):
             self.aliased_type = VoidAliasType(self)
 
+        for tweak in api_tweaks.lookup(self.c_type):
+            if tweak[0] == 'newtype':
+                self.newtype = tweak[1]
+
     def generate_forward_decl(self, for_nested=False):
         if self.nested_in and not for_nested:
             return None
-        return 'struct {};'.format(self.own_name)
+        if self.newtype is not None:
+            return '{} {};'.format(self.newtype, self.own_name)
+
+        # Aliases are not generated at all right now and resolved
+        # to their final type
+        return None
 
     def generate(self):
         assert(not self.nested_types)
