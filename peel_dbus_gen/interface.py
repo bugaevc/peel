@@ -80,7 +80,8 @@ class Interface:
             l.append(signal.generate_vfunc_ptr())
         for method in self.methods:
             l.append(method.generate_override_vfunc_method())
-        # TODO: override for signals too?
+        for signal in self.signals:
+            l.append(signal.generate_override_vfunc_method())
         l.extend([
             '  };',
             '};',
@@ -263,24 +264,36 @@ class Interface:
             name, s = method.generate_method_info()
             l.append(s)
             method_infos.append('  &{},'.format(name))
+        signal_infos = []
+        for signal in self.signals:
+            name, s = signal.generate_signal_info()
+            l.append(s)
+            signal_infos.append('  &{},'.format(name))
         property_infos = []
         for property in self.properties:
             name, s = property.generate_property_info()
             l.append(s)
             property_infos.append('  &{},'.format(name))
         l.extend([
-            'static const ::GDBusMethodInfo *',
+            'static const ::GDBusMethodInfo * const',
             '{}_method_infos[] ='.format(self.emit_name),
             '{',
             '\n'.join(method_infos),
             '  nullptr',
             '};',
             '',
-            'static const ::GDBusPropertyInfo *',
+            'static const ::GDBusSignalInfo * const',
+            '{}_signal_infos[] ='.format(self.emit_name),
+            '{',
+            '\n'.join(signal_infos),
+            '  nullptr',
+            '};',
+            '',
+            'static const ::GDBusPropertyInfo * const',
             '{}_property_infos[] ='.format(self.emit_name),
             '{',
             '\n'.join(property_infos),
-            '  nullptr,',
+            '  nullptr',
             '};',
             '',
             'static const ::GDBusInterfaceInfo',
@@ -289,7 +302,7 @@ class Interface:
             '  -1, /* ref_count */',
             '  const_cast<char *> ("{}"),'.format(self.interface_name),
             '  const_cast<::GDBusMethodInfo **> ({}_method_infos),'.format(self.emit_name),
-            '  nullptr /* {}_signal_infos */,'.format(self.emit_name),
+            '  const_cast<::GDBusSignalInfo **> ({}_signal_infos),'.format(self.emit_name),
             '  const_cast<::GDBusPropertyInfo **> ({}_property_infos),'.format(self.emit_name),
             '  nullptr /* annotations */',
             '};',
@@ -303,6 +316,8 @@ class Interface:
         ])
         for method in self.methods:
             l.append(method.generate_default_vfuncs())
+        for signal in self.signals:
+            l.append(signal.generate_id_decl())
         l.extend([
             '',
             'static void',
@@ -314,6 +329,8 @@ class Interface:
             l.append(method.generate_iface_init('iface'))
         for property in self.properties:
             l.append(property.generate_iface_init('iface'))
+        for signal in self.signals:
+            l.append(signal.generate_iface_init('{}_type'.format(self.emit_name)))
         l.extend([
             '}',
             '',
@@ -388,13 +405,23 @@ class Interface:
             'static void',
             '{}_proxy_properties_changed (::GDBusProxy *proxy, ::GVariant *changed_properties, const char * const *invalidated_properties)'.format(self.emit_name),
             '{',
-            # TODO: notify, or proxy->dispatch_properties_changed
+            # TODO: notify
             '}',
             '',
+        ])
+        for signal in self.signals:
+            l.append(signal.generate_proxy_signal('{}_type'.format(self.emit_name)))
+        l.extend([
             'static void',
             '{}_proxy_signal (::GDBusProxy *proxy, const char *sender_name, const char *signal_name, ::GVariant *parameters)'.format(self.emit_name),
             '{',
-            # TODO: switch on signal, emit the right one
+            '\n'.join(
+                '  if (!strcmp (signal_name, "{}"))\n'.format(signal.dbus_name) +
+                '    return {}_proxy_signal_{} (proxy, parameters);'.format(self.emit_name, signal.cpp_name)
+                for signal in self.signals
+            ),
+            '',
+            '  /* Otherwise, it\'s a new signal we don\'t yet know about */',
             '}',
             '',
             'static void',

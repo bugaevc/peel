@@ -8,3 +8,12 @@ def camel_case_to_underscore(camel):
         after_lower = c.islower()
         s += c.lower()
     return s
+
+# See the similarly named utility in peel-gen
+def escape_cpp_name(name):
+    if name in ('namespace'):
+        return name + '_'
+    assert(name)
+    if not name[0].isidentifier():
+        return '_' + name
+    return name
