@@ -1,5 +1,5 @@
 from peel_dbus_gen.type import Type
-from peel_dbus_gen.utils import camel_case_to_underscore
+from peel_dbus_gen.utils import camel_case_to_underscore, escape_cpp_name
 
 class Property:
     def __init__(self, attrs, iface):
@@ -7,12 +7,13 @@ class Property:
         self.dbus_name = attrs.get('name')
         self.cpp_name = camel_case_to_underscore(self.dbus_name)
         self.prop_name = self.cpp_name.replace('_', '-')
+        self.cpp_name = escape_cpp_name(self.cpp_name)
         self.type = Type(attrs.get('type'))
         self.access = attrs.get('access')
 
     def generate_header(self):
-        plain_type = self.type.generate_cpp_type(flavor='property')
-        tp = self.type.generate_cpp_type(ownership='full')
+        plain_type = self.type.generate_cpp_type(flavor='plain')
+        tp = self.type.generate_cpp_type(flavor='method', ownership='full')
         l = [
             '  static ::peel::Property<{}>'.format(plain_type),
             '  prop_{} ()'.format(self.cpp_name),
