@@ -116,7 +116,7 @@ def emit_file(repo, file_path, members):
     else:
         member_generated = None
 
-    with file_path.open(mode='w') as target_file:
+    with file_path.open(mode='w', encoding='utf-8') as target_file:
         header = repo.generate_header(extra_includes=extra_includes)
         target_file.write(header)
         write_required_forward_decls(target_file, extra_forward_members)
