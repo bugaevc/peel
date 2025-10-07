@@ -2,7 +2,7 @@ class Type:
     def __init__(self, signature):
         self.signature = signature
 
-    def generate_cpp_type(self, flavor='arg', ownership='none'):
+    def generate_cpp_type(self, flavor, ownership='none'):
         if self.signature == 'b':
             return 'bool'
         elif self.signature == 'y':
@@ -22,15 +22,18 @@ class Type:
         elif self.signature == 'd':
             return 'double'
         elif self.signature in ('s', 'o', 'g'):
+            if flavor == 'signal':
+                return 'const char *'
             return '::peel::String'
         else:
-            # TODO
-            if flavor in ('arg', 'signal'):
+            if flavor == 'method':
                 if ownership == 'none':
-                    return '::peel::GLib::Variant *'
+                    return '::peel::FloatPtr<::peel::GLib::Variant>'
                 else:
                     return '::peel::RefPtr<::peel::GLib::Variant>'
-            elif flavor == 'property':
+            elif flavor == 'signal':
+                return '::peel::GLib::Variant *'
+            elif flavor == 'plain':
                 return '::peel::GLib::Variant'
 
 
@@ -57,9 +60,11 @@ class Type:
             return 'g_variant_new_take_string (std::move ({}).release_string ())'.format(cpp_expr)
         elif self.signature == 'o':
             return 'g_variant_new_object_path ({})'.format(cpp_expr)
+        elif self.signature == 'v':
+            return 'g_variant_new_variant (reinterpret_cast<::GVariant *> (std::move ({}).release_floating_ptr ()))'.format(cpp_expr)
         else:
             # TODO
-            return 'reinterpret_cast<::GVariant *> ({})'.format(cpp_expr)
+            return 'reinterpret_cast<::GVariant *> (std::move ({}).release_floating_ptr ())'.format(cpp_expr)
 
     def generate_variant_get(self, variant_expr):
         if self.signature == 'b':
@@ -82,6 +87,8 @@ class Type:
             return 'g_variant_get_double ({})'.format(variant_expr)
         elif self.signature in ('s', 'g', 'o'):
             return '::peel::String::adopt_string (g_variant_dup_string ({}, nullptr))'.format(variant_expr)
+        elif self.signature == 'v':
+            return '::peel::RefPtr<::peel::GLib::Variant>::adopt_ref (reinterpret_cast<::peel::GLib::Variant *> (g_variant_get_variant ({})))'.format(variant_expr)
         else:
             # TODO
             return 'reinterpret_cast<::peel::GLib::Variant *> ({})'.format(variant_expr)
@@ -109,6 +116,8 @@ class Type:
             return 'g_value_take_string ({}, g_variant_dup_string ({}, nullptr))'.format(value_expr, variant_expr)
         elif self.signature == 'as':
             return '{{ const char **strv = g_variant_get_strv ({}, nullptr); g_value_set_boxed ({}, strv); g_free (strv); }}'.format(variant_expr, value_expr)
+        elif self.signature == 'v':
+            return 'g_value_take_variant ({}, g_variant_get_variant ({}))'.format(value_expr, variant_expr)
         else:
             # TODO
             return 'g_value_set_variant ({}, {})'.format(value_expr, variant_expr)

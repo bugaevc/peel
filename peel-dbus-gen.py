@@ -61,7 +61,7 @@ class SaxHandler(xml.sax.handler.ContentHandler):
             assert(self.signal is None)
             assert(self.arg is None)
             assert(self.property is None)
-            self.signal = Signal(attrs)
+            self.signal = Signal(attrs, iface=self.interface)
             self.interface.signals.append(self.signal)
         elif name == 'arg':
             assert(self.interface is not None)
@@ -69,10 +69,10 @@ class SaxHandler(xml.sax.handler.ContentHandler):
             assert(self.arg is None)
             assert(self.property is None)
             if self.method is not None:
-                self.arg = Argument(attrs, default_direction='in')
+                self.arg = Argument(attrs, self.method)
                 self.method.arguments.append(self.arg)
             else:
-                self.arg = Argument(attrs, default_direction='out')
+                self.arg = Argument(attrs, self.signal)
                 self.signal.arguments.append(self.arg)
         elif name == 'property':
             assert(self.interface is not None)

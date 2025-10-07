@@ -1,17 +1,18 @@
-from peel_dbus_gen.utils import camel_case_to_underscore
+from peel_dbus_gen.utils import camel_case_to_underscore, escape_cpp_name
 
 class Method:
     def __init__(self, attrs, iface):
         self.iface = iface
         self.dbus_name = attrs.get('name')
         self.cpp_name = camel_case_to_underscore(self.dbus_name)
+        self.cpp_name = escape_cpp_name(self.cpp_name)
         self.arguments = []
 
     def generate_arg_lists(self):
         self.in_args = ''.join(arg.generate_cpp_type() + ', ' for arg in self.arguments if arg.direction == 'in')
-        self.in_args_forward = ''.join('std::move ({}), '.format(arg.name) for arg in self.arguments if arg.direction == 'in')
+        self.in_args_forward = ''.join('std::move ({}), '.format(arg.cpp_name) for arg in self.arguments if arg.direction == 'in')
         self.out_args = ''.join(arg.generate_cpp_type() + ', ' for arg in self.arguments if arg.direction == 'out')
-        self.out_args_forward = ''.join('{}, '.format(arg.name) for arg in self.arguments if arg.direction == 'out')
+        self.out_args_forward = ''.join('{}, '.format(arg.cpp_name) for arg in self.arguments if arg.direction == 'out')
 
     def generate_header(self):
         self.generate_arg_lists()
@@ -297,16 +298,40 @@ class Method:
         ])
 
     def generate_method_info(self):
+        in_arg_infos = []
+        out_arg_infos = []
+        l = []
+        for arg in self.arguments:
+            name, s = arg.generate_arg_info()
+            l.append(s)
+            if arg.direction == 'in':
+                in_arg_infos.append('  &{},'.format(name))
+            else:
+                out_arg_infos.append('  &{},'.format(name))
         name = '{}_{}_method_info'.format(self.iface.emit_name, self.cpp_name)
-        l = [
+        l.extend([
+            'static const ::GDBusArgInfo * const',
+            '{}_{}_in_arg_infos[] ='.format(self.iface.emit_name, self.cpp_name),
+            '{',
+            '\n'.join(in_arg_infos),
+            '  nullptr',
+            '};',
+            ''
+            'static const ::GDBusArgInfo * const',
+            '{}_{}_out_arg_infos[] ='.format(self.iface.emit_name, self.cpp_name),
+            '{',
+            '\n'.join(out_arg_infos),
+            '  nullptr',
+            '};',
+            ''
             'static const ::GDBusMethodInfo',
             '{} ='.format(name),
             '{',
             '  -1, /* ref_count */',
             '  const_cast<char *> ("{}"),'.format(self.dbus_name),
-            '  nullptr,',
-            '  nullptr,',
+            '  const_cast<::GDBusArgInfo **> ({}_{}_in_arg_infos),'.format(self.iface.emit_name, self.cpp_name),
+            '  const_cast<::GDBusArgInfo **> ({}_{}_out_arg_infos),'.format(self.iface.emit_name, self.cpp_name),
             '  nullptr',
             '};',
-        ]
+        ])
         return name, '\n'.join(l)
