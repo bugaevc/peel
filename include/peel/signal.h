@@ -1,5 +1,6 @@
 #pragma once
 
+#include <peel/GLib/Quark.h>
 #include <peel/GObject/Type.h>
 #include <peel/GObject/Value.h>
 #include <peel/RefPtr.h>
@@ -388,10 +389,10 @@ struct SignalHelper2
 {
   peel_always_inline
   static Ret
-  emit (void *instance, gint id, ::GQuark detail, Args... args) noexcept
+  emit (void *instance, gint id, GLib::Quark detail, Args... args) noexcept
   {
     typename SignalTraits<Ret>::CType ret_c;
-    g_signal_emit (instance, id, detail, SignalTraits<Args>::to_c (args)..., &ret_c);
+    g_signal_emit (instance, id, static_cast<::GQuark> (detail), SignalTraits<Args>::to_c (args)..., &ret_c);
     return SignalTraits<Ret>::from_c (ret_c);
   }
 
@@ -431,9 +432,9 @@ struct SignalHelper2<void, Args...>
 {
   peel_always_inline
   static void
-  emit (void *instance, gint id, ::GQuark detail, Args... args) noexcept
+  emit (void *instance, gint id, GLib::Quark detail, Args... args) noexcept
   {
-    g_signal_emit (instance, id, detail, SignalTraits<Args>::to_c (args)...);
+    g_signal_emit (instance, id, static_cast<::GQuark> (detail), SignalTraits<Args>::to_c (args)...);
   }
 
   peel_always_inline
@@ -822,7 +823,7 @@ public:
   }
 
   Ret
-  emit (Instance *instance, ::GQuark detail, Args... args) noexcept
+  emit (Instance *instance, GLib::Quark detail, Args... args) noexcept
   {
     return internals::SignalHelper2<Ret, Args...>::emit (instance, id, detail, args...);
   }
@@ -830,7 +831,7 @@ public:
   Ret
   emit (Instance *instance, Args... args) noexcept
   {
-    return emit (instance, 0, args...);
+    return emit (instance, GLib::Quark (), args...);
   }
 
   static Ret
@@ -841,14 +842,14 @@ public:
 
   template<typename Handler>
   SignalConnection::Token
-  connect (Instance *instance, ::GQuark detail, Handler &&handler, bool after = false) noexcept
+  connect (Instance *instance, GLib::Quark detail, Handler &&handler, bool after = false) noexcept
   {
     typedef typename std::remove_reference<Handler>::type HandlerRR;
     typedef typename std::conditional<std::is_function<HandlerRR>::value, HandlerRR *, HandlerRR>::type HandlerType;
     typedef internals::SignalClosure<Instance, HandlerType, Ret, Args...> ClosureType;
     ClosureType *closure = ClosureType::make (static_cast<Handler &&> (handler));
     // Sinks the closure reference.
-    gulong conn_id = g_signal_connect_closure_by_id (reinterpret_cast<::GObject *> (instance), id, detail, closure, after);
+    gulong conn_id = g_signal_connect_closure_by_id (reinterpret_cast<::GObject *> (instance), id, static_cast<::GQuark> (detail), closure, after);
     return SignalConnection::Token { instance, conn_id };
   }
 
@@ -857,7 +858,7 @@ public:
   connect
   (
     Instance *instance,
-    ::GQuark detail,
+    GLib::Quark detail,
     HandlerObject *object,
     Ret (HandlerObject::*handler_method) (Instance *, Args...),
     bool after = false
@@ -884,7 +885,7 @@ public:
     ClosureType *closure = ClosureType::make (std::move (handler));
     g_object_watch_closure (reinterpret_cast<::GObject *> (object), closure);
     // Sinks the closure reference.
-    gulong conn_id = g_signal_connect_closure_by_id (reinterpret_cast<::GObject *> (instance), id, detail, closure, after);
+    gulong conn_id = g_signal_connect_closure_by_id (reinterpret_cast<::GObject *> (instance), id, static_cast<::GQuark> (detail), closure, after);
     return SignalConnection::Token { instance, conn_id };
   }
 
@@ -938,9 +939,9 @@ public:
   }
 
   bool
-  has_handler_pending (Instance *instance, ::GQuark detail = 0, bool may_be_blocked = false) noexcept
+  has_handler_pending (Instance *instance, GLib::Quark detail = GLib::Quark (), bool may_be_blocked = false) noexcept
   {
-    return !!g_signal_has_handler_pending (instance, id, detail, may_be_blocked);
+    return !!g_signal_has_handler_pending (instance, id, static_cast<::GQuark> (detail), may_be_blocked);
   }
 };
 
@@ -986,8 +987,11 @@ struct DynamicSignalTypeHelper1<Ret (*) (Instance *, Args...)>
   template<typename _SignalHandler>                                            \
   ::peel::SignalConnection::Token                                              \
   connect_ ## signal_name                                                      \
-  (_SignalHandler &&signal_handler, ::GQuark detail = 0, bool after = false)   \
-  noexcept                                                                     \
+  (                                                                            \
+    _SignalHandler &&signal_handler,                                           \
+    ::peel::GLib::Quark detail = ::peel::GLib::Quark (),                       \
+    bool after = false                                                         \
+  ) noexcept                                                                   \
   {                                                                            \
     return (signal_obj).connect (this, detail,                                 \
       static_cast<_SignalHandler &&> (signal_handler), after);                 \
@@ -1003,7 +1007,7 @@ struct DynamicSignalTypeHelper1<Ret (*) (Instance *, Args...)>
   (                                                                            \
     _HandlerObject *object,                                                    \
     _HandlerMethod _HandlerObject::*handler_method,                            \
-    ::GQuark detail = 0,                                                       \
+    ::peel::GLib::Quark detail = ::peel::GLib::Quark (),                       \
     bool after = false                                                         \
   ) noexcept                                                                   \
   {                                                                            \

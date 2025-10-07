@@ -1,5 +1,6 @@
 #pragma once
 
+#include <peel/GLib/Quark.h>
 #include <peel/GObject/Type.h>
 #include <peel/GObject/Value.h>
 #include <peel/GObject/TypeInstance.h>
@@ -530,7 +531,7 @@ public:
   connect_notify (Property<T> prop, Handler &&handler, bool after = false) noexcept
   {
     Signal<Object, void (ParamSpec *)> notify_signal = Signal<Object, void (ParamSpec *)>::lookup ("notify");
-    ::GQuark quark = g_quark_from_string (prop.name);
+    GLib::Quark quark { prop.name };
     return notify_signal.template connect<Handler> (this, quark, static_cast<Handler &&> (handler), after);
   }
 
@@ -539,7 +540,7 @@ public:
   connect_notify (Handler &&handler, bool after = false) noexcept
   {
     Signal<Object, void (ParamSpec *)> notify_signal = Signal<Object, void (ParamSpec *)>::lookup ("notify");
-    return notify_signal.template connect<Handler> (this, 0, static_cast<Handler &&> (handler), after);
+    return notify_signal.template connect<Handler> (this, GLib::Quark (), static_cast<Handler &&> (handler), after);
   }
 
   template<typename T, typename HandlerObject>
@@ -553,7 +554,7 @@ public:
   ) noexcept
   {
     Signal<Object, void (ParamSpec *)> notify_signal = Signal<Object, void (ParamSpec *)>::lookup ("notify");
-    ::GQuark quark = g_quark_from_string (prop.name);
+    GLib::Quark quark { prop.name };
     return notify_signal.template connect<HandlerObject> (this, quark, object, handler_method, after);
   }
 
@@ -567,7 +568,7 @@ public:
   ) noexcept
   {
     Signal<Object, void (ParamSpec *)> notify_signal = Signal<Object, void (ParamSpec *)>::lookup ("notify");
-    return notify_signal.template connect<HandlerObject> (this, 0, object, handler_method, after);
+    return notify_signal.template connect<HandlerObject> (this, GLib::Quark (), object, handler_method, after);
   }
 
   template<typename T>
@@ -598,10 +599,10 @@ public:
   }
 
   void *
-  get_data (::GQuark quark) noexcept
+  get_data (GLib::Quark quark) noexcept
   {
     ::GObject *obj = reinterpret_cast<::GObject *> (this);
-    return g_object_get_qdata (obj, quark);
+    return g_object_get_qdata (obj, static_cast<::GQuark> (quark));
   }
 
   void
@@ -612,10 +613,10 @@ public:
   }
 
   void
-  set_data (::GQuark quark, void *data, ::GDestroyNotify destroy_notify = nullptr) noexcept
+  set_data (GLib::Quark quark, void *data, ::GDestroyNotify destroy_notify = nullptr) noexcept
   {
     ::GObject *obj = reinterpret_cast<::GObject *> (this);
-    g_object_set_qdata_full (obj, quark, data, destroy_notify);
+    g_object_set_qdata_full (obj, static_cast<::GQuark> (quark), data, destroy_notify);
   }
 
   void *
@@ -626,10 +627,10 @@ public:
   }
 
   void *
-  steal_data (::GQuark quark) noexcept
+  steal_data (GLib::Quark quark) noexcept
   {
     ::GObject *obj = reinterpret_cast<::GObject *> (this);
-    return g_object_steal_qdata (obj, quark);
+    return g_object_steal_qdata (obj, static_cast<::GQuark> (quark));
   }
 
   class Class : public TypeClass
