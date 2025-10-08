@@ -27,17 +27,14 @@ class Type:
             return '::peel::String'
         else:
             if flavor == 'method':
-                if ownership == 'none':
-                    return '::peel::FloatPtr<::peel::GLib::Variant>'
-                else:
-                    return '::peel::RefPtr<::peel::GLib::Variant>'
+                return '::peel::RefPtr<::peel::GLib::Variant>'
             elif flavor == 'signal':
                 return '::peel::GLib::Variant *'
             elif flavor == 'plain':
                 return '::peel::GLib::Variant'
 
 
-    def generate_make_variant(self, cpp_expr):
+    def generate_make_variant(self, cpp_expr, ownership='full'):
         if self.signature == 'b':
             return 'g_variant_new_boolean ({})'.format(cpp_expr)
         elif self.signature == 'y':
@@ -57,14 +54,17 @@ class Type:
         elif self.signature == 'd':
             return 'g_variant_new_double ({})'.format(cpp_expr)
         elif self.signature in ('s', 'g'):
-            return 'g_variant_new_take_string (std::move ({}).release_string ())'.format(cpp_expr)
+            if ownership == 'full':
+                return 'g_variant_new_take_string (std::move ({}).release_string ())'.format(cpp_expr)
+            else:
+                return 'g_variant_new_string ({})'.format(cpp_expr)
         elif self.signature == 'o':
             return 'g_variant_new_object_path ({})'.format(cpp_expr)
         elif self.signature == 'v':
-            return 'g_variant_new_variant (reinterpret_cast<::GVariant *> (std::move ({}).release_floating_ptr ()))'.format(cpp_expr)
+            return 'g_variant_new_variant (reinterpret_cast<::GVariant *> (static_cast<::peel::GLib::Variant *> ({})))'.format(cpp_expr)
         else:
             # TODO
-            return 'reinterpret_cast<::GVariant *> (std::move ({}).release_floating_ptr ())'.format(cpp_expr)
+            return 'reinterpret_cast<::GVariant *> (static_cast<::peel::GLib::Variant *> ({}))'.format(cpp_expr)
 
     def generate_variant_get(self, variant_expr):
         if self.signature == 'b':

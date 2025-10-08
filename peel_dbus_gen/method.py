@@ -335,3 +335,73 @@ class Method:
             '};',
         ])
         return name, '\n'.join(l)
+
+    def generate_vtable_method(self):
+        in_args = [arg for arg in self.arguments if arg.direction == 'in']
+        num_in_args = len(in_args)
+        l = [
+            'static void',
+            '{}_vtable_method_{}_ready_cb (::GObject *_peel_source_object, ::GAsyncResult *_peel_res, gpointer _peel_user_data)'.format(
+                self.iface.emit_name,
+                self.cpp_name,
+            ),
+            '{',
+            '  g_return_if_fail (G_TYPE_CHECK_INSTANCE_TYPE (_peel_source_object, ::peel::Type::of<{}> ()));'.format(self.iface.emit_name),
+            '  {} *self = reinterpret_cast<{} *> (_peel_source_object);'.format(
+                self.iface.emit_name,
+                self.iface.emit_name,
+            ),
+            '  {}::Iface *_peel_iface = G_TYPE_INSTANCE_GET_INTERFACE (self, ::peel::Type::of<{}> (), {}::Iface);'.format(
+                self.iface.emit_name,
+                self.iface.emit_name,
+                self.iface.emit_name,
+            ),
+            '  ::GDBusMethodInvocation *_peel_invocation = G_DBUS_METHOD_INVOCATION (_peel_user_data);',
+            '  ::peel::UniquePtr<::peel::GLib::Error> _peel_error;',
+            '  // _peel_iface->_peel_vfunc_{}_finish (self, _peel_res, /* TODO: out args */&_peel_error);'.format(self.cpp_name),
+            '  if (_peel_error)',
+            '    {',
+            '#if GLIB_CHECK_VERSION(2, 30, 0)',
+            '      g_dbus_method_invocation_take_error (_peel_invocation, reinterpret_cast<::GError *> (std::move (_peel_error).release_ref ()));',
+            '#else',
+            '      g_dbus_method_invocation_return_gerror (_peel_invocation, reinterpret_cast<::GError *> (static_cast<::peel::GLib::Error *> (_peel_error)));',
+            '#endif',
+            '      return;',
+            '    }',
+            '}',
+            '',
+            'static void',
+            '{}_vtable_method_{} ({} *self, ::GVariant *_peel_parameters, ::GDBusMethodInvocation *_peel_invocation)'.format(
+                self.iface.emit_name,
+                self.cpp_name,
+                self.iface.emit_name,
+            ),
+            '{',
+            '  ::GVariant *_peel_in_args[{}];'.format(num_in_args),
+        ]
+        for i, arg in enumerate(in_args):
+            arg_expr = '_peel_in_args[{}]'.format(i)
+            l.extend([
+                '  {} = g_variant_get_child_value (_peel_parameters, {});'.format(arg_expr, i),
+                '  {} = {};'.format(arg.generate_cpp_type(ownership='full'), arg.type.generate_variant_get(arg_expr)),
+            ])
+        l.extend([
+            '  bool _peel_no_reply = g_dbus_message_get_flags (g_dbus_method_invocation_get_message (_peel_invocation)) & G_DBUS_MESSAGE_FLAGS_NO_REPLY_EXPECTED;',
+            '  {}::Iface *_peel_iface = G_TYPE_INSTANCE_GET_INTERFACE (self, ::peel::Type::of<{}> (), {}::Iface);'.format(
+                self.iface.emit_name,
+                self.iface.emit_name,
+                self.iface.emit_name,
+            ),
+            '  _peel_iface->_peel_vfunc_{}_async (self, {}_peel_no_reply ? nullptr : {}_vtable_method_{}_ready_cb, _peel_invocation, nullptr, ::peel::Gio::DBusCallFlags::NONE, -1);'.format(
+                self.cpp_name,
+                self.in_args_forward,
+                self.iface.emit_name,
+                self.cpp_name,
+            ),
+            '  for (::GVariant *_peel_in_arg : _peel_in_args)',
+            '    g_variant_unref (_peel_in_arg);',
+            '  if (_peel_no_reply)',
+            '    g_object_unref (_peel_invocation);',
+            '}',
+        ])
+        return '\n'.join(l)
