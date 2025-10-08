@@ -8,7 +8,14 @@ class Array(NodeHandler, AnyType):
         self.ns = ns
         self.fixed_size = attrs.get('fixed-size', None)
         self.length = attrs.get('length', None)
-        self.zero_terminated = attrs.get('zero-terminated', '0') == '1'
+        zero_terminated = attrs.get('zero-terminated', None)
+        if zero_terminated is not None:
+            self.zero_terminated = zero_terminated == '1'
+        elif self.length is not None or self.fixed_size is not None:
+            self.zero_terminated = False
+        else:
+            # Defaults to true for arrays, see giscanner/girwriter.py:GIRWriter._write_type
+            self.zero_terminated = True
         self.item_type_name = None
         self.item_c_type = None
         self.item_type = None
