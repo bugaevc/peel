@@ -19,7 +19,7 @@ class Argument:
         self.direction = attrs.get('direction', default_direction)
         self.type = Type(attrs.get('type'))
 
-    def generate_cpp_type(self, bare=False):
+    def generate_cpp_type(self, bare=False, ownership=None):
         from peel_dbus_gen.method import Method
         from peel_dbus_gen.signal import Signal
 
@@ -28,10 +28,11 @@ class Argument:
         else:
             out_asterisk = '*'
 
-        if self.direction == 'in':
-            ownership = 'none'
-        else:
-            ownership = 'full'
+        if ownership is None:
+            if self.direction == 'in':
+                ownership = 'none'
+            else:
+                ownership = 'full'
         if isinstance(self.function, Method):
             flavor = 'method'
         else:
@@ -44,9 +45,8 @@ class Argument:
         else:
             return '{} {}{}'.format(s, out_asterisk, self.cpp_name)
 
-    def generate_make_variant(self):
-        return self.type.generate_make_variant(self.cpp_name)
-
+    def generate_make_variant(self, ownership='full'):
+        return self.type.generate_make_variant(self.cpp_name, ownership)
 
     def generate_set_from_variant(self, variant_expr):
         return '*{} = {}'.format(self.cpp_name, self.type.generate_variant_get(variant_expr))

@@ -131,3 +131,57 @@ class Signal:
             l.append('  g_value_unset (&instance_and_params[{}]);'.format(index))
         l.append('}')
         return '\n'.join(l)
+
+    def generate_emit_method_decl(self):
+        args = ', '.join(arg.generate_cpp_type() for arg in self.arguments)
+        return '\n'.join([
+            '  void',
+            '  {} ({}) noexcept;'.format(self.cpp_name, args),
+        ])
+
+    def generate_emit_method_body(self):
+        args = ', '.join(arg.generate_cpp_type() for arg in self.arguments)
+        args_forward = ''.join(', ' + arg.cpp_name for arg in self.arguments)
+        return '\n'.join([
+            'void',
+            '{}::Skeleton::{} ({}) noexcept'.format(self.iface.emit_name, self.cpp_name, args),
+            '{',
+            '  g_signal_emit (G_OBJECT (this), {}_{}_signal_id, 0{});'.format(self.iface.emit_name, self.cpp_name, args_forward),
+            '}',
+        ])
+
+    def generate_iface_base_init(self, iface_expr):
+        return '\n'.join([
+            '  if (!{}->_peel_vfunc_{})'.format(iface_expr, self.cpp_name),
+            '    {}->_peel_vfunc_{} = {}_skeleton_real_{};'.format(iface_expr, self.cpp_name, self.iface.emit_name, self.cpp_name)
+        ])
+
+    def generate_skeleton_vfunc(self):
+        args = ''.join(', ' + arg.generate_cpp_type() for arg in self.arguments)
+        return '\n'.join([
+            'static void',
+            '{}_skeleton_real_{} ({} *self{})'.format(self.iface.emit_name, self.cpp_name, self.iface.emit_name, args),
+            '{',
+            '  g_return_if_fail (self->check_type<{}::Skeleton> ());'.format(self.iface.emit_name),
+            '  ::GDBusInterfaceSkeleton *skeleton = G_DBUS_INTERFACE_SKELETON (self);',
+            '',
+            '  ::GList *_peel_connections = g_dbus_interface_skeleton_get_connections (skeleton);',
+            '  if (!_peel_connections)',
+            '    return;',
+            '  const char *_peel_object_path = g_dbus_interface_skeleton_get_object_path (skeleton);',
+            '',
+            '  ::GVariant *_peel_args[{}]'.format(len(self.arguments)),
+            '  {',
+            '\n'.join('    {},'.format(arg.generate_make_variant(ownership='none')) for arg in self.arguments),
+            '  };',
+            '  ::GVariant *_peel_args_variant = g_variant_ref_sink (g_variant_new_tuple (_peel_args, {}));'.format(len(self.arguments)),
+            '',
+            '  for (::GList *_peel_l = _peel_connections; _peel_l; _peel_l = _peel_l->next)',
+            '    g_dbus_connection_emit_signal (G_DBUS_CONNECTION (_peel_l->data), nullptr,',
+            '      _peel_object_path, "{}", "{}",'.format(self.iface.interface_name, self.dbus_name),
+            '      _peel_args_variant, nullptr);',
+            '',
+            '  g_variant_unref (_peel_args_variant);',
+            '  g_list_free_full (_peel_connections, g_object_unref);',
+            '}',
+        ])
