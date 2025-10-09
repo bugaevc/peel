@@ -47,7 +47,7 @@
 #define peel_assume(expr) do { } while (0)
 #endif
 
-#if __cpp_lib_unreachable >= 202202L
+#ifdef __cpp_lib_unreachable
 #define peel_unreachable std::unreachable ()
 #elif defined (__GNUC__)
 #define peel_unreachable __builtin_unreachable ()
