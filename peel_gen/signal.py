@@ -2,12 +2,14 @@ from peel_gen.alias import chase_type_aliases
 from peel_gen.function_like import FunctionLike
 from peel_gen.type import PlainType
 from peel_gen.exceptions import UnsupportedForNowException
+from peel_gen.utils import make_simple_decl
 
 class Signal(FunctionLike):
     def __init__(self, attrs, containing_type):
         super().__init__(attrs, containing_type.ns)
         self.containing_type = containing_type
         self.detailed = attrs.get('detailed', '0') != '0'
+        self.action = attrs.get('action', '0') != '0'
         self.tweak_ident = containing_type.c_type + '::signal_' + self.name
 
     def __repr__(self):
@@ -24,8 +26,12 @@ class Signal(FunctionLike):
         rv_cpp_type = self.rv.generate_cpp_type(name=None, context=self.containing_type)
         if self.params is not None:
             param_types = [p.generate_cpp_type(name=None, context=self.containing_type) for p in self.params.params]
+            param_names_and_types = [p.generate_cpp_type(name=p.name, context=self.containing_type) for p in self.params.params]
+            param_names = [p.name for p in self.params.params]
         else:
             param_types = []
+            param_names_and_types = []
+            param_names = []
         signal_type = 'Signal<{}, {} ({})>'.format(
             self.containing_type.emit_name,
             rv_cpp_type,
@@ -56,4 +62,20 @@ class Signal(FunctionLike):
             ),
             '  }',
         ]
+
+        if self.action:
+            l += [
+                '',
+                '  {}'.format(rv_cpp_type),
+                '  emit_{} ({}) noexcept'.format(connect_signal_name, ', '.join(param_names_and_types)),
+                '  {',
+                '    return {}::_peel_emit_by_name (this, "{}"{}{});'.format(
+                    signal_type,
+                    self.name,
+                    (', ' if len(param_names) > 0 else ''),
+                    ', '.join(param_names),
+                ),
+                '  }',
+            ]
+
         return '\n'.join(l)
