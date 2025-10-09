@@ -133,5 +133,8 @@ def find_and_parse_gir_repo(name, version):
     import peel_gen.sax_handler
     sax_handler = peel_gen.sax_handler.SaxHandler(name, version)
     parser.setContentHandler(sax_handler)
-    parser.parse(str(gir_path))
+    with gir_path.open('r', encoding='utf-8') as f:
+        src = xml.sax.InputSource()
+        src.setCharacterStream(f)
+        parser.parse(src)
     return sax_handler.repo
