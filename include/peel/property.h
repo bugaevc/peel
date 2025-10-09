@@ -510,26 +510,14 @@ public:
     return *this;
   }
 
+  template<typename ArgType>
   Setter &
-  set (void (Class::*setter) (UnownedType)) noexcept
+  set (void (Class::*setter) (ArgType)) noexcept
   {
     if (!found_ptr)
       return *this;
     *found_ptr = true;
-    UnownedType v = GObject::Value::Traits<T>::get (value);
-    (instance->*setter) (v);
-    return *this;
-  }
-
-  // template<typename = peel::enable_if_derived<GObject::Object, T>>
-  Setter &
-  set (void (Class::*setter) (FloatPtr<T>)) noexcept
-  {
-    if (!found_ptr)
-      return *this;
-    *found_ptr = true;
-    FloatPtr<T> obj = GObject::Value::Traits<T>::get (value);
-    (instance->*setter) (std::move (obj));
+    (instance->*setter) (GObject::Value::Traits<T>::get (value));
     return *this;
   }
 };
