@@ -373,10 +373,14 @@ public:
     size_t c_from_size = is_effectively_empty<CFrom> () ? 0 : sizeof (CFrom);
     if (c_to_size + c_from_size <= sizeof (gpointer))
       {
-#ifdef __GNUC__
+#if defined (__GNUC__) && !defined (__clang__)
 #pragma GCC diagnostic push
+#if __GNUC__ >= 7
 #pragma GCC diagnostic ignored "-Wstringop-overflow"
+#endif
+#if __GNUC__ >= 8
 #pragma GCC diagnostic ignored "-Wclass-memaccess"
+#endif
 #endif
         union U
         {
@@ -456,7 +460,7 @@ public:
           bool transformed = BindingTransformHelper<T2, T1, CFrom>::transform (*transform_from, _peel_binding, _peel_from_value, _peel_to_value);
           return static_cast<gboolean> (transformed);
         };
-#ifdef __GNUC__
+#if defined (__GNUC__) && !defined (__clang__)
 #pragma GCC diagnostic pop
 #endif
       }
