@@ -55,33 +55,33 @@ public:
     peel::ArrayRef<FlagsValue>
     get_values () const noexcept
     {
-        return peel::ArrayRef<FlagsValue> (this->values, this->n_values);
+      return peel::ArrayRef<FlagsValue> (this->values, this->n_values);
     }
 
     const FlagsValue *
     get_first_value (unsigned value) noexcept
     {
-        return reinterpret_cast<const FlagsValue *> (g_flags_get_first_value (reinterpret_cast<::GFlagsClass*> (this), value));
+      return reinterpret_cast<const FlagsValue *> (g_flags_get_first_value (reinterpret_cast<::GFlagsClass*> (this), value));
     }
 
     peel_nonnull_args (2)
     const FlagsValue *
     get_value_by_name (const char *name) noexcept
     {
-        return reinterpret_cast<const FlagsValue *> (g_flags_get_value_by_name (reinterpret_cast<::GFlagsClass*> (this), name));
+      return reinterpret_cast<const FlagsValue *> (g_flags_get_value_by_name (reinterpret_cast<::GFlagsClass*> (this), name));
     }
 
     peel_nonnull_args (2)
     const FlagsValue *
     get_value_by_nick (const char *nick) noexcept
     {
-        return reinterpret_cast<const FlagsValue *> (g_flags_get_value_by_name (reinterpret_cast<::GFlagsClass*> (this), nick));
+      return reinterpret_cast<const FlagsValue *> (g_flags_get_value_by_name (reinterpret_cast<::GFlagsClass*> (this), nick));
     }
 
     peel::String
     to_string (int value) noexcept
     {
-        return peel::String::adopt_string (g_flags_to_string (this->get_type (), value));
+      return peel::String::adopt_string (g_flags_to_string (this->get_type (), value));
     }
   }; /* class Class */
 }; /* struct Flags */

@@ -19,12 +19,15 @@ static_headers = files(
   'peel/coro/SimpleTask.h',
   'peel/coro/AsyncResult.h',
 
+  'peel/GObject/EnumClass.h',
+  'peel/GObject/FlagsClass.h',
   'peel/GObject/Type.h',
   'peel/GObject/TypeInstance.h',
   'peel/GObject/TypeClass.h',
   'peel/GObject/TypeInterface.h',
   'peel/GObject/Value.h',
   'peel/GObject/Object.h',
+  'peel/GObject/ObjectConstructParam.h',
   'peel/GLib/Variant.h',
 )
 

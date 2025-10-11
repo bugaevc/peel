@@ -26,11 +26,11 @@ public:
   constexpr
   Enum (int value) noexcept
     : value (value)
-  {  }
+  { }
 
   Enum (const EnumValue *value) noexcept
     : value (reinterpret_cast<const ::GEnumValue *> (value)->value)
-  {  }
+  { }
 
   constexpr
   operator int () const noexcept
@@ -57,33 +57,33 @@ public:
     peel::ArrayRef<EnumValue>
     get_values () noexcept
     {
-        return peel::ArrayRef<EnumValue> (this->values, this->n_values);
+      return peel::ArrayRef<EnumValue> (this->values, this->n_values);
     }
 
     const EnumValue *
     get_value (int value) noexcept
     {
-        return reinterpret_cast<const EnumValue *> (g_enum_get_value (reinterpret_cast<::GEnumClass*> (this), value));
+      return reinterpret_cast<const EnumValue *> (g_enum_get_value (reinterpret_cast<::GEnumClass*> (this), value));
     }
 
     peel_nonnull_args (2)
     const EnumValue *
     get_value_by_name (const char *name) noexcept
     {
-        return reinterpret_cast<const EnumValue *> (g_enum_get_value_by_name (reinterpret_cast<::GEnumClass*> (this), name));
+      return reinterpret_cast<const EnumValue *> (g_enum_get_value_by_name (reinterpret_cast<::GEnumClass*> (this), name));
     }
 
     peel_nonnull_args (2)
     const EnumValue *
     get_value_by_nick (const char *nick) noexcept
     {
-        return reinterpret_cast<const EnumValue *> (g_enum_get_value_by_name (reinterpret_cast<::GEnumClass*> (this), nick));
+      return reinterpret_cast<const EnumValue *> (g_enum_get_value_by_name (reinterpret_cast<::GEnumClass*> (this), nick));
     }
 
     peel::String
     to_string (int value) noexcept
     {
-        return peel::String::adopt_string (g_enum_to_string (this->get_type (), value));
+      return peel::String::adopt_string (g_enum_to_string (this->get_type (), value));
     }
   }; /* class Class */
 }; /* struct Enum */
