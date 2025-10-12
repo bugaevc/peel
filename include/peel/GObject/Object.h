@@ -267,7 +267,11 @@ public:
   typename GetPropertyHelper<T>::GetType
   get_property (Property<T> prop) noexcept
   {
+#if GLIB_CHECK_VERSION (2, 62, 0)
+    Value value;
+#else
     Value value { Type::of<T> () };
+#endif
     get_property (prop.name, &value);
     return GetPropertyHelper<T>::get (&value);
   }
@@ -276,6 +280,9 @@ public:
   typename GetPropertyHelper<T>::GetType
   get_property (const char *name) noexcept
   {
+#if GLIB_CHECK_VERSION (2, 62, 0)
+    Value value;
+#else
     Type tp;
 
     if (std::is_same<T, Enum>::value || std::is_same<T, Flags>::value)
@@ -295,6 +302,7 @@ public:
       tp = Type::of<T> ();
 
     Value value { tp };
+#endif
     get_property (name, &value);
     return GetPropertyHelper<T>::get (&value);
   }
