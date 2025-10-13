@@ -2,7 +2,7 @@ add_languages('cpp', native: false)
 
 glib = dependency('gobject-2.0')
 gtk4 = dependency('gtk4')
-libadwaita = dependency('libadwaita-1', required: false)
+libadwaita = dependency('libadwaita-1', version: '>= 1.5', required: false)
 libsoup = dependency('libsoup-3.0', required: false)
 libdex = dependency('libdex-1.0', required: false)
 
