@@ -940,6 +940,9 @@ out	GtkEntryBuffer::vfunc_get_text	n_bytes
 nonnull	gtk_bitset_ref			self
 nonnull	gtk_bitset_unref		self
 
+nullable gtk_label_set_label		str
+nullable gtk_label_get_label		return
+
 unowned	gdk_dmabuf_texture_builder_get_color_state	return
 unowned	gdk_gl_texture_builder_get_color_state		return
 
