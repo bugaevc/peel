@@ -16,6 +16,7 @@ class Parameter(NodeHandler):
         self.name = attrs.get('name', None)
         self.type_name = None
         self.type = None
+        self.c_type = None
         # self.is_rv = None
         self.is_instance = False
         self.is_record_field = False
