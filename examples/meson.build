@@ -4,7 +4,7 @@ glib = dependency('gobject-2.0')
 gtk4 = dependency('gtk4')
 libadwaita = dependency('libadwaita-1', version: '>= 1.5', required: false)
 libsoup = dependency('libsoup-3.0', required: false)
-libdex = dependency('libdex-1', required: false)
+libdex = dependency('libdex-1', version: '>= 1.0', required: false)
 gst = dependency('gstreamer-1.0', version: '>= 1.27.2', required: false)
 
 peel_gen_command = [
