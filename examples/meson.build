@@ -5,6 +5,7 @@ gtk4 = dependency('gtk4')
 libadwaita = dependency('libadwaita-1', version: '>= 1.5', required: false)
 libsoup = dependency('libsoup-3.0', required: false)
 libdex = dependency('libdex-1', required: false)
+gst = dependency('gstreamer-1.0', version: '>= 1.27.2', required: false)
 
 peel_gen_command = [
   py, meson.project_source_root() / 'peel-gen.py',
@@ -23,6 +24,10 @@ endif
 
 if libdex.found()
   peel_gen_command += ['Dex', '1']
+endif
+
+if gst.found()
+  peel_gen_command += ['Gst', '1.0']
 endif
 
 peel_headers = custom_target('peel-codegen',
@@ -54,6 +59,8 @@ adw_examples = ['adwaita']
 soup_examples = ['soup']
 
 dex_examples = ['libdex']
+
+gst_examples = ['hello-gst']
 
 if gtk4.version().version_compare('>= 4.10')
   gtk_examples += [
@@ -108,6 +115,17 @@ if libdex.found()
       example + '.cpp',
       peel_headers,
       dependencies: [libdex, peel_dep],
+      install: false,
+    )
+  endforeach
+endif
+
+if gst.found()
+  foreach example : gst_examples
+    executable(example,
+      example + '.cpp',
+      peel_headers,
+      dependencies: [gst, peel_dep],
       install: false,
     )
   endforeach
