@@ -28,6 +28,7 @@
     - [Per-class data]()
 - [GTK Widget Templates](gtk-widget-templates.md)
 - [Gotchas and Pitfalls](gotchas-and-pitfalls.md)
-- [C++20 coroutines]()
+- [Errors You May Encounter](errors-you-may-encounter.md)
+- [C++20 Coroutines]()
 - [peel internals]()
     - [Local copies](local-copies.md)
