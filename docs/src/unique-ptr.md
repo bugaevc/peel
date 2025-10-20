@@ -22,10 +22,10 @@ Here's a typical example of using `UniquePtr<GLib::Error>` to call a function
 that can potentially fail:
 
 ```cpp
-~#include <peel/Gtk/Gtk.h>
-~
-~using namespace peel;
-~
+$#include <peel/Gtk/Gtk.h>
+$
+$using namespace peel;
+$
 Gtk::ColorDialog *dialog = /* ... */;
 Gio::AsyncResult *res = /* ... */;
 

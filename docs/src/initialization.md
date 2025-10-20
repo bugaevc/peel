@@ -31,22 +31,22 @@ A typical implementation of an instance initializer for a widget (in this case,
 a window) looks like this:
 
 ```cpp
-~#include <peel/Gtk/Gtk.h>
-~
-~using namespace peel;
-~
-~class MyWindow final : public Gtk::Window
-~{
-~  PEEL_SIMPLE_CLASS (MyWindow, Gtk::Widget)
-~
-~  inline void
-~  init (Class *);
-~
-~  int last_index;
-~};
-~
-~PEEL_CLASS_IMPL (MyWindow, "MyWindow", Gtk::Window)
-~
+$#include <peel/Gtk/Gtk.h>
+$
+$using namespace peel;
+$
+$class MyWindow final : public Gtk::Window
+${
+$  PEEL_SIMPLE_CLASS (MyWindow, Gtk::Widget)
+$
+$  inline void
+$  init (Class *);
+$
+$  int last_index;
+$};
+$
+$PEEL_CLASS_IMPL (MyWindow, "MyWindow", Gtk::Window)
+$
 inline void
 MyWindow::init (Class *)
 {
@@ -94,27 +94,27 @@ per-class data. Specifically:
 A typical implementation of a class initializer for a widget looks like this:
 
 ```cpp
-~#include <peel/Gtk/Gtk.h>
-~
-~using namespace peel;
-~
-~namespace Demo
-~{
-~
-~class Gizmo final : public Gtk::Widget
-~{
-~  PEEL_SIMPLE_CLASS (Gizmo, Gtk::Widget)
-~  friend class Gtk::Widget::Class;
-~
-~  inline void
-~  vfunc_dispose ();
-~
-~  inline void
-~  vfunc_snapshot (Gtk::Snapshot *);
-~};
-~
-~PEEL_CLASS_IMPL (Gizmo, "DemoGizmo", Gtk::Widget)
-~
+$#include <peel/Gtk/Gtk.h>
+$
+$using namespace peel;
+$
+$namespace Demo
+${
+$
+$class Gizmo final : public Gtk::Widget
+${
+$  PEEL_SIMPLE_CLASS (Gizmo, Gtk::Widget)
+$  friend class Gtk::Widget::Class;
+$
+$  inline void
+$  vfunc_dispose ();
+$
+$  inline void
+$  vfunc_snapshot (Gtk::Snapshot *);
+$};
+$
+$PEEL_CLASS_IMPL (Gizmo, "DemoGizmo", Gtk::Widget)
+$
 inline void
 Gizmo::Class::init ()
 {
@@ -127,8 +127,8 @@ Gizmo::Class::init ()
   set_layout_manager_type (Type::of<Gtk::BinLayout> ());
   install_action ("gizmo.frob", nullptr, /* ... */);
 }
-~
-~} /* namespace Demo */
+$
+$} /* namespace Demo */
 ```
 
 Note that the C++ `this` pointer inside the class initializer refers to an
@@ -151,13 +151,13 @@ the most relevant [properties]. Conventionally, constructors are named
 For example, a constructor for a label widget might look like this:
 
 ```cpp
-~#include <peel/Gtk/Gtk.h>
-~
-~using namespace peel;
-~
-~namespace Demo
-~{
-~
+$#include <peel/Gtk/Gtk.h>
+$
+$using namespace peel;
+$
+$namespace Demo
+${
+$
 class Label final : public Gtk::Widget
 {
   PEEL_SIMPLE_CLASS (Label, Gtk::Widget)
@@ -176,8 +176,8 @@ Label::create (const char *text)
 {
   return Object::create<Label> (prop_text (), text);
 }
-~
-~} /* namespace Demo */
+$
+$} /* namespace Demo */
 ```
 
 Most importantly, please note that such a constructor is _not_ a single,

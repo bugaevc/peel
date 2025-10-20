@@ -68,10 +68,10 @@ lambda is typically broken, because of this (optimistic, but in this case,
 incorrect) assumption that peel makes:
 
 ```cpp
-~#include <peel/GLib/functions.h>
-~
-~using namespace peel;
-~
+$#include <peel/GLib/functions.h>
+$
+$using namespace peel;
+$
 Gtk::Button *button = /* ... */;
 
 GLib::idle_add_once (
@@ -87,10 +87,10 @@ GLib::idle_add_once (
 The workaround is to add another capture, perhaps of a dummy variable:
 
 ```cpp
-~#include <peel/GLib/functions.h>
-~
-~using namespace peel;
-~
+$#include <peel/GLib/functions.h>
+$
+$using namespace peel;
+$
 Gtk::Button *button = /* ... */;
 
 GLib::idle_add_once (

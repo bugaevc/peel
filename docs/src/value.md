@@ -14,21 +14,21 @@ To create a new value, define a variable of type `Value` (on the stack) and
 initialize it by passing the type that it's going to hold:
 
 ```cpp
-~#include <peel/GObject/Value.h>
-~
-~using namespace peel;
-~
+$#include <peel/GObject/Value.h>
+$
+$using namespace peel;
+$
 Value value { Type::of<int> () };
 ```
 
 To get and set the value, use the method templates `get` and `set`:
 
 ```cpp
-~#include <peel/GObject/Value.h>
-~
-~using namespace peel;
-~
-~Value value { Type::of<int> () };
+$#include <peel/GObject/Value.h>
+$
+$using namespace peel;
+$
+$Value value { Type::of<int> () };
 value->set<int> (42);
 int fourty_two = value->get<int> ();
 ```

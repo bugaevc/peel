@@ -41,8 +41,8 @@ macro[^define-type]. The arguments to the macro are:
 * the parent class.
 
 ```cpp
-~#include "Demo/Gizmo.h"
-~
+$#include "Demo/Gizmo.h"
+$
 PEEL_CLASS_IMPL (Demo::Gizmo, "DemoGizmo", peel::GObject::Object)
 ```
 
@@ -50,8 +50,8 @@ Alternatively, it is possible to use `PEEL_CLASS_IMPL` inside a namespace,
 like so:
 
 ```cpp
-~#include "Demo/Gizmo.h"
-~
+$#include "Demo/Gizmo.h"
+$
 namespace Demo
 {
 
@@ -73,10 +73,10 @@ This is enough for the class to compile. You should now be able to create an
 instance of the class using `Object::create`:
 
 ```cpp
-~#include "Demo/Gizmo.h"
-~
-~using namespace peel;
-~
+$#include "Demo/Gizmo.h"
+$
+$using namespace peel;
+$
 int
 main ()
 {

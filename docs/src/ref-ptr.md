@@ -12,10 +12,10 @@ object will be destroyed.
 A `RefPtr` can be made from a `nullptr`, or a plain pointer to an object:
 
 ```cpp
-~#include <peel/Gtk/Gtk.h>
-~
-~using namespace peel;
-~
+$#include <peel/Gtk/Gtk.h>
+$
+$using namespace peel;
+$
 Gtk::Button *my_button = /* ... */;
 RefPtr<Gtk::Widget> widget = nullptr;
 /* Keep an additional reference on my_button */
@@ -25,10 +25,10 @@ widget = my_button;
 A `RefPtr` can be dereferenced with `->` just like a plain pointer:
 
 ```cpp
-~#include <peel/Gtk/Gtk.h>
-~
-~using namespace peel;
-~
+$#include <peel/Gtk/Gtk.h>
+$
+$using namespace peel;
+$
 RefPtr<Gtk::Button> button = /* ... */;
 button->set_label ("My Button");
 ```
@@ -67,10 +67,10 @@ a plain pointer, and another by `RefPtr`. You can just call both of them
 whether you have a plain pointer or a `RefPtr`:
 
 ```cpp
-~#include <peel/RefPtr.h>
-~
-~using namespace peel;
-~
+$#include <peel/RefPtr.h>
+$
+$using namespace peel;
+$
 void takes_plain_ptr (Object *object);
 void takes_ref_ptr (RefPtr<Object> object);
 
@@ -103,10 +103,10 @@ an object is kept alive over some manipulation. For example, here's how you
 would move a button between two boxes:
 
 ```cpp
-~#include <peel/Gtk/Gtk.h>
-~
-~using namespace peel;
-~
+$#include <peel/Gtk/Gtk.h>
+$
+$using namespace peel;
+$
 Gtk::Box *box1 = /* ... */;
 Gtk::Box *box2 = /* ... */;
 Gtk::Button *button = /* ... */;
@@ -128,11 +128,11 @@ long as an instance of this class does:
 [class]: custom-gobject-classes.md
 
 ```cpp
-~#include <peel/Gtk/Gtk.h>
-~#include <peel/class.h>
-~
-~using namespace peel;
-~
+$#include <peel/Gtk/Gtk.h>
+$#include <peel/class.h>
+$
+$using namespace peel;
+$
 class MyWidget : public Gtk::Widget
 {
   /* ... */
@@ -150,8 +150,8 @@ Note that copy and move semantics apply to `RefPtr` as usual in C++. Passing a
 
 
 ```cpp
-~void takes_ref_ptr (RefPtr<Object> object);
-~
+$void takes_ref_ptr (RefPtr<Object> object);
+$
 RefPtr<Object> my_ref_ptr = /* ... */;
 
 takes_ref_ptr (my_ref_ptr);
@@ -171,8 +171,8 @@ This may be what you wanted if you plan to keep using the object (and the
 `RefPtr` "by move" (typically using [`std::move`]), like this:
 
 ```cpp
-~void takes_ref_ptr (RefPtr<Object> object);
-~
+$void takes_ref_ptr (RefPtr<Object> object);
+$
 RefPtr<Object> my_ref_ptr = /* ... */;
 
 takes_ref_ptr (std::move (my_ref_ptr));
@@ -203,10 +203,10 @@ The usual way to perform downcasting in peel is with the
 `GObject::TypeInstance::cast` method, like this:
 
 ```cpp
-~#include <peel/Gtk/Gtk.h>
-~
-~using namespace peel;
-~
+$#include <peel/Gtk/Gtk.h>
+$
+$using namespace peel;
+$
 Gtk::Widget *widget = /* ... */;
 /* We know that it's actually a button */
 Gtk::Button *button = widget->cast<Gtk::Button> ();
@@ -219,10 +219,10 @@ defined on `RefPtr` itself rather than on the type it references, so in order
 to call it, make sure to use a dot (`.`) and not an arrow (`->`):
 
 ```cpp
-~#include <peel/Gtk/Gtk.h>
-~
-~using namespace peel;
-~
+$#include <peel/Gtk/Gtk.h>
+$
+$using namespace peel;
+$
 RefPtr<Gtk::Widget> widget = /* ... */;
 /* We know that it's actually a button */
 RefPtr<Gtk::Button> button = std::move (widget).cast<Gtk::Button> ();

@@ -19,7 +19,7 @@
 - [Custom GObject Classes](custom-gobject-classes.md)
     - [Naming conventions](naming-conventions.md)
     - [Initialization](initialization.md)
-    - [Destruction]()
+    - [Destruction](destruction.md)
     - [Virtual functions]()
     - [Properties]()
     - [Signals]()

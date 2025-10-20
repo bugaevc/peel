@@ -11,4 +11,4 @@ git-repository-url = "https://gitlab.gnome.org/bugaevc/peel"
 git-repository-icon = "gitlab"
 
 [output.html.code]
-hidelines = { cpp = "~", python = "~" }
+hidelines = { cpp = "$", python = "~" }

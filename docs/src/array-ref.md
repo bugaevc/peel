@@ -11,10 +11,10 @@ analogous to C++20 [`std::span`], or a [Rust slice].
 make it ergonomic to pass "an array" as an argument in various ways:
 
 ```cpp
-~#include <peel/ArrayRef.h>
-~
-~using namespace peel;
-~
+$#include <peel/ArrayRef.h>
+$
+$using namespace peel;
+$
 void takes_int_array (ArrayRef<int> arr);
 
 /* a C array (size deduced) */

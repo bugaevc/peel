@@ -7,10 +7,10 @@ The following is an example of invoking the [`Gtk::Button::set_label`] and
 [`Gtk::Widget::set_valign`] methods on a button:
 
 ```cpp
-~#include <peel/Gtk/Gtk.h>
-~
-~using namespace peel;
-~
+$#include <peel/Gtk/Gtk.h>
+$
+$using namespace peel;
+$
 Gtk::Button *button = /* ... */;
 button->set_label ("My Button");
 button->set_valign (Gtk::Align::CENTER);
@@ -24,10 +24,10 @@ part of a constructor name replaced with "`create`" (because a bare `new` is a
 C++ keyword):
 
 ```cpp
-~#include <peel/Gtk/Gtk.h>
-~
-~using namespace peel;
-~
+$#include <peel/Gtk/Gtk.h>
+$
+$using namespace peel;
+$
 auto window = Gtk::Window::create ();
 window->set_title ("My Window");
 
@@ -38,11 +38,11 @@ To connect to a GObject [signal], use the corresponding `connect_*` method,
 which you can pass a C++ lambda to:
 
 ```cpp
-~#include <peel/Gtk/Gtk.h>
-~
-~using namespace peel;
-~
-~auto button = Gtk::Button::create_with_label ("Click me");
+$#include <peel/Gtk/Gtk.h>
+$
+$using namespace peel;
+$
+$auto button = Gtk::Button::create_with_label ("Click me");
 int times_clicked = 0;
 /* Connect a handler to the "clicked" signal of the button */
 button->connect_clicked ([&times_clicked] (Gtk::Button *button)
