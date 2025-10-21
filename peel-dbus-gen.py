@@ -147,8 +147,6 @@ def main():
         s = interface.generate_cpp(generated_header_name=args.output_header)
         with open(args.output_cpp, 'w') as f:
             f.write(s)
-        # FIXME
-        break
 
 if __name__ == '__main__':
     main()
