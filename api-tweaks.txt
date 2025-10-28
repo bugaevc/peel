@@ -257,6 +257,7 @@ skip	g_unix_fd_add
 skip	g_unix_fd_add_full
 skip	g_unix_fd_source_new
 skip	g_fdwalk_set_cloexec
+skip	g_unix_fd_query_path
 skip	g_unix_get_passwd_entry
 skip	g_unix_open_pipe
 skip	g_unix_set_fd_nonblocking
