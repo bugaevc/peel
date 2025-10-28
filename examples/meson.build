@@ -6,6 +6,7 @@ libadwaita = dependency('libadwaita-1', version: '>= 1.5', required: false)
 libsoup = dependency('libsoup-3.0', required: false)
 libdex = dependency('libdex-1', version: '>= 1.0', required: false)
 gst = dependency('gstreamer-1.0', version: '>= 1.27.2', required: false)
+glycin = dependency('glycin-gtk4-2', required: false)
 
 peel_gen_command = [
   py, meson.project_source_root() / 'peel-gen.py',
@@ -28,6 +29,10 @@ endif
 
 if gst.found()
   peel_gen_command += ['Gst', '1.0']
+endif
+
+if glycin.found()
+  peel_gen_command += ['GlyGtk4', '2']
 endif
 
 peel_headers = custom_target('peel-codegen',
@@ -129,4 +134,13 @@ if gst.found()
       install: false,
     )
   endforeach
+endif
+
+if glycin.found()
+  executable('glycin',
+    'glycin.cpp',
+    peel_headers,
+    dependencies: [glycin, gtk4, peel_dep],
+    install: false,
+  )
 endif
