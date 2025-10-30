@@ -615,7 +615,8 @@ class Parameter(NodeHandler):
             assert(tp.params is not None)
             assert(len(tp.params.params) >= 1)
             user_data_param = tp.params.params[-1]
-            assert(user_data_param.type_name == 'gpointer')
+            if user_data_param.type_name != 'gpointer':
+                raise UnsupportedForNowException('Unexpected user_data format')
             tp.params.resolve_stuff(has_typed_tweak=False)
             # FIXME: This is a gross place to do this.
             if user_data_param not in tp.params.skip_params:
