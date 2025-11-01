@@ -1,3 +1,10 @@
+# Note: this is not an example of how to use Meson with peel,
+# please see https://bugaevc.pages.gitlab.gnome.org/peel/using-peel-with-meson.html
+# for that instead.
+#
+# This file enables the peel examples to be built by Meson when
+# building peel itself, when build_examples options is enabled.
+
 add_languages('cpp', native: false)
 
 glib = dependency('gobject-2.0')
