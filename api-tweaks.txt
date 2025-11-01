@@ -363,6 +363,43 @@ skip	g_signal_handlers_block_matched
 skip	g_signal_handlers_disconnect_matched
 skip	g_signal_handlers_unblock_matched
 
+# Skip glib:boxed duplicates of GLib types
+skip	GArray				GObject
+skip	GBookmarkFile			GObject
+skip	GByteArray			GObject
+skip	GBytes				GObject
+skip	GChecksum			GObject
+skip	GDate				GObject
+skip	GDateTime			GObject
+skip	GDir				GObject
+skip	GError				GObject
+skip	GHashTable			GObject
+skip	GHmac				GObject
+skip	GIOChannel			GObject
+skip	GKeyFile			GObject
+skip	GMainContext			GObject
+skip	GMainLoop			GObject
+skip	GMappedFile			GObject
+skip	GMarkupParseContext		GObject
+skip	GMatchInfo			GObject
+skip	GOptionGroup			GObject
+skip	GPatternSpec			GObject
+skip	GPollFD				GObject
+skip	GPtrArray			GObject
+skip	GRand				GObject
+skip	GRegex				GObject
+skip	GSource				GObject
+skip	GString				GObject
+skip	GStrv				GObject
+skip	GStrvBuilder			GObject
+skip	GThread				GObject
+skip	GTimeZone			GObject
+skip	GTree				GObject
+skip	GUri				GObject
+skip	GVariantBuilder			GObject
+skip	GVariantDict			GObject
+skip	GVariantType			GObject
+
 float	GClosure
 float	g_source_set_closure		closure
 float	g_binding_group_bind_with_closures transform_to
