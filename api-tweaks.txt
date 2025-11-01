@@ -1469,3 +1469,22 @@ vararg	gtk_source_buffer_create_source_tag	object-new
 # JavaScriptCore
 array	jsc_value_array_buffer_get_data		return
 out	jsc_value_array_buffer_get_data		size
+
+# EBookContacts
+out	e_phone_number_get_country_code		source
+optional e_phone_number_get_country_code	source
+array	e_source_backend_summary_setup_get_indexed_fields	return
+array	e_source_backend_summary_setup_get_summary_fields	return
+array	e_source_backend_summary_setup_set_indexed_fieldsv	fields
+array	e_source_backend_summary_setup_set_indexed_fieldsv	types
+array	e_source_backend_summary_setup_set_summary_fieldsv	fields
+
+# EBook
+array	e_book_client_get_cursor		sort_fields
+array	e_book_client_get_cursor		sort_types
+array	e_book_client_get_cursor_sync		sort_fields
+array	e_book_client_get_cursor_sync		sort_types
+
+# EDataServer
+array	ESource::vfunc_invoke_authenticate_impl			arg_credentials
+array	e_client_util_strv_to_slist		strv
