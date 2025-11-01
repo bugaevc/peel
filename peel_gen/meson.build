@@ -3,6 +3,7 @@ peel_gen_files = files(
   'api_tweaks.py',
   'array.py',
   'bitfield.py',
+  'boxed.py',
   'callback.py',
   'c_function_wrapper.py',
   'constant.py',

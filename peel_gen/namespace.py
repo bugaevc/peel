@@ -10,6 +10,7 @@ from peel_gen.callback import Callback
 from peel_gen.klass import Class
 from peel_gen.interface import Interface
 from peel_gen.function import Function
+from peel_gen.boxed import Boxed
 from peel_gen import api_tweaks
 
 __all__ = ('Namespace', 'raw_namespace_names')
@@ -87,6 +88,13 @@ class Namespace(NodeHandler):
             f = Function(attrs, ns=self)
             self.members.append(f)
             return f
+        elif name == 'glib:boxed':
+            # Avoid even constructing the boxed if it is to be skipped.
+            if 'glib:type-name' in attrs and api_tweaks.should_skip(attrs['glib:type-name'], ns=self):
+                return None
+            b = Boxed(attrs, ns=self)
+            self.members.append(b)
+            return b
 
     def end_element(self):
         from peel_gen.type import AnyType
@@ -95,7 +103,7 @@ class Namespace(NodeHandler):
                 member.resolve_stuff()
 
     def should_emit_file(self, member):
-        if not isinstance(member, (Class, Interface, Record, Enumeration, Bitfield, Union)):
+        if not isinstance(member, (Class, Interface, Record, Enumeration, Bitfield, Union, Boxed)):
             return False
         if isinstance(member, Record) and member.is_private:
             return False
@@ -105,7 +113,7 @@ class Namespace(NodeHandler):
 
     def is_manual_member(self, member):
         # Same list of types as above but we also include Alias here
-        if not isinstance(member, (Class, Interface, Record, Enumeration, Bitfield, Union, Alias)):
+        if not isinstance(member, (Class, Interface, Record, Enumeration, Bitfield, Union, Boxed, Alias)):
             return False
 
         for tweak in api_tweaks.lookup(member.c_type, 'skip'):
