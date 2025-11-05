@@ -3,6 +3,7 @@
 #include <peel/Gio/FileInfo.h>
 #include <peel/Gio/Gio.h>
 #include <peel/GLib/MainContext.h>
+#include <peel/GLib/functions.h>
 #include <peel/class.h>
 
 using namespace peel;
@@ -157,9 +158,8 @@ main ()
       Gtk::Inscription *inscription = item->get_child ()->cast<Gtk::Inscription> ();
       Gtk::TreeListRow *tree_list_row = item->get_item ()->cast<Gtk::TreeListRow> ();
       RefPtr<Gio::FileInfo> file_info = tree_list_row->get_item ().cast<Gio::FileInfo> ();
-      char *size = g_format_size (file_info->get_size ());
+      String size = GLib::format_size (file_info->get_size ());
       inscription->set_text (size);
-      g_free (size);
     });
   RefPtr<Gtk::ColumnView::Column> size_column = Gtk::ColumnView::Column::create (
     "Size", std::move (size_column_factory));
