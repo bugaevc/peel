@@ -117,7 +117,7 @@ public:
   bool
   set (String &&other) noexcept
   {
-    if (g_strcmp0 (str, other.str))
+    if (g_strcmp0 (str, other.str) == 0)
       return false;
 
     do_free ();
