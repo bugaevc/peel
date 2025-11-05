@@ -73,7 +73,7 @@ public:
   static peel::RefPtr<Testy>
   create () noexcept
   {
-    ::TestTesty * _peel_return = test_testy_new ();
+    ::TestTesty *_peel_return = test_testy_new ();
     peel_assume (_peel_return);
     return peel::RefPtr<Testy>::adopt_ref (reinterpret_cast<Testy *> (_peel_return));
   }
@@ -185,7 +185,7 @@ public:
   inout_owned_optional_object (peel::RefPtr<GObject::Object> *obj_ptr) noexcept
   {
     ::TestTesty *_peel_this = reinterpret_cast<::TestTesty *> (this);
-    ::GObject * _peel_obj_ptr;
+    ::GObject *_peel_obj_ptr;
     if (obj_ptr)
       _peel_obj_ptr = reinterpret_cast<::GObject *> (std::move (*obj_ptr).release_ref ());
     test_testy_inout_owned_optional_object (_peel_this, obj_ptr ? &_peel_obj_ptr : nullptr);
@@ -318,7 +318,7 @@ public:
   (&return_fixed_size_array () noexcept)[4]
   {
     ::TestTesty *_peel_this = reinterpret_cast<::TestTesty *> (this);
-    const float * _peel_return = test_testy_return_fixed_size_array (_peel_this);
+    const float *_peel_return = test_testy_return_fixed_size_array (_peel_this);
     peel_assume (_peel_return);
     return reinterpret_cast<const float (&)[4]> (*_peel_return);
   }
@@ -327,7 +327,7 @@ public:
   return_nullable_fixed_size_array () noexcept
   {
     ::TestTesty *_peel_this = reinterpret_cast<::TestTesty *> (this);
-    const float * _peel_return = test_testy_return_nullable_fixed_size_array (_peel_this);
+    const float *_peel_return = test_testy_return_nullable_fixed_size_array (_peel_this);
     return reinterpret_cast<const float *> (*_peel_return);
   }
 
@@ -336,7 +336,7 @@ public:
   {
     gsize _peel_size;
     ::TestTesty *_peel_this = reinterpret_cast<::TestTesty *> (this);
-    const ::GBindingFlags * _peel_return = test_testy_return_flags_array (_peel_this, &_peel_size);
+    const ::GBindingFlags *_peel_return = test_testy_return_flags_array (_peel_this, &_peel_size);
     peel_assume (_peel_return);
     return peel::ArrayRef<const GObject::Binding::Flags> (reinterpret_cast<const GObject::Binding::Flags *> (_peel_return), _peel_size);
   }
@@ -392,7 +392,7 @@ public:
   {
     gsize _peel_count;
     ::TestTesty *_peel_this = reinterpret_cast<::TestTesty *> (this);
-    ::GObject ** _peel_return = test_testy_return_array_transfer_full (_peel_this, &_peel_count);
+    ::GObject **_peel_return = test_testy_return_array_transfer_full (_peel_this, &_peel_count);
     peel_assume (_peel_return);
     return peel::UniquePtr<peel::RefPtr<GObject::Object>[]>::adopt_ref (reinterpret_cast<peel::RefPtr<GObject::Object> *> (_peel_return), _peel_count);
   }
@@ -402,7 +402,7 @@ public:
   {
     gsize _peel_count;
     ::TestTesty *_peel_this = reinterpret_cast<::TestTesty *> (this);
-    ::GObject ** _peel_return = test_testy_return_array_transfer_container (_peel_this, &_peel_count);
+    ::GObject **_peel_return = test_testy_return_array_transfer_container (_peel_this, &_peel_count);
     peel_assume (_peel_return);
     return peel::UniquePtr<GObject::Object *[]>::adopt_ref (reinterpret_cast<GObject::Object **> (_peel_return), _peel_count);
   }
@@ -412,7 +412,7 @@ public:
   {
     gsize _peel_count;
     ::TestTesty *_peel_this = reinterpret_cast<::TestTesty *> (this);
-    ::GObject ** _peel_return = test_testy_return_array_transfer_none (_peel_this, &_peel_count);
+    ::GObject **_peel_return = test_testy_return_array_transfer_none (_peel_this, &_peel_count);
     peel_assume (_peel_return);
     return peel::ArrayRef<GObject::Object *> (reinterpret_cast<GObject::Object **> (_peel_return), _peel_count);
   }
@@ -442,7 +442,7 @@ public:
   {
     ::TestTesty *_peel_this = reinterpret_cast<::TestTesty *> (this);
     TestVoidAlias *_peel_arg = reinterpret_cast<TestVoidAlias *> (arg);
-    TestVoidAlias * _peel_return = test_testy_void_alias (_peel_this, _peel_arg);
+    TestVoidAlias *_peel_return = test_testy_void_alias (_peel_this, _peel_arg);
     peel_assume (_peel_return);
     return reinterpret_cast<VoidAlias *> (_peel_return);
   }
@@ -600,7 +600,7 @@ protected:
   {
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (GObject::TypeClass::peek<DerivedClass> ()->peek_parent ());
     ::TestTesty *_peel_this = reinterpret_cast<::TestTesty *> (this);
-    ::GObject * _peel_obj_ptr;
+    ::GObject *_peel_obj_ptr;
     if (obj_ptr)
       _peel_obj_ptr = reinterpret_cast<::GObject *> (std::move (*obj_ptr).release_ref ());
     _peel_class->inout_owned_optional_object (_peel_this, obj_ptr ? &_peel_obj_ptr : nullptr);
@@ -731,7 +731,7 @@ protected:
   {
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (GObject::TypeClass::peek<DerivedClass> ()->peek_parent ());
     ::TestTesty *_peel_this = reinterpret_cast<::TestTesty *> (this);
-    const float * _peel_return = _peel_class->return_fixed_size_array (_peel_this);
+    const float *_peel_return = _peel_class->return_fixed_size_array (_peel_this);
     peel_assume (_peel_return);
     return reinterpret_cast<const float (&)[4]> (*_peel_return);
   }
@@ -742,7 +742,7 @@ protected:
   {
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (GObject::TypeClass::peek<DerivedClass> ()->peek_parent ());
     ::TestTesty *_peel_this = reinterpret_cast<::TestTesty *> (this);
-    const float * _peel_return = _peel_class->return_nullable_fixed_size_array (_peel_this);
+    const float *_peel_return = _peel_class->return_nullable_fixed_size_array (_peel_this);
     return reinterpret_cast<const float *> (*_peel_return);
   }
 
@@ -753,7 +753,7 @@ protected:
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (GObject::TypeClass::peek<DerivedClass> ()->peek_parent ());
     gsize _peel_size;
     ::TestTesty *_peel_this = reinterpret_cast<::TestTesty *> (this);
-    const ::GBindingFlags * _peel_return = _peel_class->return_flags_array (_peel_this, &_peel_size);
+    const ::GBindingFlags *_peel_return = _peel_class->return_flags_array (_peel_this, &_peel_size);
     peel_assume (_peel_return);
     return peel::ArrayRef<const GObject::Binding::Flags> (reinterpret_cast<const GObject::Binding::Flags *> (_peel_return), _peel_size);
   }
@@ -821,7 +821,7 @@ protected:
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (GObject::TypeClass::peek<DerivedClass> ()->peek_parent ());
     gsize _peel_count;
     ::TestTesty *_peel_this = reinterpret_cast<::TestTesty *> (this);
-    ::GObject ** _peel_return = _peel_class->return_array_transfer_full (_peel_this, &_peel_count);
+    ::GObject **_peel_return = _peel_class->return_array_transfer_full (_peel_this, &_peel_count);
     peel_assume (_peel_return);
     return peel::UniquePtr<peel::RefPtr<GObject::Object>[]>::adopt_ref (reinterpret_cast<peel::RefPtr<GObject::Object> *> (_peel_return), _peel_count);
   }
@@ -833,7 +833,7 @@ protected:
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (GObject::TypeClass::peek<DerivedClass> ()->peek_parent ());
     gsize _peel_count;
     ::TestTesty *_peel_this = reinterpret_cast<::TestTesty *> (this);
-    ::GObject ** _peel_return = _peel_class->return_array_transfer_container (_peel_this, &_peel_count);
+    ::GObject **_peel_return = _peel_class->return_array_transfer_container (_peel_this, &_peel_count);
     peel_assume (_peel_return);
     return peel::UniquePtr<peel::RefPtr<GObject::Object>[]>::adopt_ref (reinterpret_cast<peel::RefPtr<GObject::Object> *> (_peel_return), _peel_count);
   }
@@ -845,7 +845,7 @@ protected:
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (GObject::TypeClass::peek<DerivedClass> ()->peek_parent ());
     gsize _peel_count;
     ::TestTesty *_peel_this = reinterpret_cast<::TestTesty *> (this);
-    ::GObject ** _peel_return = _peel_class->return_array_transfer_none (_peel_this, &_peel_count);
+    ::GObject **_peel_return = _peel_class->return_array_transfer_none (_peel_this, &_peel_count);
     peel_assume (_peel_return);
     return peel::ArrayRef<GObject::Object *> (reinterpret_cast<GObject::Object **> (_peel_return), _peel_count);
   }
@@ -867,7 +867,7 @@ protected:
   parent_vfunc_make_instance (int i) noexcept
   {
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (GObject::TypeClass::peek<DerivedClass> ()->peek_parent ());
-    ::TestTesty * _peel_return = _peel_class->make_instance (i);
+    ::TestTesty *_peel_return = _peel_class->make_instance (i);
     peel_assume (_peel_return);
     return peel::RefPtr<Testy>::adopt_ref (reinterpret_cast<Testy *> (_peel_return));
   }

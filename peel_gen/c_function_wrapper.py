@@ -108,7 +108,7 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
         for p in params.params:
             if p in params.skip_params and not p.name in raw_param_names:
                 needs_local_copy = p.direction != 'in'
-                l.append(indent + '  {} {};'.format(p.generate_c_type(for_local_copy=needs_local_copy), p.generate_casted_name()))
+                l.append(indent + '  {};'.format(make_simple_decl(p.generate_c_type(for_local_copy=needs_local_copy), p.generate_casted_name())))
         for p in params.params:
             if p.name in raw_param_names:
                 assert(not p.is_cpp_this())
@@ -166,7 +166,7 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
                     c_type = p.generate_c_type(for_local_copy=needs_local_copy)
                     if needs_local_copy and p.optional:
                         l.extend([
-                            indent + '  {} {};'.format(c_type, casted_name),
+                            indent + '  {};'.format(make_simple_decl(c_type, casted_name)),
                             indent + '  if ({})'.format(cpp_name),
                             indent + '    {} = {};'.format(casted_name, cast_to_c),
                         ])
@@ -222,7 +222,7 @@ def generate(name, c_callee, context, rv, params, throws, indent, extra_decls=No
         if cast_from_c is None and num_local_copies == 0 and not have_post_call_assumes:
             rv_expr = call
         else:
-            l.append(indent + '  {} {} = {};'.format(rv.generate_c_type(for_local_copy=False), casted_name, call))
+            l.append(indent + '  {} = {};'.format(make_simple_decl(rv.generate_c_type(for_local_copy=False), casted_name), call))
             if cast_from_c is None:
                 rv_expr = casted_name
             else:
