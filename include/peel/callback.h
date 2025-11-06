@@ -186,6 +186,50 @@ public:
 
   template<typename F, typename F2>
   static CallbackType
+  wrap_call_callback (F &&f, F2 &&, gpointer *out_data, bool const_invocable)
+  {
+    typedef typename std::remove_reference<F>::type C;
+    // std::addressof
+    void *f_ptr = &reinterpret_cast<unsigned char &> (f);
+
+    if (std::is_same<C, decltype (nullptr)>::value)
+      {
+        *out_data = nullptr;
+        return nullptr;
+      }
+    else if (sizeof (C) <= sizeof (gpointer) && const_invocable)
+      {
+        *out_data = nullptr;
+        memcpy (out_data, f_ptr, sizeof (C));
+        return +[] (Args... args, gpointer data) -> Ret
+        {
+#ifdef peel_cpp_20
+          F2 f2;
+#else
+          // Make up a fake instance of F2.
+          F2 &f2 = *reinterpret_cast<F2 *> (data);
+#endif
+          return f2 (args..., &data);
+        };
+      }
+    else
+      {
+        *out_data = f_ptr;
+        return +[] (Args... args, gpointer data) -> Ret
+        {
+#ifdef peel_cpp_20
+          F2 f2;
+#else
+          // Make up a fake instance of F2.
+          F2 &f2 = *reinterpret_cast<F2 *> (data);
+#endif
+          return f2 (args..., data);
+        };
+      }
+  }
+
+  template<typename F, typename F2>
+  static CallbackType
   wrap_gsourcefunc_callback (F &&f, F2 &&, gpointer *out_data, bool const_invocable)
   {
     typedef typename std::remove_reference<F>::type C;
@@ -391,6 +435,50 @@ public:
 #else
           g_free (data);
 #endif
+        };
+      }
+  }
+
+  template<typename F, typename F2>
+  static CallbackType
+  wrap_call_callback (F &&f, F2 &&, gpointer *out_data, bool const_invocable)
+  {
+    typedef typename std::remove_reference<F>::type C;
+    // std::addressof
+    void *f_ptr = &reinterpret_cast<unsigned char &> (f);
+
+    if (std::is_same<C, decltype (nullptr)>::value)
+      {
+        *out_data = nullptr;
+        return nullptr;
+      }
+    else if (sizeof (C) <= sizeof (gpointer) && const_invocable)
+      {
+        *out_data = nullptr;
+        memcpy (out_data, f_ptr, sizeof (C));
+        return +[] (Args... args, gpointer data) -> void
+        {
+#ifdef peel_cpp_20
+          F2 f2;
+#else
+          // Make up a fake instance of F2.
+          F2 &f2 = *reinterpret_cast<F2 *> (data);
+#endif
+          f2 (args..., &data);
+        };
+      }
+    else
+      {
+        *out_data = f_ptr;
+        return +[] (Args... args, gpointer data) -> void
+        {
+#ifdef peel_cpp_20
+          F2 f2;
+#else
+          // Make up a fake instance of F2.
+          F2 &f2 = *reinterpret_cast<F2 *> (data);
+#endif
+          f2 (args..., data);
         };
       }
   }
