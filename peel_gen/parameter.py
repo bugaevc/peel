@@ -674,11 +674,8 @@ class Parameter(NodeHandler):
                 wrap_method_name = 'wrap_gsourcefunc_callback'
                 misc_args = ', ' + is_const_invocable_expr
             elif self.scope in ('call', None):
-                return '({} = reinterpret_cast<gpointer> (&{}), +[] {})'.format(
-                    closure_param_place,
-                    cpp_name,
-                    lambda_expr,
-                )
+                wrap_method_name = 'wrap_call_callback'
+                misc_args = ', ' + is_const_invocable_expr
             if wrap_method_name:
                 return '\n'.join([
                     '{}::{} ('.format(callback_helper_type, wrap_method_name),
