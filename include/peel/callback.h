@@ -56,7 +56,7 @@ public:
         *out_data = nullptr;
         return nullptr;
       }
-    if (sizeof (C) <= sizeof (gpointer) && const_invocable)
+    else if (sizeof (C) <= sizeof (gpointer) && const_invocable)
       {
         union U
           {
@@ -132,7 +132,7 @@ public:
         *out_data = nullptr;
         return nullptr;
       }
-    if (sizeof (C) <= sizeof (gpointer))
+    else if (sizeof (C) <= sizeof (gpointer))
       {
         union U
           {
@@ -194,7 +194,7 @@ public:
         *out_data = nullptr;
         return nullptr;
       }
-    if (sizeof (C) <= sizeof (gpointer) && const_invocable)
+    else if (sizeof (C) <= sizeof (gpointer) && const_invocable)
       {
         union U
           {
@@ -269,7 +269,7 @@ public:
         *out_data = nullptr;
         return nullptr;
       }
-    if (sizeof (C) <= sizeof (gpointer) && const_invocable)
+    else if (sizeof (C) <= sizeof (gpointer) && const_invocable)
       {
         union U
           {
@@ -345,7 +345,7 @@ public:
         *out_data = nullptr;
         return nullptr;
       }
-    if (sizeof (C) <= sizeof (gpointer))
+    else if (sizeof (C) <= sizeof (gpointer))
       {
         union U
           {
