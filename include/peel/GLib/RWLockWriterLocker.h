@@ -15,13 +15,23 @@ struct RWLock;
 class RWLockWriterLocker final
 {
 private:
-  RWLockWriterLocker () = delete;
   RWLockWriterLocker (const RWLockWriterLocker &) = delete;
-  RWLockWriterLocker (RWLockWriterLocker &&) = delete;
+  RWLockWriterLocker &
+  operator = (RWLockWriterLocker &other) = delete;
 
   ::GRWLock *mutex;
 
 public:
+  constexpr RWLockWriterLocker () noexcept
+    : mutex (nullptr)
+  { }
+
+  explicit RWLockWriterLocker (GLib::RWLock &m) noexcept
+    : mutex (reinterpret_cast<::GRWLock *> (&m))
+  {
+    g_rw_lock_writer_lock (mutex);
+  }
+
   explicit RWLockWriterLocker (GLib::RWLock *m) noexcept
     : mutex (reinterpret_cast<::GRWLock *> (m))
   {
@@ -30,7 +40,30 @@ public:
 
   ~RWLockWriterLocker () noexcept
   {
-    g_rw_lock_writer_unlock (mutex);
+    unlock ();
+  }
+
+  void
+  unlock () noexcept
+  {
+    if (mutex)
+      g_rw_lock_writer_unlock (mutex);
+    mutex = nullptr;
+  }
+
+  RWLockWriterLocker (RWLockWriterLocker &&other) noexcept
+  {
+    mutex = other.mutex;
+    other.mutex = nullptr;
+  }
+
+  RWLockWriterLocker &
+  operator = (RWLockWriterLocker &&other) noexcept
+  {
+    unlock ();
+    mutex = other.mutex;
+    other.mutex = nullptr;
+    return *this;
   }
 };
 

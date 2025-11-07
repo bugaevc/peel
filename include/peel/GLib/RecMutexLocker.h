@@ -16,13 +16,23 @@ struct RWLock;
 class RecMutexLocker final
 {
 private:
-  RecMutexLocker () = delete;
   RecMutexLocker (const RecMutexLocker &) = delete;
-  RecMutexLocker (RecMutexLocker &&) = delete;
+  RecMutexLocker &
+  operator = (RecMutexLocker &other) = delete;
 
   ::GRecMutex *mutex;
 
 public:
+  constexpr RecMutexLocker () noexcept
+    : mutex (nullptr)
+  { }
+
+  explicit RecMutexLocker (GLib::RecMutex &m) noexcept
+    : mutex (reinterpret_cast<::GRecMutex *> (&m))
+  {
+    g_rec_mutex_lock (mutex);
+  }
+
   explicit RecMutexLocker (GLib::RecMutex *m) noexcept
     : mutex (reinterpret_cast<::GRecMutex *> (m))
   {
@@ -31,7 +41,30 @@ public:
 
   ~RecMutexLocker () noexcept
   {
-    g_rec_mutex_unlock (mutex);
+    unlock ();
+  }
+
+  void
+  unlock () noexcept
+  {
+    if (mutex)
+      g_rec_mutex_unlock (mutex);
+    mutex = nullptr;
+  }
+
+  RecMutexLocker (RecMutexLocker &&other) noexcept
+  {
+    mutex = other.mutex;
+    other.mutex = nullptr;
+  }
+
+  RecMutexLocker &
+  operator = (RecMutexLocker &&other) noexcept
+  {
+    unlock ();
+    mutex = other.mutex;
+    other.mutex = nullptr;
+    return *this;
   }
 };
 
