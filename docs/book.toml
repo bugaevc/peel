@@ -9,6 +9,7 @@ title = "peel documentation"
 smart-punctuation = true
 git-repository-url = "https://gitlab.gnome.org/bugaevc/peel"
 git-repository-icon = "fa-gitlab"
+edit-url-template = "https://gitlab.gnome.org/bugaevc/peel/edit/main/docs/{path}"
 
 [output.html.code]
 hidelines = { cpp = "$", python = "~" }
