@@ -1,10 +1,5 @@
 # GLib
 
-skip	g_strfreev
-skip	g_strjoinv
-skip	g_strv_contains
-skip	g_strv_equal
-skip	g_strv_length
 skip	g_vasprintf
 
 skip	g_ascii_dtostr
@@ -101,6 +96,16 @@ skip	g_strlcat
 skip	g_strlcpy
 skip	g_strreverse
 skip	g_strup
+
+owned	g_strdupv			return
+array	g_strdupv			str_array
+array	g_strjoinv			str_array
+array	g_strfreev			str_array
+array	g_strv_length			str_array
+array	g_strv_contains			strv
+array	g_strv_equal			strv1
+array	g_strv_equal			strv2
+
 skip	g_test_log_buffer_push
 skip	g_timer_elapsed
 skip	g_type_class_adjust_private_offset
