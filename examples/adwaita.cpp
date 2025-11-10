@@ -82,6 +82,7 @@ Window::init (Class *)
 
   RefPtr<Gio::Menu> menu = Gio::Menu::create ();
   menu->append ("New Window", "app.new-window");
+  menu->append ("About", "app.about");
   menu->append ("Quit", "app.quit");
   FloatPtr<Gtk::PopoverMenu> popover_menu = Gtk::PopoverMenu::create_from_model (menu);
 
@@ -169,6 +170,9 @@ class Application final : public Adw::Application
   void
   action_new_window (Gio::SimpleAction *, GLib::Variant *);
 
+  void
+  action_about (Gio::SimpleAction *, GLib::Variant *);
+
 public:
   static RefPtr<Application>
   create ()
@@ -187,9 +191,15 @@ Application::init (Class *)
   RefPtr<Gio::SimpleAction> action = Gio::SimpleAction::create ("quit", nullptr);
   action->connect_activate (this, &Application::action_quit);
   cast<Gio::ActionMap> ()->add_action (action);
+  set_accels_for_action ("app.quit", (const char *[]) { "<Ctrl>Q", nullptr });
 
   action = Gio::SimpleAction::create ("new-window", nullptr);
   action->connect_activate (this, &Application::action_new_window);
+  cast<Gio::ActionMap> ()->add_action (action);
+  set_accels_for_action ("app.new-window", (const char *[]) { "<Ctrl>N", nullptr });
+
+  action = Gio::SimpleAction::create ("about", nullptr);
+  action->connect_activate (this, &Application::action_about);
   cast<Gio::ActionMap> ()->add_action (action);
 }
 
@@ -219,6 +229,30 @@ Application::action_new_window (Gio::SimpleAction *, GLib::Variant *)
 {
   Window *window = Window::create (this);
   window->present ();
+}
+
+void Application::action_about (Gio::SimpleAction *, GLib::Variant *)
+{
+  Gtk::Window *parent_window = get_active_window ();
+  if (parent_window && !parent_window->check_type<Window> ())
+    parent_window = nullptr;
+
+  Adw::show_about_dialog (parent_window,
+    Adw::AboutDialog::prop_application_name (), "peel Adwaita demo",
+    Adw::AboutDialog::prop_application_icon (), "application-x-executable",
+    Adw::AboutDialog::prop_version (), "0.1",
+    Adw::AboutDialog::prop_license_type (), Gtk::License::MIT_X11,
+    Adw::AboutDialog::prop_comments (), "A simple application demonstrating how Adwaita can be used from C++ with peel.",
+    Adw::AboutDialog::prop_support_url (), "https://matrix.to/#/#peel:matrix.org",
+    Adw::AboutDialog::prop_issue_url (), "https://gitlab.gnome.org/bugaevc/peel/-/issues",
+    Adw::AboutDialog::prop_developers (), (const char *[])
+      {
+        "Sergey Bugaev <bugaevc@gmail.com>",
+        "Sebastian Dröge <sebastian@centricular.com>",
+        "amyspark <amy@amyspark.me>",
+        "peel project contributors",
+        nullptr
+      });
 }
 
 } /* namespace Demo */
