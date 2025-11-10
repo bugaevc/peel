@@ -328,7 +328,7 @@ public:
   {
     ::TestTesty *_peel_this = reinterpret_cast<::TestTesty *> (this);
     const float *_peel_return = test_testy_return_nullable_fixed_size_array (_peel_this);
-    return reinterpret_cast<const float *> (*_peel_return);
+    return reinterpret_cast<const float *> (_peel_return);
   }
 
   peel::ArrayRef<const GObject::Binding::Flags>
@@ -743,7 +743,7 @@ protected:
     ::TestTestyClass *_peel_class = reinterpret_cast<::TestTestyClass *> (GObject::TypeClass::peek<DerivedClass> ()->peek_parent ());
     ::TestTesty *_peel_this = reinterpret_cast<::TestTesty *> (this);
     const float *_peel_return = _peel_class->return_nullable_fixed_size_array (_peel_this);
-    return reinterpret_cast<const float *> (*_peel_return);
+    return reinterpret_cast<const float *> (_peel_return);
   }
 
   template<typename DerivedClass>

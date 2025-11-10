@@ -373,6 +373,9 @@ class Parameter(NodeHandler):
                     s = s + ' '
 
                 return s + out_asterisk + name
+            elif strip_refs:
+                assert(name is None)
+                return s
             elif tp.fixed_size is not None:
                 if self.is_record_field:
                     assert(name is not None)
@@ -403,9 +406,6 @@ class Parameter(NodeHandler):
                     array_type = 'peel::ArrayRef<{}>'.format(s)
                 elif self.ownership in ('container', 'full'):
                     array_type = 'peel::UniquePtr<{}[]>'.format(s)
-                if strip_refs:
-                    assert(name is None)
-                    return s
                 if name is None:
                     return array_type
                 return '{} {}{}'.format(array_type, out_asterisk, name)
@@ -794,7 +794,9 @@ class Parameter(NodeHandler):
             if isinstance(itp, PlainType) and itp.stdname == 'bool':
                 raise UnsupportedForNowException('array of bool')
             if tp.fixed_size is not None:
-                return 'reinterpret_cast<{}> (*{})'.format(plain_cpp_type, c_name)
+                if self.nullable:
+                    return 'reinterpret_cast<{}> ({})'.format(add_asterisk(plain_cpp_type), c_name)
+                return 'reinterpret_cast<{} (&)[{}]> (*{})'.format(plain_cpp_type, tp.fixed_size, c_name)
             elif tp.length is not None:
                 if tp.length_param.direction == 'in':
                     length_param_name = tp.length_param.name
