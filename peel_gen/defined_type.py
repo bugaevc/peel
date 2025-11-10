@@ -24,6 +24,7 @@ class DefinedType(NodeHandler, AnyType):
         self.nested_in_name = None
         self.nested_in_alias_name = None
         self.nested_in = None
+        self.nested_in_alias = None
         self.nested_types = []
         self.nested_type_aliases = []
         if self.c_type is not None:
@@ -70,8 +71,8 @@ class DefinedType(NodeHandler, AnyType):
                 self.nested_in = lookup_type(self.nested_in_name, self.ns)
             self.nested_in.nested_types.append(self)
         elif self.nested_in_alias_name:
-            nested_in = lookup_type(self.nested_in_alias_name, self.ns)
-            nested_in.nested_type_aliases.append(self)
+            self.nested_in_alias = lookup_type(self.nested_in_alias_name, self.ns)
+            self.nested_in_alias.nested_type_aliases.append(self)
 
     def emit_name_for_context(self, ns_or_tp):
         from peel_gen.namespace import Namespace

@@ -169,6 +169,8 @@ class Parameter(NodeHandler):
             # We have to fully include the containing type
             # to forward-declare the nested type.
             s.add(tp.nested_in)
+        elif tp.nested_in_alias:
+            s.add(tp.nested_in_alias)
         if isinstance(tp, Alias):
             s.add(tp)
             return s

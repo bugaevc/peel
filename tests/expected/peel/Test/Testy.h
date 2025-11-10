@@ -16,6 +16,7 @@
 #include <cstdint>
 #include <utility>
 #include <peel-test/peel-test.h>
+#include <peel/GObject/Binding.h>
 #include <peel/GObject/Object.h>
 
 peel_begin_header
@@ -1356,6 +1357,5 @@ public:
 peel_end_header
 
 #include <peel/GLib/Error.h>
-#include <peel/GObject/Binding.h>
 #include <peel/GObject/InitiallyUnowned.h>
 #include <peel/GObject/Value.h>
