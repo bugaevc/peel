@@ -1493,5 +1493,35 @@ array	e_book_client_get_cursor_sync		sort_fields
 array	e_book_client_get_cursor_sync		sort_types
 
 # EDataServer
-array	ESource::vfunc_invoke_authenticate_impl			arg_credentials
-array	e_client_util_strv_to_slist		strv
+array	ESource::vfunc_invoke_authenticate_impl		arg_credentials
+array	e_client_util_strv_to_slist			strv
+array	e_named_parameters_new_strv			strv
+array	e_source_proxy_set_ignore_hosts			ignore_hosts
+array	e_oauth2_service_util_compile_value		out_glob_buff
+in	e_webdav_session_util_maybe_dequote		text
+out	e_webdav_session_report_sync			out_content_type
+out	e_webdav_session_report_sync			out_content
+out	e_enum_from_string				enum_value
+out	e_localtime_with_offset				tm
+out	e_localtime_with_offset				offset
+out	e_strftime					string
+array	e_strftime					string
+out	e_utf8_strftime					string
+array	e_utf8_strftime					string
+out	e_time_format_date_and_time			buffer
+array	e_time_format_date_and_time			buffer
+out	e_time_format_time				buffer
+array	e_time_format_time				buffer
+out	e_util_ensure_gdbus_string			gdbus_str
+owned	e_util_ensure_gdbus_string			gdbus_str
+owned	e_util_safe_free_string				str
+array	e_util_strv_to_slist				strv
+out	e_util_unicode_get_utf8				out
+out	e_time_parse_date_and_time_ex			result
+out	e_time_parse_date_and_time_ex			two_digit_year
+optional e_time_parse_date_and_time_ex			two_digit_year
+out	e_time_parse_date_ex				result
+out	e_time_parse_date_ex				two_digit_year
+optional e_time_parse_date_ex				two_digit_year
+skip	e_filename_make_safe
+skip	eds_check_version
