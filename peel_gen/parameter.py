@@ -436,13 +436,13 @@ class Parameter(NodeHandler):
                 if name is None:
                     return array_type
                 return '{} {}{}'.format(array_type, out_asterisk, name)
-            #elif not tp.zero_terminated and self.ownership in ('none', None):
-            #    # A conceptual array, but there's no way to know the length.
-            #    # Use a plain pointer to the item type.
-            #    s = add_asterisk(s) + out_asterisk
-            #    if name is None:
-            #        return s
-            #    return s + name
+            elif self.ownership in ('none', None):
+                # A conceptual array, but there's no way to know the length.
+                # Use a plain pointer to the item type.
+                s = add_asterisk(s) + out_asterisk
+                if name is None:
+                    return s
+                return s + name
             else:
                 raise UnsupportedForNowException('Complex array')
 
@@ -762,16 +762,16 @@ class Parameter(NodeHandler):
                     )
 
                 return '({}, {})'.format(set_length_param, cast_expr)
-            #elif not tp.zero_terminated and self.ownership in ('none', None):
-            #    param_cpp_type = self.generate_cpp_type(
-            #        name='',
-            #        context=context,
-            #        strip_refs=0,
-            #        for_local_copy=False,
-            #    )
-            #    if param_cpp_type == c_type:
-            #        return None
-            #    return 'reinterpret_cast<{}> ({})'.format(c_type, cpp_name)
+            elif not tp.zero_terminated and self.ownership in ('none', None):
+                param_cpp_type = self.generate_cpp_type(
+                    name='',
+                    context=context,
+                    strip_refs=0,
+                    for_local_copy=False,
+                )
+                if param_cpp_type == c_type:
+                    return None
+                return 'reinterpret_cast<{}> ({})'.format(c_type, cpp_name)
             else:
                 raise UnsupportedForNowException('Complex array')
 
@@ -864,10 +864,10 @@ class Parameter(NodeHandler):
                     return 'peel::ZTArrayRef<{}>::adopt ({})'.format(plain_cpp_type, ptr_expr)
                 else:
                     return 'peel::ZTUniquePtr<{}[]>::adopt_ref ({})'.format(plain_cpp_type, ptr_expr)
-            #elif not tp.zero_terminated and self.ownership in ('none', None):
-            #    if self.c_type == add_asterisk(plain_cpp_type):
-            #        return None
-            #    return 'reinterpret_cast<{}> ({})'.format(add_asterisk(plain_cpp_type), c_name)
+            elif self.ownership in ('none', None):
+                if self.c_type == add_asterisk(plain_cpp_type):
+                    return None
+                return 'reinterpret_cast<{}> ({})'.format(add_asterisk(plain_cpp_type), c_name)
             else:
                 raise UnsupportedForNowException('Complex array')
 
