@@ -1,7 +1,6 @@
 [book]
 authors = ["Sergey Bugaev"]
 language = "en"
-multilingual = false
 src = "src"
 title = "peel documentation"
 
