@@ -93,8 +93,11 @@ def escape_cpp_name(name):
 def extract_constness_from_c_type(c_type):
     assert('[' not in c_type)
     c_type = (c_type
+        .replace('const gconstpointer', 'const void * const')
         .replace('gconstpointer', 'const void *')
+        .replace('const gpointer', 'void * const')
         .replace('gpointer', 'void *')
+        .replace('const gchararray', 'char * const')
         .replace('gchararray', 'char *')
     )
     res = []
