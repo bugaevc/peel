@@ -55,6 +55,15 @@ public:
     return arr;
   }
 
+  size_t
+  length () const noexcept
+  {
+    size_t l = 0;
+    for (T *p = ptr; p; p++)
+      l++;
+    return l;
+  }
+
   operator ZTArrayRef<const T> () const noexcept
   {
     return ZTArrayRef<const T>::adopt (ptr);
