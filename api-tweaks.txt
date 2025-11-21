@@ -96,6 +96,7 @@ skip	g_strlcat
 skip	g_strlcpy
 skip	g_strreverse
 skip	g_strup
+skip	g_win32_get_system_data_dirs_for_module
 
 owned	g_strdupv			return
 array	g_strdupv			str_array
