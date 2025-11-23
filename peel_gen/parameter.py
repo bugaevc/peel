@@ -365,15 +365,26 @@ class Parameter(NodeHandler):
                 constness = ['const']
 
         # Don't trust the C signature for constness of zero-terminated arrays:
-        # they commonly use 'char **' even for transfer none arrays.
+        # they commonly use 'char **' even for transfer none arrays. Also at
+        # times they use 'gconstpointer' for the type, so we end up with one
+        # level of constness instead of two.
         # TODO: Could do this for more than just strings.
         if isinstance(tp, Array) and isinstance(itp, StrType) and tp.zero_terminated and tp.length is None:
             if not c_type:
                 constness = [True, True]
             elif self.ownership in ('none', None):
-                constness[0] = constness[1] = True
+                if len(constness) >= 2:
+                    constness[0] = constness[1] = True
+                else:
+                    # gconstpointer
+                    constness = [True, True]
             elif self.ownership == 'container':
-                constness[0] = True
+                if len(constness) >= 2:
+                    constness[0] = True
+                else:
+                    constness = [True, False]
+            elif not len(constness) >= 2:
+                constness = [False, False]
 
         constness0 = 'const ' if constness and constness[0] else ''
         constness1 = ' const' if len(constness) >= 2 and constness[1] else ''
