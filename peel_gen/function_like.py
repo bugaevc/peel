@@ -89,7 +89,7 @@ class FunctionLike(NodeHandler):
                     # Force the type to be an array. This will likely result in
                     # an UnsupportedForNowException when we try to generate anything.
                     if not isinstance(p.type, Array):
-                        p.type = Array(dict(), self.ns)
+                        p.type = Array({ 'zero-terminated': '0' }, self.ns)
                         p.type.item_type_name = p.type_name
                         p.type_name = None
             elif tweak[0] == 'vararg':
