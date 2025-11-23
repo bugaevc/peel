@@ -328,6 +328,10 @@ class Parameter(NodeHandler):
         assert(self.scope is None and self.closure is None and self.destroy is None)
 
         if isinstance(tp, Array):
+            if tp.artificial:
+                # We know it's an array parameter (through a tweak), but it wasn't
+                # marked as such in the GIR, so we can trust nothing.
+                raise UnsupportedForNowException('array parameter not marked as such')
             itp = chase_type_aliases(tp.item_type)
             if isinstance(itp, Array):
                 raise UnsupportedForNowException('array of arrays')

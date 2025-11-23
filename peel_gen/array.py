@@ -20,6 +20,7 @@ class Array(NodeHandler, AnyType):
         self.item_c_type = None
         self.item_type = None
         self.has_resolved_stuff = False
+        self.artificial = 'peel-artificial-array' in attrs
 
     def __repr__(self):
         return 'Array(item_type_name={})'.format(self.item_type_name)
