@@ -118,7 +118,7 @@ class Parameter(NodeHandler):
     def append_skip_params_to(self, skip_params):
         self.resolve_stuff()
         if self.type is None:
-            raise UnsupportedForNowException('no type for ' + self.name)
+            raise UnsupportedForNowException('no type for a parameter')
         if self in skip_params:
             # Ignore DestroyNotify for callbacks.
             return
@@ -236,7 +236,7 @@ class Parameter(NodeHandler):
         # vararg shouldn't get here
         assert(self.name != '...')
         if self.type is None:
-            raise UnsupportedForNowException('no type for ' + self.name)
+            raise UnsupportedForNowException('no type for a parameter')
         tp = chase_type_aliases(self.type)
         # Handle the case where we don't have a C type and need to make one up
         # completely. This happens in signals and in anonymous inline unions/records.
@@ -282,7 +282,7 @@ class Parameter(NodeHandler):
             return 'Args &&...' + name
 
         if self.type is None:
-            raise UnsupportedForNowException('no type for ' + self.name)
+            raise UnsupportedForNowException('no type for a paramter')
         tp = chase_type_aliases(self.type)
         if isinstance(tp, DefinedType) and tp.gir_name is None:
             raise UnsupportedForNowException('anonymous type')
@@ -954,6 +954,8 @@ class Parameter(NodeHandler):
 
     def should_add_nonnull(self):
         tp = chase_type_aliases(self.type)
+        if tp is None:
+            raise UnsupportedForNowException('no type for a parameter')
         if isinstance(tp, (Callback, Array)):
             return False
         if self.closure is not None:
