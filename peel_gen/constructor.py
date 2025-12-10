@@ -61,7 +61,7 @@ class Constructor(FunctionLike):
                 self.rv.ownership = 'floating'
 
     def emit_name(self):
-        if self.name == 'new' or self.name.startswith('new_'):
+        if self.name in ('new', 'newv') or self.name.startswith('new_'):
             name = 'create' + self.name[3:]
         else:
             name = self.name
