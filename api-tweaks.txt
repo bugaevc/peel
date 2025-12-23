@@ -553,6 +553,7 @@ nest	GFileCopyFlags			File::CopyFlags
 nest	GFileCreateFlags		File::CreateFlags
 nest	GFileMeasureFlags		File::MeasureFlags
 nest	GFileMonitorFlags		File::MonitorFlags
+nest	GFileMonitorEvent		FileMonitor::Event
 nest	GFileQueryInfoFlags		File::QueryInfoFlags
 nest	GTestDBusFlags			TestDBus::Flags
 nest	GConverterFlags			Converter::Flags
