@@ -551,12 +551,13 @@ private:
   }
 
 public:
+  template<typename CallbackArg>
   static SignalClosure *
-  make (Callback &&callback) noexcept
+  make (CallbackArg &&callback) noexcept
   {
     ::GClosure *g_closure = g_closure_new_simple (sizeof (SignalClosure), nullptr);
     SignalClosure *closure = reinterpret_cast<SignalClosure *> (g_closure);
-    new (closure->callback_ptr ()) Callback (static_cast<Callback &&> (callback));
+    new (closure->callback_ptr ()) Callback (static_cast<CallbackArg &&> (callback));
 
     g_closure_set_marshal (g_closure, marshal);
     // _g_closure_set_va_marshal (g_closure, marshal_va);
@@ -847,7 +848,7 @@ public:
     typedef typename std::remove_reference<Handler>::type HandlerRR;
     typedef typename std::conditional<std::is_function<HandlerRR>::value, HandlerRR *, HandlerRR>::type HandlerType;
     typedef internals::SignalClosure<Instance, HandlerType, Ret, Args...> ClosureType;
-    ClosureType *closure = ClosureType::make (static_cast<Handler &&> (handler));
+    ClosureType *closure = ClosureType::template make<Handler> (static_cast<Handler &&> (handler));
     // Sinks the closure reference.
     gulong conn_id = g_signal_connect_closure_by_id (reinterpret_cast<::GObject *> (instance), id, static_cast<::GQuark> (detail), closure, after);
     return SignalConnection::Token { instance, conn_id };
@@ -896,7 +897,7 @@ public:
     typedef typename std::remove_reference<Handler>::type HandlerRR;
     typedef typename std::conditional<std::is_function<HandlerRR>::value, HandlerRR *, HandlerRR>::type HandlerType;
     typedef internals::SignalClosure<Instance, HandlerType, Ret, Args...> ClosureType;
-    ClosureType *closure = ClosureType::make (static_cast<Handler &&> (handler));
+    ClosureType *closure = ClosureType::template make<Handler> (static_cast<Handler &&> (handler));
     // Sinks the closure reference.
     gulong conn_id = g_signal_connect_closure (reinterpret_cast<::GObject *> (instance), detailed_name, closure, after);
     return SignalConnection::Token { instance, conn_id };
