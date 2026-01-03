@@ -223,7 +223,7 @@ def main():
             emit_repo(repo, out_dir=args.out_dir)
     else:
         for repo in requested_repos:
-          emit_repo(repo, out_dir=args.out_dir)
+            emit_repo(repo, out_dir=args.out_dir)
 
 if __name__ == '__main__':
     main()
