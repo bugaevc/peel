@@ -137,8 +137,8 @@ public:
 };
 
 MyClass::MyClass ()
- : m_int (42)
- /* m_vector implicitly constructed here */
+  : m_int (42)
+  /* m_vector implicitly constructed here */
 {
   std::cout << "My C++ constructor" << std::endl;
 }
