@@ -708,6 +708,8 @@ repo-skip gio/gwin32inputstream.h	Gio
 repo-skip gio/gwin32outputstream.h	Gio
 repo-skip gio/gregistrysettingsbackend.h Gio
 
+include	GOsxAppInfo			gio/gosxappinfo.h
+
 # cairo
 raw	cairo
 #skip	cairo_image_surface_create
