@@ -1,4 +1,4 @@
-# Building with CMake
+# Using peel with CMake
 
 Many C++ projects are built with [CMake]. peel provides a CMake package to make
 it easier to use peel in CMake projects.
