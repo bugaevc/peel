@@ -37,6 +37,7 @@ class Class(DefinedType):
         self.fields = []
         self.type_struct_name = attrs.get('glib:type-struct', None)
         self.type_struct = None
+        self.extra_includes = []
 
     def is_passed_by_ref(self):
         return True
@@ -76,6 +77,8 @@ class Class(DefinedType):
                 self.dup_value_func = tweak[1]
             elif tweak[0] == 'hide':
                 self.hidden_members.append(tweak[1])
+            elif tweak[0] == 'include':
+                self.extra_includes.append(tweak[1])
 
         if self.parent is None:
             self.is_refcounted = bool(self.ref_func)
@@ -163,6 +166,7 @@ class Class(DefinedType):
             s.discard(self.type_struct)
         for nested_type in self.nested_types:
             assert(nested_type not in s)
+        s.update(self.extra_includes)
         return s
 
     def generate_extra_forward_members(self):
