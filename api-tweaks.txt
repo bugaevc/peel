@@ -1478,6 +1478,7 @@ in	gst_byte_reader_peek_data	size
 # Has both free and ref/unref functions
 skip	gst_flow_combiner_free
 no-autofree GstFlowCombiner
+float	GstAggregator::vfunc_create_new_pad	return
 # Deprecated since forever, let's not generate it
 skip	GstCollectPads
 skip	GstCollectData
