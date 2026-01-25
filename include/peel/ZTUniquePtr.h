@@ -30,7 +30,7 @@ class ZTUniquePtr<T[]>
 #ifdef __GNUC__
         if (!__builtin_constant_p (ptr == nullptr) || (ptr != nullptr))
 #endif
-          g_strfreev (reinterpret_cast<gchar **> (ptr));
+          g_strfreev (reinterpret_cast<gchar **> (reinterpret_cast<void *> (ptr)));
         ptr = nullptr;
         return;
       }
