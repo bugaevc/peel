@@ -1478,6 +1478,8 @@ vararg	gtk_source_buffer_create_source_tag	object-new
 # Use gtk_source_scheduler_add_full instead
 scope	gtk_source_scheduler_add	callback	forever
 skip	gtk_source_scheduler_add
+out	gtk_source_view_get_mark_attributes	priority
+
 
 # JavaScriptCore
 array	jsc_value_array_buffer_get_data		return
