@@ -1500,6 +1500,9 @@ onstack GstVideoColorimetry
 onstack GstVideoTileInfo
 onstack GstVideoFrame
 
+# GstElement
+unowned GstElement::vfunc_request_new_pad	return
+
 # Json (json-glib)
 no-autofree JsonNode
 nest	JsonNodeType			Node::Type
