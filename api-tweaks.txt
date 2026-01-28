@@ -237,6 +237,9 @@ vararg	g_strdup_printf			format
 vararg	g_build_filename		argv
 vararg	g_build_path			argv
 
+vararg	g_strconcat			argv
+vararg	g_strjoin			argv
+
 raw-params-overload	g_option_context_parse	argc,argv
 
 #ifdef	GUnixFDSourceFunc		G_OS_UNIX
