@@ -85,7 +85,7 @@ per-class data. Specifically:
 * Initialize your own [per-class data], if any.
 
 [virtual functions]: vfuncs.md
-[signals]: signals.md
+[signals]: defining-signals.md
 [`set_css_name`]: https://docs.gtk.org/gtk4/class_method.Widget.set_css_name.html
 [`set_layout_manager_type`]: https://docs.gtk.org/gtk4/class_method.Widget.set_layout_manager_type.html
 [`install_action`]: https://docs.gtk.org/gtk4/class_method.Widget.install_action.html

@@ -34,7 +34,8 @@ window->set_title ("My Window");
 auto button = Gtk::Button::create_with_label ("My Button");
 ```
 
-To connect to a GObject [signal], use the corresponding `connect_*` method,
+To connect to a GObject [signal], use the corresponding
+<code>.connect_<i>signal_name</i> ()</code> method,
 which you can pass a C++ lambda to:
 
 ```cpp
