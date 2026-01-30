@@ -240,6 +240,9 @@ vararg	g_build_path			argv
 vararg	g_strconcat			argv
 vararg	g_strjoin			argv
 
+vararg	g_variant_builder_add		variant-new
+vararg	g_variant_builder_add_parsed	variant-new
+
 raw-params-overload	g_option_context_parse	argc,argv
 
 #ifdef	GUnixFDSourceFunc		G_OS_UNIX
