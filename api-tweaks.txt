@@ -1486,6 +1486,24 @@ scope	gtk_source_scheduler_add	callback	forever
 skip	gtk_source_scheduler_add
 out	gtk_source_view_get_mark_attributes	priority
 
+# These are actually inout caller-allocates parameters, but g-i fails
+# to support that properly. Turn them into unowned in parameters, since
+# those produce identical binding code.
+in	gtk_source_indenter_indent		iter
+unowned	gtk_source_indenter_indent		iter
+in	GtkSourceIndenter::vfunc_indent		iter
+unowned	GtkSourceIndenter::vfunc_indent		iter
+in	GtkSourceView::signal_push-snippet	location
+unowned	GtkSourceView::signal_push-snippet	location
+in	gtk_source_buffer_backward_iter_to_source_mark	iter
+unowned	gtk_source_buffer_backward_iter_to_source_mark	iter
+in	gtk_source_buffer_forward_iter_to_source_mark	iter
+unowned	gtk_source_buffer_forward_iter_to_source_mark	iter
+in	gtk_source_buffer_iter_backward_to_context_class_toggle	iter
+unowned	gtk_source_buffer_iter_backward_to_context_class_toggle	iter
+in	gtk_source_buffer_iter_forward_to_context_class_toggle	iter
+unowned	gtk_source_buffer_iter_forward_to_context_class_toggle	iter
+
 
 # JavaScriptCore
 array	jsc_value_array_buffer_get_data		return
