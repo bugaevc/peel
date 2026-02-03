@@ -543,7 +543,7 @@ struct Value::Traits<const char *>
   set (::GValue *value, const char *str) noexcept
   {
 #ifdef __GNUC__
-    if (__builtin_constant_p (__builtin_strlen (str)))
+    if ((__builtin_constant_p (!str) && !str) || __builtin_constant_p (__builtin_strlen (str)))
       g_value_set_static_string (value, str);
     else
 #endif

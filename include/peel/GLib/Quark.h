@@ -35,7 +35,7 @@ public:
   Quark (const char *string) noexcept
   {
 #ifdef __GNUC__
-    if (__builtin_constant_p (__builtin_strlen (string)))
+    if ((__builtin_constant_p (!string) && !string) || __builtin_constant_p (__builtin_strlen (string)))
       quark = g_quark_from_static_string (string);
     else
 #endif
