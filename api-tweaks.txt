@@ -1127,6 +1127,7 @@ float	gtk_tree_expander_set_child	child
 float	gtk_scrolled_window_set_child	child
 float	gtk_range_set_adjustment	adjustment
 float	gtk_scrollbar_set_adjustment	adjustment
+float	gtk_text_view_add_child_at_anchor child
 float	gtk_scrolled_window_set_hadjustment hadjustment
 float	gtk_scrolled_window_set_vadjustment vadjustment
 
