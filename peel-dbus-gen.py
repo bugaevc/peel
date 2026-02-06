@@ -139,14 +139,22 @@ def main():
     parser.setContentHandler(handler)
     parser.parse(args.interface)
 
+    header_contents = ''
+    cpp_contents = ''
+    first_interface = True
+
     for interface in handler.all_interfaces:
-        print(interface.interface_name, file=sys.stderr)
-        s = interface.generate_header()
-        with open(args.output_header, 'w') as f:
-            f.write(s)
-        s = interface.generate_cpp(generated_header_name=args.output_header)
-        with open(args.output_cpp, 'w') as f:
-            f.write(s)
+        if not first_interface:
+            header_contents += '\n\n'
+            cpp_contents += '\n\n'
+        header_contents += interface.generate_header(skip_preambule=not first_interface)
+        cpp_contents += interface.generate_cpp(generated_header_name=args.output_header, skip_preambule=not first_interface)
+        first_interface = False
+
+    with open(args.output_header, 'w') as f:
+        f.write(header_contents)
+    with open(args.output_cpp, 'w') as f:
+        f.write(cpp_contents)
 
 if __name__ == '__main__':
     main()
