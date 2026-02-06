@@ -128,6 +128,17 @@ public:
   }
 
   static peel::FloatPtr<Variant>
+  create_array (const Variant::Type *child_type, peel::ArrayRef<Variant * const> children) noexcept
+  {
+    const ::GVariantType *_peel_child_type = reinterpret_cast<const ::GVariantType *> (child_type);
+    ::GVariant * const *_peel_children = reinterpret_cast<::GVariant * const *> (children.data ());
+    gsize _peel_n_children = children.size ();
+    ::GVariant *_peel_return = g_variant_new_array (_peel_child_type, _peel_children, _peel_n_children);
+    peel_assume (_peel_return);
+    return peel::FloatPtr<Variant> (reinterpret_cast<Variant *> (_peel_return));
+  }
+
+  static peel::FloatPtr<Variant>
   create_tuple (peel::ArrayRef<Variant * const> children) noexcept
   {
     ::GVariant * const *_peel_children = reinterpret_cast<::GVariant * const *> (children.data ());
@@ -137,7 +148,7 @@ public:
     return peel::FloatPtr<Variant> (reinterpret_cast<Variant *> (_peel_return));
   }
 
-  // TODO: FloatPtr-enabled overload of create_tuple
+  // TODO: FloatPtr-enabled overloads of create_tuple, create_array
 
   template<typename T>
   typename Traits<T>::GetCppType
