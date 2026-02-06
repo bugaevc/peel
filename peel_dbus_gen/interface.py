@@ -10,25 +10,28 @@ class Interface:
         # FIXME: This s wrong, but we have to start somewhere.
         self.gtype_name = self.own_name = self.emit_name = self.interface_name.split('.')[-1]
 
-    def generate_header(self):
-        l = [
-            '#pragma once',
-            '',
-            '#include <peel/GObject/Object.h>',
-            '#include <peel/Gio/DBusProxy.h>',
-            '#include <peel/Gio/DBusProxyFlags.h>',
-            '#include <peel/Gio/DBusCallFlags.h>',
-            '#include <peel/Gio/DBusInterfaceSkeleton.h>',
-            '',
-            'namespace peel',
-            '{',
-            'namespace Gio',
-            '{',
-            'class DBusConnection;',
-            '}',
-            '}',
-            '',
-        ]
+    def generate_header(self, skip_preambule):
+        if skip_preambule:
+            l = []
+        else:
+            l = [
+                '#pragma once',
+                '',
+                '#include <peel/GObject/Object.h>',
+                '#include <peel/Gio/DBusProxy.h>',
+                '#include <peel/Gio/DBusProxyFlags.h>',
+                '#include <peel/Gio/DBusCallFlags.h>',
+                '#include <peel/Gio/DBusInterfaceSkeleton.h>',
+                '',
+                'namespace peel',
+                '{',
+                'namespace Gio',
+                '{',
+                'class DBusConnection;',
+                '}',
+                '}',
+                '',
+            ]
         # TODO: generate opening namespace blocks
         l.extend([
             'class /* interface */ {} : public ::peel::GObject::Object'.format(self.emit_name),
@@ -264,18 +267,21 @@ class Interface:
         ])
         return '\n'.join(l)
 
-    def generate_cpp(self, generated_header_name):
-        l = [
-            '#ifdef __GNUC__',
-            '#pragma GCC optimize "no-exceptions"',
-            '#endif',
-            '',
-            '#include "{}"'.format(generated_header_name),
-            '#include <peel/Gio/Task.h>',
-            '#include <peel/GLib/MainContext.h>',
-            '#include <peel/class.h>',
-            '',
-        ]
+    def generate_cpp(self, generated_header_name, skip_preambule):
+        if skip_preambule:
+            l = []
+        else:
+            l = [
+                '#ifdef __GNUC__',
+                '#pragma GCC optimize "no-exceptions"',
+                '#endif',
+                '',
+                '#include "{}"'.format(generated_header_name),
+                '#include <peel/Gio/Task.h>',
+                '#include <peel/GLib/MainContext.h>',
+                '#include <peel/class.h>',
+                '',
+            ]
         # TODO: Open any namespaces here.
         l.extend([
             'static ::GType {}_type;'.format(self.emit_name),
