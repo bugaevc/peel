@@ -459,7 +459,25 @@ class Interface:
             'static void',
             '{}_proxy_properties_changed (::GDBusProxy *proxy, ::GVariant *changed_properties, const char * const *invalidated_properties)'.format(self.emit_name),
             '{',
-            # TODO: notify
+            '  for (const char * const *prop = invalidated_properties; *prop; prop++)',
+            '    {',
+            '\n'.join(
+                '      {}if (!strcmp (*prop, "{}"))\n'.format('' if index == 0 else 'else ', property.dbus_name) +
+                '        g_object_notify (G_OBJECT (proxy), "{}");'.format(property.prop_name)
+                for index, property in enumerate(self.properties)
+            ),
+            '  }',
+            '  ::GVariantIter iter;',
+            '  g_variant_iter_init (&iter, changed_properties);',
+            '  const char *prop;',
+            '  while (g_variant_iter_loop (&iter, "{&sv}", &prop, nullptr))',
+            '    {',
+            '\n'.join(
+                '      {}if (!strcmp (prop, "{}"))\n'.format('' if index == 0 else 'else ', property.dbus_name) +
+                '        g_object_notify (G_OBJECT (proxy), "{}");'.format(property.prop_name)
+                for index, property in enumerate(self.properties)
+            ),
+            '    }',
             '}',
             '',
         ])
