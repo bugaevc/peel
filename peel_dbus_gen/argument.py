@@ -19,11 +19,11 @@ class Argument:
         self.direction = attrs.get('direction', default_direction)
         self.type = Type(attrs.get('type'))
 
-    def generate_cpp_type(self, bare=False, ownership=None):
+    def generate_cpp_type(self, bare=False, ownership=None, no_out_asterisk=False):
         from peel_dbus_gen.method import Method
         from peel_dbus_gen.signal import Signal
 
-        if self.direction == 'in' or isinstance(self.function, Signal):
+        if no_out_asterisk or self.direction == 'in' or isinstance(self.function, Signal):
             out_asterisk = ''
         else:
             out_asterisk = '*'
