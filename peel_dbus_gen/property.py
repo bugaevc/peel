@@ -13,7 +13,7 @@ class Property:
 
     def generate_header(self):
         plain_type = self.type.generate_cpp_type(flavor='plain')
-        tp = self.type.generate_cpp_type(flavor='method', ownership='full')
+        tp = self.type.generate_cpp_type(flavor='method')
         l = [
             '  static ::peel::Property<{}>'.format(plain_type),
             '  prop_{} ()'.format(self.cpp_name),

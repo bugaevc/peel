@@ -2,7 +2,7 @@ class Type:
     def __init__(self, signature):
         self.signature = signature
 
-    def generate_cpp_type(self, flavor, ownership='none'):
+    def generate_cpp_type(self, flavor):
         if self.signature == 'b':
             return 'bool'
         elif self.signature == 'y':
@@ -25,6 +25,11 @@ class Type:
             if flavor == 'signal':
                 return 'const char *'
             return '::peel::String'
+        #elif self.signature in ('as', 'ao', 'ag'):
+        elif self.signature == 'as':
+            if flavor == 'signal':
+                return '::peel::StrvRef'
+            return '::peel::Strv'
         else:
             if flavor == 'method':
                 return '::peel::RefPtr<::peel::GLib::Variant>'
@@ -53,13 +58,18 @@ class Type:
             return 'g_variant_new_uint64 ({})'.format(cpp_expr)
         elif self.signature == 'd':
             return 'g_variant_new_double ({})'.format(cpp_expr)
-        elif self.signature in ('s', 'g'):
+        elif self.signature == 's':
             if ownership == 'full':
                 return 'g_variant_new_take_string (std::move ({}).release_string ())'.format(cpp_expr)
             else:
                 return 'g_variant_new_string ({})'.format(cpp_expr)
+        elif self.signature == 'g':
+            return 'g_variant_new_signature ({})'.format(cpp_expr)
         elif self.signature == 'o':
             return 'g_variant_new_object_path ({})'.format(cpp_expr)
+        elif self.signature == 'as':
+            # TODO: would be nice to reduce copying here
+            return 'g_variant_new_strv (reinterpret_cast<const char * const *> ({}.data ()), -1)'.format(cpp_expr)
         elif self.signature == 'v':
             return 'g_variant_new_variant (reinterpret_cast<::GVariant *> (static_cast<::peel::GLib::Variant *> ({})))'.format(cpp_expr)
         else:
@@ -89,6 +99,8 @@ class Type:
             return '::peel::String::adopt_string (g_variant_dup_string ({}, nullptr))'.format(variant_expr)
         elif self.signature == 'v':
             return '::peel::RefPtr<::peel::GLib::Variant>::adopt_ref (reinterpret_cast<::peel::GLib::Variant *> (g_variant_get_variant ({})))'.format(variant_expr)
+        elif self.signature == 'as':
+            return '::peel::ZTUniquePtr<::peel::String[]>::adopt_ref (reinterpret_cast<::peel::String *> (g_variant_dup_strv ({}, nullptr)))'.format(variant_expr)
         else:
             # TODO
             return 'reinterpret_cast<::peel::GLib::Variant *> ({})'.format(variant_expr)
@@ -122,6 +134,39 @@ class Type:
             # TODO
             return 'g_value_set_variant ({}, {})'.format(value_expr, variant_expr)
 
+    def generate_make_variant_from_value(self, value_expr):
+        if self.signature == 'b':
+            return 'g_variant_new_boolean (g_value_get_boolean ({}))'.format(value_expr)
+        elif self.signature == 'y':
+            return 'g_variant_new_byte (g_value_get_uchar ({}))'.format(value_expr)
+        elif self.signature == 'n':
+            return 'g_variant_new_int16 (g_value_get_int ({}))'.format(value_expr)
+        elif self.signature == 'q':
+            return 'g_variant_new_uint16 (g_value_get_uint ({}))'.format(value_expr)
+        elif self.signature == 'i':
+            return 'g_variant_new_int32 (g_value_get_int ({}))'.format(value_expr)
+        elif self.signature == 'u':
+            return 'g_variant_new_uint32 (g_value_get_uint ({}))'.format(value_expr)
+        elif self.signature == 'x':
+            return 'g_variant_new_int64 (g_value_get_int64 ({}))'.format(value_expr)
+        elif self.signature == 't':
+            return 'g_variant_new_uint64 (g_value_get_uint64 ({}))'.format(value_expr)
+        elif self.signature == 'd':
+            return 'g_variant_new_double (g_value_get_double ({}))'.format(value_expr)
+        elif self.signature == 's':
+            return 'g_variant_new_string (g_value_get_string ({}))'.format(value_expr)
+        elif self.signature == 'g':
+            return 'g_variant_new_signature (g_value_get_string ({}))'.format(value_expr)
+        elif self.signature == 'o':
+            return 'g_variant_new_object_path (g_value_get_string ({}))'.format(value_expr)
+        elif self.signature == 'as':
+            return 'g_variant_new_strv ((const char * const *) g_value_get_boxed ({}), -1)'.format(value_expr)
+        elif self.signature == 'v':
+            return 'g_variant_new_variant (g_value_get_variant ({}))'.format(value_expr)
+        else:
+            # TODO
+            return 'g_variant_ref (g_value_get_variant ({}))'.format(value_expr)
+
     def generate_make_pspec(self, name, nick, blurb, flags):
         if self.signature == 'b':
             return 'g_param_spec_boolean ({}, {}, {}, FALSE, {})'.format(name, nick, blurb, flags)
@@ -147,4 +192,4 @@ class Type:
             return 'g_param_spec_boxed ({}, {}, {}, G_TYPE_STRV, {})'.format(name, nick, blurb, flags)
         else:
             # TODO
-            return 'g_param_spec_variant ({}, {}, {}, "{}", nullptr, {})'.format(name, nick, blurb, self.signature, flags)
+            return 'g_param_spec_variant ({}, {}, {}, G_VARIANT_TYPE ("{}"), nullptr, {})'.format(name, nick, blurb, self.signature, flags)

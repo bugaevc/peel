@@ -391,7 +391,7 @@ class Method:
             arg_expr = '_peel_in_args[{}]'.format(i)
             l.extend([
                 '  {} = g_variant_get_child_value (_peel_parameters, {});'.format(arg_expr, i),
-                '  {} = {};'.format(arg.generate_cpp_type(ownership='full'), arg.type.generate_variant_get(arg_expr)),
+                '  {} = {};'.format(arg.generate_cpp_type(), arg.type.generate_variant_get(arg_expr)),
             ])
         l.extend([
             '  bool _peel_no_reply = g_dbus_message_get_flags (g_dbus_method_invocation_get_message (_peel_invocation)) & G_DBUS_MESSAGE_FLAGS_NO_REPLY_EXPECTED;',
