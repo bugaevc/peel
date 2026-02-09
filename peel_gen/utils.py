@@ -57,6 +57,7 @@ def escape_cpp_name(name):
         'YES',
         'NO',
         'EOF',
+        'NODEV',
         'BIG_ENDIAN',
         'LITTLE_ENDIAN',
         'UNICODE',
