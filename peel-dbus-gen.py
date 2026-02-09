@@ -144,6 +144,13 @@ def main():
     first_interface = True
 
     for interface in handler.all_interfaces:
+        # Don't pointlessly generate bindings to standard interfaces.
+        if interface.interface_name in (
+            'org.freedesktop.DBus.Peer',
+            'org.freedesktop.DBus.Introspectable',
+            'org.freedesktop.DBus.Properties'
+        ):
+            continue
         if not first_interface:
             header_contents += '\n\n'
             cpp_contents += '\n\n'

@@ -9,9 +9,14 @@ class Argument:
         self.function = function
         self.dbus_name = attrs.get('name', None)
         if self.dbus_name:
-            self.cpp_name = escape_cpp_name(self.dbus_name)
+            self.cpp_name = cpp_base_name = escape_cpp_name(self.dbus_name)
+            # Rename the argument on conflicts.
+            suffix = 2
+            while any(arg for arg in self.function.arguments if arg.cpp_name == self.cpp_name):
+                self.cpp_name = '{}{}'.format(cpp_base_name, suffix)
+                suffix += 1
         else:
-            self.cpp_name = 'unnamed_arg_{}'.format(len(self.function.args) + 1)
+            self.cpp_name = 'unnamed_arg_{}'.format(len(self.function.arguments) + 1)
         if isinstance(function, Method):
             default_direction = 'in'
         else:
@@ -19,7 +24,7 @@ class Argument:
         self.direction = attrs.get('direction', default_direction)
         self.type = Type(attrs.get('type'))
 
-    def generate_cpp_type(self, bare=False, ownership=None, no_out_asterisk=False):
+    def generate_cpp_type(self, bare=False, no_out_asterisk=False):
         from peel_dbus_gen.method import Method
         from peel_dbus_gen.signal import Signal
 
@@ -28,16 +33,11 @@ class Argument:
         else:
             out_asterisk = '*'
 
-        if ownership is None:
-            if self.direction == 'in':
-                ownership = 'none'
-            else:
-                ownership = 'full'
         if isinstance(self.function, Method):
             flavor = 'method'
         else:
             flavor = 'signal'
-        s = self.type.generate_cpp_type(flavor=flavor, ownership=ownership)
+        s = self.type.generate_cpp_type(flavor=flavor)
         if bare:
             return s + out_asterisk
         elif s.endswith('*'):
