@@ -579,7 +579,22 @@ class Interface:
             '  const char *sender, const char *object_path, const char *interface_name, const char *property_name,',
             '  ::GError **error, gpointer user_data)',
             '{',
-            '  return nullptr;',
+            '  GObject *self = G_OBJECT (user_data);',
+            '  ::GVariant *v = nullptr;',
+            '',
+            '  ::GValue value = G_VALUE_INIT;',
+            '\n'.join(
+                '  {}if (!strcmp (property_name, "{}"))\n'.format('' if index == 0 else 'else ', property.dbus_name) +
+                '    {\n' +
+                '      g_value_init (&value, ::peel::GObject::Type::of<{}> ());\n'.format(property.type.generate_cpp_type(flavor='plain')) +
+                '      g_object_get_property (self, "{}", &value);\n'.format(property.prop_name) +
+                '      v = {};\n'.format(property.type.generate_make_variant_from_value(value_expr='&value')) +
+                '    }'
+                for index, property in enumerate(self.properties)
+            ),
+            '  g_value_unset (&value);',
+            '',
+            '  return v;',
             '}',
             '',
             'static gboolean',
