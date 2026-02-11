@@ -998,6 +998,7 @@ nonnull	gtk_bitset_unref		self
 
 nullable gtk_label_set_label		str
 nullable gtk_label_get_label		return
+nullable gtk_widget_activate_action	format_string
 
 unowned	gdk_dmabuf_texture_builder_get_color_state	return
 unowned	gdk_gl_texture_builder_get_color_state		return
