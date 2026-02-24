@@ -51,7 +51,11 @@ endif
 
 pkg.generate(
   name: 'peel',
-  version : '0.1.0',
   description: 'C++ bindings for GObject-based libraries',
   filebase: 'peel',
+  requires: 'gobject-2.0',
+  url: 'https://gitlab.gnome.org/bugaevc/peel',
+  variables: [
+    'peel_gen=${bindir}/peel-gen',
+  ],
 )
