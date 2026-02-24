@@ -29,6 +29,22 @@ private:
 
   T *ptr;
 
+  void
+  do_free () noexcept
+  {
+#ifdef __GNUC__
+    /* If we can statically see it's nullptr, don't do anything. */
+    if (__builtin_constant_p (ptr == nullptr) && (ptr == nullptr))
+      return;
+    if (UniqueTraits<T>::can_free_null || ptr)
+      UniqueTraits<T>::free (ptr);
+#else
+    if (ptr)
+      UniqueTraits<T>::free (ptr);
+#endif
+    ptr = nullptr;
+  }
+
 public:
   constexpr UniquePtr () noexcept
     : ptr (nullptr)
@@ -48,16 +64,7 @@ public:
 
   ~UniquePtr () noexcept
   {
-#ifdef __GNUC__
-    /* If we can statically see it's nullptr, don't do anything. */
-    if (__builtin_constant_p (ptr == nullptr) && (ptr == nullptr))
-      return;
-    if (UniqueTraits<T>::can_free_null || ptr)
-      UniqueTraits<T>::free (ptr);
-#else
-    if (ptr)
-      UniqueTraits<T>::free (ptr);
-#endif
+    do_free ();
   }
 
   static UniquePtr
@@ -85,10 +92,16 @@ public:
   {
     if (this == &other)
       return *this;
-    if (ptr)
-      UniqueTraits<T>::free (ptr);
+    do_free ();
     ptr = other.ptr;
     other.ptr = nullptr;
+    return *this;
+  }
+
+  UniquePtr &
+  operator = (decltype (nullptr)) noexcept
+  {
+    do_free ();
     return *this;
   }
 
@@ -130,7 +143,7 @@ private:
   size_t c;
 
   void
-  free () noexcept
+  do_free () noexcept
   {
     if (!std::is_trivially_destructible<T>::value)
       {
@@ -175,7 +188,7 @@ public:
 
   ~UniquePtr () noexcept
   {
-    free ();
+    do_free ();
   }
 
   peel_nodiscard ("the reference will leak if unused")
@@ -196,11 +209,18 @@ public:
   {
     if (this == &other)
       return *this;
-    free ();
+    do_free ();
     ptr = other.ptr;
     c = other.c;
     other.ptr = nullptr;
     other.c = 0;
+    return *this;
+  }
+
+  UniquePtr &
+  operator = (decltype (nullptr)) noexcept
+  {
+    do_free ();
     return *this;
   }
 
