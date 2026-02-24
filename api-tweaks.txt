@@ -245,6 +245,11 @@ vararg	g_variant_builder_add_parsed	variant-new
 
 raw-params-overload	g_option_context_parse	argc,argv
 
+# There need *error to be null on entry
+inout	g_set_error			err
+inout	g_set_error_literal		err
+inout	g_propagate_error		dest
+
 #ifdef	GUnixFDSourceFunc		G_OS_UNIX
 #ifdef	GUnixPipe			G_OS_UNIX
 #ifdef	GUnixPipeEnd			G_OS_UNIX
