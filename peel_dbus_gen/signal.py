@@ -8,6 +8,10 @@ class Signal:
         self.signal_name = self.cpp_name.replace('_', '-')
         # self.cpp_name = escape_cpp_name(self.cpp_name)
         self.arguments = []
+        self.annotations = dict()
+
+    def resolve_stuff(self):
+        pass
 
     def generate_header(self):
         arg_types = [arg.generate_cpp_type(bare=True) for arg in self.arguments]

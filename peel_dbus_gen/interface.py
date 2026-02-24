@@ -1,14 +1,46 @@
 # from peel_dbus_gen.method import Method
+from peel_dbus_gen.utils import escape_cpp_name
 
 class Interface:
-    def __init__(self, attrs):
+    def __init__(self, attrs, interface_prefix, namespace):
         self.interface_name = attrs.get('name')
         self.methods = []
         self.properties = []
         self.signals = []
+        self.annotations = dict()
 
-        # FIXME: This s wrong, but we have to start somewhere.
-        self.gtype_name = self.own_name = self.emit_name = self.interface_name.split('.')[-1]
+        name = self.interface_name
+        if interface_prefix and name.startswith(interface_prefix):
+            name = name[len(interface_prefix):]
+        if name.startswith('.'):
+            name = name[1:]
+        name = name.split('.')
+
+        if namespace:
+            self.cpp_namespaces = [ns for ns in namespace.split('::') if ns]
+        else:
+            self.cpp_namespaces = []
+        self.cpp_namespaces.extend(name[:-1])
+
+        self.own_name = escape_cpp_name(name[-1])
+        self.emit_name = self.own_name
+
+        self.gtype_name = ''
+        for ns in self.cpp_namespaces:
+            ns = ns[0].upper() + ns[1:]
+            self.gtype_name += ns
+        self.gtype_name += self.own_name
+
+        for i in range(len(self.cpp_namespaces)):
+            self.cpp_namespaces[i] = escape_cpp_name(self.cpp_namespaces[i])
+
+    def resolve_stuff(self):
+        for method in self.methods:
+            method.resolve_stuff()
+        for signal in self.signals:
+            signal.resolve_stuff()
+        for property in self.properties:
+            property.resolve_stuff()
 
     def generate_header(self, skip_preambule):
         if skip_preambule:
@@ -28,11 +60,13 @@ class Interface:
                 'namespace Gio',
                 '{',
                 'class DBusConnection;',
-                '}',
-                '}',
+                '} /* namespace Gio */',
+                '} /* namespace peel */',
                 '',
             ]
-        # TODO: generate opening namespace blocks
+        for ns in self.cpp_namespaces:
+            l.append('namespace ' + ns)
+            l.append('{')
         l.extend([
             'class /* interface */ {} : public ::peel::GObject::Object'.format(self.emit_name),
             '{',
@@ -54,7 +88,7 @@ class Interface:
             '  static ::peel::GObject::Type',
             '  _peel_get_type () noexcept;',
             '',
-            '  unsigned',
+            '  bool',
             '  export_on_bus (::peel::Gio::DBusConnection *connection, const char *object_path, ::peel::UniquePtr<::peel::GLib::Error> *error) noexcept;',
             '',
             '  static const ::peel::Gio::DBusInterface::Info *',
@@ -241,28 +275,30 @@ class Interface:
         ])
         for signal in self.signals:
            l.append(signal.generate_emit_method_decl())
+        l.append('};')
+        for ns in self.cpp_namespaces:
+            l.append('}} /* namespace {} */'.format(ns))
         l.extend([
-            '};',
             '',
             'template<>',
             'inline ::peel::GObject::Type',
-            'peel::GObject::Type::of<{}> ()'.format(self.emit_name),
+            'peel::GObject::Type::of<{}::{}> ()'.format('::'.join(self.cpp_namespaces), self.emit_name),
             '{',
-            '  return {}::_peel_get_type ();'.format(self.emit_name),
+            '  return {}::{}::_peel_get_type ();'.format('::'.join(self.cpp_namespaces), self.emit_name),
             '}',
             '',
             'template<>',
             'inline ::peel::GObject::Type',
-            'peel::GObject::Type::of<{}::Proxy> ()'.format(self.emit_name),
+            'peel::GObject::Type::of<{}::{}::Proxy> ()'.format('::'.join(self.cpp_namespaces), self.emit_name),
             '{',
-            '  return {}::Proxy::_peel_get_type ();'.format(self.emit_name),
+            '  return {}::{}::Proxy::_peel_get_type ();'.format('::'.join(self.cpp_namespaces), self.emit_name),
             '}',
             '',
             'template<>',
             'inline ::peel::GObject::Type',
-            'peel::GObject::Type::of<{}::Skeleton> ()'.format(self.emit_name),
+            'peel::GObject::Type::of<{}::{}::Skeleton> ()'.format('::'.join(self.cpp_namespaces), self.emit_name),
             '{',
-            '  return {}::Skeleton::_peel_get_type ();'.format(self.emit_name),
+            '  return {}::{}::Skeleton::_peel_get_type ();'.format('::'.join(self.cpp_namespaces), self.emit_name),
             '}',
         ])
         return '\n'.join(l)
@@ -282,7 +318,9 @@ class Interface:
                 '#include <peel/class.h>',
                 '',
             ]
-        # TODO: Open any namespaces here.
+        for ns in self.cpp_namespaces:
+            l.append('namespace ' + ns)
+            l.append('{')
         l.extend([
             'static ::GType {}_type;'.format(self.emit_name),
             'static ::GType {}_proxy_type;'.format(self.emit_name),
@@ -362,19 +400,20 @@ class Interface:
             l.append(property.generate_iface_init('iface'))
         for signal in self.signals:
             l.append(signal.generate_iface_init('{}_type'.format(self.emit_name)))
-        l.extend([
-            '}',
-            '',
-            'static void',
-            '{}_iface_base_init (gpointer g_iface)'.format(self.emit_name),
-            '{',
-            '  {}::Iface *iface = reinterpret_cast<{}::Iface *> (g_iface);'.format(self.emit_name, self.emit_name),
-            '  ::GType tp = reinterpret_cast<::GTypeInterface *> (g_iface)->g_instance_type;',
-            '  if (!tp || !{}_skeleton_type || !g_type_is_a (tp, {}_skeleton_type))'.format(self.emit_name, self.emit_name),
-            '    return;',
-        ])
-        for signal in self.signals:
-            l.append(signal.generate_iface_base_init('iface'))
+        if self.signals:
+            l.extend([
+                '}',
+                '',
+                'static void',
+                '{}_iface_base_init (gpointer g_iface)'.format(self.emit_name),
+                '{',
+                '  {}::Iface *iface = reinterpret_cast<{}::Iface *> (g_iface);'.format(self.emit_name, self.emit_name),
+                '  ::GType tp = reinterpret_cast<::GTypeInterface *> (g_iface)->g_instance_type;',
+                '  if (!tp || !{}_skeleton_type || !g_type_is_a (tp, {}_skeleton_type))'.format(self.emit_name, self.emit_name),
+                '    return;',
+            ])
+            for signal in self.signals:
+                l.append(signal.generate_iface_base_init('iface'))
         l.extend([
             '}',
             '',
@@ -386,7 +425,7 @@ class Interface:
             '      ::GTypeInfo type_info =',
             '      {',
             '        sizeof ({}::Iface),'.format(self.emit_name),
-            '        {}_iface_base_init,'.format(self.emit_name),
+            '        {}_iface_base_init,'.format(self.emit_name) if self.signals else '        nullptr,',
             '        nullptr,',
             '        {}_iface_init,'.format(self.emit_name),
             '        nullptr,',
@@ -399,13 +438,6 @@ class Interface:
             '      ::GType tp = g_type_register_static (G_TYPE_INTERFACE,',
             '        g_intern_static_string ("{}"),'.format(self.gtype_name),
             '        &type_info, ::GTypeFlags (0));',
-            #'      ::GType tp = g_type_register_static_simple (G_TYPE_INTERFACE,',
-            #'        g_intern_static_string ("{}"),'.format(self.gtype_name),
-            #'        sizeof ({}::Iface),'.format(self.emit_name),
-            #'        {}_iface_init,'.format(self.emit_name),
-            #'        0,',
-            #'        nullptr,',
-            #'        ::GTypeFlags (0));',
             '      g_type_interface_add_prerequisite (tp, G_TYPE_OBJECT);',
             '      _peel_once_init_leave (&{}_type, tp);'.format(self.emit_name),
             '    }',
@@ -467,10 +499,13 @@ class Interface:
             '{',
             '  for (const char * const *prop = invalidated_properties; *prop; prop++)',
             '    {',
+            '      if (false)',
+            '        { }',
             '\n'.join(
-                '      {}if (!strcmp (*prop, "{}"))\n'.format('' if index == 0 else 'else ', property.dbus_name) +
+                '      else if (!strcmp (*prop, "{}"))\n'.format(property.dbus_name) +
                 '        g_object_notify (G_OBJECT (proxy), "{}");'.format(property.prop_name)
-                for index, property in enumerate(self.properties)
+                for property in self.properties
+                if property.annotations.get('org.freedesktop.DBus.Property.EmitsChangedSignal', 'true') in ('true', 'invalidates')
             ),
             '  }',
             '  ::GVariantIter iter;',
@@ -478,10 +513,13 @@ class Interface:
             '  const char *prop;',
             '  while (g_variant_iter_loop (&iter, "{&sv}", &prop, nullptr))',
             '    {',
+            '      if (false)',
+            '        { }',
             '\n'.join(
-                '      {}if (!strcmp (prop, "{}"))\n'.format('' if index == 0 else 'else ', property.dbus_name) +
+                '      else if (!strcmp (prop, "{}"))\n'.format(property.dbus_name) +
                 '        g_object_notify (G_OBJECT (proxy), "{}");'.format(property.prop_name)
                 for index, property in enumerate(self.properties)
+                if property.annotations.get('org.freedesktop.DBus.Property.EmitsChangedSignal', 'true') in ('true', 'invalidates')
             ),
             '    }',
             '}',
@@ -579,7 +617,7 @@ class Interface:
             '  const char *sender, const char *object_path, const char *interface_name, const char *property_name,',
             '  ::GError **error, gpointer user_data)',
             '{',
-            '  GObject *self = G_OBJECT (user_data);',
+            '  ::GObject *self = G_OBJECT (user_data);',
             '  ::GVariant *v = nullptr;',
             '',
             '  ::GValue value = G_VALUE_INIT;',
@@ -590,7 +628,7 @@ class Interface:
                 '      g_object_get_property (self, "{}", &value);\n'.format(property.prop_name) +
                 '      v = {};\n'.format(property.type.generate_make_variant_from_value(value_expr='&value')) +
                 '    }'
-                for index, property in enumerate(self.properties)
+                for index, property in enumerate(self.properties) if 'read' in property.access
             ),
             '  g_value_unset (&value);',
             '',
@@ -600,9 +638,43 @@ class Interface:
             'static gboolean',
             '{}_interface_vtable_set_property (::GDBusConnection *connection,'.format(self.emit_name),
             '  const char *sender, const char *object_path, const char *interface_name, const char *property_name,',
-            '  ::GVariant *value, ::GError **error, gpointer user_data)',
+            '  ::GVariant *v, ::GError **error, gpointer user_data)',
             '{',
-            '  return false;',
+            '  ::GObject *self = G_OBJECT (user_data);',
+            '',
+            '  ::GValue value = G_VALUE_INIT;',
+            '  const char *name;',
+            '  GParamSpec *pspec;',
+            '  gboolean valid;',
+            '',
+            '  if (false)',
+            '    { }',
+            '\n'.join(
+                '  else if (!strcmp (property_name, "{}"))\n'.format(property.dbus_name) +
+                '    {\n' +
+                '      g_value_init (&value, ::peel::GObject::Type::of<{}> ());\n'.format(property.type.generate_cpp_type(flavor='plain')) +
+                '      {};\n'.format(property.type.generate_set_value_from_variant(value_expr='&value', variant_expr='v')) +
+                '      name = "{}";\n'.format(property.prop_name) +
+                '    }'
+                for property in self.properties if 'write' in property.access
+            ),
+            '  else',
+            '    g_assert_not_reached ();',
+            '',
+            '  pspec = g_object_class_find_property (G_OBJECT_GET_CLASS (self), name);',
+            '#if GLIB_CHECK_VERSION (2, 74, 0)',
+            '  valid = g_param_value_is_valid (pspec, &value);',
+            '#else',
+            '  valid = g_param_value_validate (pspec, &value);',
+            '#endif',
+            '',
+            '  if (G_LIKELY (valid))',
+            '    g_object_set_property (self, name, &value);',
+            '  else',
+            '    g_set_error (error, G_DBUS_ERROR, G_DBUS_ERROR_INVALID_ARGS, "Provided value is not valid for property %s", property_name);',
+            '',
+            '  g_value_unset (&value);',
+            '  return valid;',
             '}',
             '',
             'static const ::GDBusInterfaceVTable',
@@ -612,6 +684,85 @@ class Interface:
             '  {}_interface_vtable_get_property,'.format(self.emit_name),
             '  {}_interface_vtable_set_property,'.format(self.emit_name),
             '};',
+            '',
+            'bool',
+            '{}::export_on_bus (::peel::Gio::DBusConnection *connection, const char *object_path, ::peel::UniquePtr<::peel::GLib::Error> *error) noexcept'.format(self.emit_name),
+            '{',
+            '  if ({}_skeleton_type && G_TYPE_CHECK_INSTANCE_TYPE (this, {}_skeleton_type))'.format(self.emit_name, self.emit_name),
+            '    return reinterpret_cast<::peel::Gio::DBusInterfaceSkeleton *> (this)->export_ (connection, object_path, error);',
+            '  return g_dbus_connection_register_object (reinterpret_cast<::GDBusConnection *> (connection), object_path, const_cast<::GDBusInterfaceInfo *> (&{}_interface_info), &{}_interface_vtable, g_object_ref (this), g_object_unref, reinterpret_cast<::GError **> (error));'.format(self.emit_name, self.emit_name),
+            '}',
+            '',
+            'static void',
+            '{}_build_property_changed (::GObject *object, ::GParamSpec *pspec, ::GVariantBuilder *changed, ::GVariantBuilder *invalidated)'.format(self.emit_name),
+            '{',
+            '  const char *name = g_param_spec_get_name (pspec);',
+            '  GValue value = G_VALUE_INIT;',
+            '  GVariant *v;',
+            '',
+            '  if (false)',
+            '    { }',
+        ])
+        for property in self.properties:
+            emits_changed = property.annotations.get('org.freedesktop.DBus.Property.EmitsChangedSignal', 'true')
+            if emits_changed in ('const', 'false'):
+                continue
+            l.extend([
+                '  else if (!strcmp (name, "{}"))'.format(property.prop_name),
+                '    {',
+            ])
+            if emits_changed == 'true':
+                l.extend([
+                    '      g_value_init (&value, ::peel::GObject::Type::of<{}> ());'.format(property.type.generate_cpp_type(flavor='plain')),
+                    '      g_object_get_property (object, "{}", &value);'.format(property.prop_name),
+                    '      v = {};'.format(property.type.generate_make_variant_from_value(value_expr='&value')),
+                    '      g_variant_builder_add (changed, "{{sv}}", "{}", v);'.format(property.dbus_name),
+                ])
+            else:
+                l.append('      g_variant_builder_add (invalidated, "s", "{}");'.format(property.dbus_name))
+            l.append('    }')
+        l.extend([
+            '',
+            '  g_value_unset (&value);',
+            '}',
+            '',
+            'static void',
+            '{}_skeleton_dispatch_properties_changed (::GObject *object, guint n_pspecs, ::GParamSpec **pspecs)'.format(self.emit_name),
+            '{',
+            '  ::GDBusInterfaceSkeleton *self = G_DBUS_INTERFACE_SKELETON (object);',
+            '  const char *object_path = g_dbus_interface_skeleton_get_object_path (self);',
+            '  ::GList *connections = g_dbus_interface_skeleton_get_connections (self);',
+            '  ::GVariant *args = nullptr;',
+            '  if (!connections)',
+            '    goto chain_up;',
+            '',
+            '  ::GVariantBuilder changed;',
+            '  ::GVariantBuilder invalidated;',
+            '#if GLIB_CHECK_VERSION (2, 84, 0)',
+            '  g_variant_builder_init_static (&changed, G_VARIANT_TYPE ("a{sv}"));',
+            '  g_variant_builder_init_static (&invalidated, G_VARIANT_TYPE ("as"));',
+            '#else',
+            '  g_variant_builder_init (&changed, G_VARIANT_TYPE ("a{sv}"));',
+            '  g_variant_builder_init (&invalidated, G_VARIANT_TYPE ("as"));',
+            '#endif',
+            '',
+            '  for (guint i = 0; i < n_pspecs; i++)',
+            '    {}_build_property_changed (object, pspecs[i], &changed, &invalidated);'.format(self.emit_name),
+            '',
+            '  args = g_variant_new ("(sa{{sv}}as)", "{}", &changed, &invalidated);'.format(self.interface_name),
+            '  g_variant_ref_sink (args);',
+            '',
+            '  for (::GList *l = connections; l; l = l->next)',
+            '    g_dbus_connection_emit_signal (G_DBUS_CONNECTION (l->data), nullptr,',
+            '      object_path, "org.freedesktop.DBus.Properties", "PropertiesChanged",',
+            '      args, nullptr);',
+            '',
+            '  g_list_free_full (connections, g_object_unref);',
+            '  g_variant_unref (args);',
+            '',
+            'chain_up:',
+            '  G_OBJECT_CLASS (g_type_class_peek (G_TYPE_DBUS_INTERFACE_SKELETON))->dispatch_properties_changed (object, n_pspecs, pspecs);',
+            '}',
             '',
             'static ::GDBusInterfaceVTable *',
             '{}_skeleton_get_vtable (::GDBusInterfaceSkeleton *self)'.format(self.emit_name),
@@ -630,6 +781,8 @@ class Interface:
             '{',
             '  ::GObjectClass *object_class = G_OBJECT_CLASS (g_class);',
             '  ::GDBusInterfaceSkeletonClass *skeleton_class = G_DBUS_INTERFACE_SKELETON_CLASS (g_class);',
+            ''
+            '  object_class->dispatch_properties_changed = {}_skeleton_dispatch_properties_changed;'.format(self.emit_name),
             '',
             '  skeleton_class->get_info = {}_skeleton_get_info;'.format(self.emit_name),
             '  skeleton_class->get_vtable = {}_skeleton_get_vtable;'.format(self.emit_name),
@@ -641,7 +794,7 @@ class Interface:
             '  if (_peel_once_init_enter (&{}_skeleton_type))'.format(self.emit_name),
             '    {',
             '      ::GType tp = g_type_register_static_simple (G_TYPE_DBUS_INTERFACE_SKELETON,',
-            '        g_intern_static_string ("{}Skeleton"),'.format(self.emit_name),
+            '        g_intern_static_string ("{}Skeleton"),'.format(self.gtype_name),
             '        sizeof ({}::Skeleton::Class),'.format(self.emit_name),
             '        {}_skeleton_class_init,'.format(self.emit_name),
             '        sizeof ({}::Skeleton),'.format(self.emit_name),
@@ -654,4 +807,6 @@ class Interface:
         ])
         for signal in self.signals:
             l.append(signal.generate_emit_method_body())
+        for ns in self.cpp_namespaces:
+            l.append('}} /* namespace {} */'.format(ns))
         return '\n'.join(l)

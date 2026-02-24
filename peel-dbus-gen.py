@@ -7,10 +7,12 @@ from pathlib import Path
 
 # These will be set by Meson in the installed file.
 peel_gen_module_path = '@module_path@'
+peel_version = r'@peel_version@'
 
 if peel_gen_module_path == '@' + 'module_path' + '@':
     # Running uninstalled from the source tree.
     peel_gen_module_path = str(Path(__file__).parent)
+    peel_version = '(uninstalled)'
 
 sys.path.insert(0, peel_gen_module_path)
 
@@ -24,7 +26,9 @@ from peel_dbus_gen.argument import Argument
 from peel_dbus_gen.property import Property
 
 class SaxHandler(xml.sax.handler.ContentHandler):
-    def __init__(self):
+    def __init__(self, interface_prefix, namespace):
+        self.interface_prefix = interface_prefix
+        self.namespace = namespace
         self.all_interfaces = []
         self.interface = None
         self.method = None
@@ -45,7 +49,7 @@ class SaxHandler(xml.sax.handler.ContentHandler):
             assert(self.signal is None)
             assert(self.arg is None)
             assert(self.property is None)
-            self.interface = Interface(attrs)
+            self.interface = Interface(attrs, self.interface_prefix, self.namespace)
             self.all_interfaces.append(self.interface)
         elif name == 'method':
             assert(self.interface is not None)
@@ -82,6 +86,20 @@ class SaxHandler(xml.sax.handler.ContentHandler):
             assert(self.property is None)
             self.property = Property(attrs, iface=self.interface)
             self.interface.properties.append(self.property)
+        elif name == 'annotation':
+            if self.property is not None:
+                d = self.property.annotations
+            elif self.arg is not None:
+                d = self.arg.annotations
+            elif self.method is not None:
+                d = self.method.annotations
+            elif self.signal is not None:
+                d = self.signal.annotations
+            elif self.interface is not None:
+                d = self.interface.annotations
+            else:
+                return
+            d[attrs['name']] = attrs['value']
         else:
             print('Unhandled tag', name, file=sys.stderr)
 
@@ -133,9 +151,13 @@ def main():
     arg_parser.add_argument('output_header', metavar='Interface.h')
     arg_parser.add_argument('output_cpp', metavar='Interface.cpp')
 
+    arg_parser.add_argument('--version', action='version', version='peel ' + peel_version)
+    arg_parser.add_argument('--interface-prefix')
+    arg_parser.add_argument('--namespace')
+
     args = arg_parser.parse_args()
     parser = xml.sax.make_parser()
-    handler = SaxHandler()
+    handler = SaxHandler(interface_prefix=args.interface_prefix, namespace=args.namespace)
     parser.setContentHandler(handler)
     parser.parse(args.interface)
 
@@ -144,7 +166,7 @@ def main():
     first_interface = True
 
     for interface in handler.all_interfaces:
-        # Don't pointlessly generate bindings to standard interfaces.
+        # Don't pointlessly generate bindings for the standard interfaces.
         if interface.interface_name in (
             'org.freedesktop.DBus.Peer',
             'org.freedesktop.DBus.Introspectable',
@@ -154,6 +176,7 @@ def main():
         if not first_interface:
             header_contents += '\n\n'
             cpp_contents += '\n\n'
+        interface.resolve_stuff()
         header_contents += interface.generate_header(skip_preambule=not first_interface)
         cpp_contents += interface.generate_cpp(generated_header_name=args.output_header, skip_preambule=not first_interface)
         first_interface = False

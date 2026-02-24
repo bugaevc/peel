@@ -6,9 +6,15 @@
  *
  * This example primarily showcases binding D-Bus object properties
  * directly to GTK UI elements, using GObject property binding.
+ *
+ * $ peel-dbus-gen \
+ *     --interface-prefix=org.freedesktop \
+ *     --namespace=Demo \
+ *     /usr/share/dbus-1/interfaces/org.freedesktop.UPower.Device.xml \
+ *     UPowerDevice.h UPowerDevice.cpp
  */
 
-#include "UPower.h"
+#include "UPowerDevice.h"
 #include <peel/Gio/BusType.h>
 #include <peel/Gtk/Gtk.h>
 #include <peel/GObject/Binding.h>
@@ -59,7 +65,8 @@ main ()
   Gtk::init ();
 
   /* Connect to UPower's "display device" */
-  RefPtr<Device> battery = Device::Proxy::create_sync (Gio::BusType::SYSTEM,
+  RefPtr<Demo::UPower::Device> battery = Demo::UPower::Device::Proxy::create_sync (
+    Gio::BusType::SYSTEM,
     "org.freedesktop.UPower", "/org/freedesktop/UPower/devices/DisplayDevice",
     &error);
   if (error)
@@ -91,7 +98,7 @@ main ()
   label = Gtk::Label::create (nullptr);
   label->set_xalign (0.0);
   Object::bind_property (
-    battery, Device::prop_state (),
+    battery, Demo::UPower::Device::prop_state (),
     label, Gtk::Label::prop_label (),
     peel::GObject::Binding::Flags::SYNC_CREATE,
     [] (unsigned state) -> const char *
@@ -107,7 +114,7 @@ main ()
   label = Gtk::Label::create (nullptr);
   label->set_xalign (0.0);
   Object::bind_property (
-    battery, Device::prop_percentage (),
+    battery, Demo::UPower::Device::prop_percentage (),
     label, Gtk::Label::prop_label (),
     peel::GObject::Binding::Flags::SYNC_CREATE);
   grid->attach (std::move (label), 1, 1, 1, 1);

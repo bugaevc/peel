@@ -10,6 +10,10 @@ class Property:
         self.cpp_name = escape_cpp_name(self.cpp_name)
         self.type = Type(attrs.get('type'))
         self.access = attrs.get('access')
+        self.annotations = dict()
+
+    def resolve_stuff(self):
+        pass
 
     def generate_header(self):
         plain_type = self.type.generate_cpp_type(flavor='plain')

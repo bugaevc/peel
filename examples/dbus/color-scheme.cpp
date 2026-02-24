@@ -2,6 +2,12 @@
  * Query and watch the dark style preference via the settings portal.
  *
  * https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.Settings.html
+ *
+ * $ peel-dbus-gen \
+ *     --interface-prefix org.freedesktop.portal \
+ *     --namespace Demo \
+ *     /usr/share/dbus-1/interfaces/org.freedesktop.portal.Settings.xml \
+ *     Settings.h Settings.cpp
  */
 
 #include "Settings.h"
@@ -31,7 +37,7 @@ main ()
 {
   UniquePtr<GLib::Error> error;
 
-  RefPtr<Settings> settings_portal = Settings::Proxy::create_sync (Gio::BusType::SESSION,
+  RefPtr<Demo::Settings> settings_portal = Demo::Settings::Proxy::create_sync (Gio::BusType::SESSION,
     "org.freedesktop.portal.Desktop", "/org/freedesktop/portal/desktop", &error);
   if (error)
     {
@@ -42,7 +48,7 @@ main ()
   g_print ("Portal version: %u\n", settings_portal->get_version ());
 
   /* When the setting changes, print the new value */
-  settings_portal->connect_setting_changed ([] (Settings *, const char *ns, const char *setting, GLib::Variant *value)
+  settings_portal->connect_setting_changed ([] (Demo::Settings *, const char *ns, const char *setting, GLib::Variant *value)
     {
       g_print ("Setting changed: %s %s\n", ns, setting);
       if (!strcmp (ns, "org.freedesktop.appearance") && !strcmp (setting, "color-scheme"))

@@ -7,15 +7,22 @@ class Method:
         self.cpp_name = camel_case_to_underscore(self.dbus_name)
         self.cpp_name = escape_cpp_name(self.cpp_name)
         self.arguments = []
+        self.annotations = dict()
 
-    def generate_arg_lists(self):
+    def resolve_stuff(self):
         self.in_args = ''.join(arg.generate_cpp_type() + ', ' for arg in self.arguments if arg.direction == 'in')
         self.in_args_forward = ''.join('std::move ({}), '.format(arg.cpp_name) for arg in self.arguments if arg.direction == 'in')
         self.out_args = ''.join(arg.generate_cpp_type() + ', ' for arg in self.arguments if arg.direction == 'out')
         self.out_args_forward = ''.join('{}, '.format(arg.cpp_name) for arg in self.arguments if arg.direction == 'out')
 
+        self.no_reply = self.annotations.get('org.freedesktop.DBus.Method.NoReply', 'false') == 'true'
+        if 'org.freedesktop.DBus.GLib.CSymbol' in self.annotations:
+            self.cpp_name = escape_cpp_name(self.annotations['org.freedesktop.DBus.GLib.CSymbol'])
+        self.unix_fd = bool(self.annotations.get('org.gtk.GDBus.C.UnixFD', None))
+        if not self.unix_fd:
+            self.unix_fd = any('h' in arg.type.signature for arg in self.arguments)
+
     def generate_header(self):
-        self.generate_arg_lists()
         return '\n'.join([
             '  template<typename AsyncReadyCallback>',
             '  void',
@@ -56,7 +63,6 @@ class Method:
         ])
 
     def generate_vfunc_ptr(self):
-        self.generate_arg_lists()
         return '\n'.join([
             '    void (*_peel_vfunc_{}_async) ({} *self, {}'.format(self.cpp_name, self.iface.emit_name, self.in_args.strip()),
             '      ::GAsyncReadyCallback, gpointer user_data, ::peel::Gio::Cancellable *, ::peel::Gio::DBusCallFlags, int bus_call_timeout_msec);',
@@ -67,7 +73,6 @@ class Method:
         ])
 
     def generate_override_vfunc_method(self):
-        self.generate_arg_lists()
         return '\n'.join([
             '    template<typename DerivedClass>',
             '    void',
@@ -121,8 +126,7 @@ class Method:
         ])
 
     def generate_default_vfuncs(self):
-        self.generate_arg_lists()
-        return '\n'.join([
+        l = [
             'static void',
             '{}_default_{}_async ({} *self, {}'.format(self.iface.emit_name, self.cpp_name, self.iface.emit_name, self.in_args.strip()),
             '  ::GAsyncReadyCallback, gpointer user_data, ::peel::Gio::Cancellable *, ::peel::Gio::DBusCallFlags, int bus_call_timeout_msec);',
@@ -135,10 +139,10 @@ class Method:
             '',
             'struct {}{}Data'.format(self.iface.emit_name, self.dbus_name),
             '{',
-            '\n'.join(
-              '  {};'.format(arg.generate_cpp_type(no_out_asterisk=True))
-              for arg in self.arguments
-            ),
+        ]
+        for arg in self.arguments:
+            l.append('  {};'.format(arg.generate_cpp_type(no_out_asterisk=True)))
+        l.extend([
             '  ::peel::Gio::DBusCallFlags bus_call_flags;',
             '  int bus_call_timeout_msec;',
             '};',
@@ -155,37 +159,47 @@ class Method:
             '{}_default_{}_async ({} *self, {}'.format(self.iface.emit_name, self.cpp_name, self.iface.emit_name, self.in_args.strip()),
             '  ::GAsyncReadyCallback callback, gpointer user_data, ::peel::Gio::Cancellable *cancellable, ::peel::Gio::DBusCallFlags bus_call_flags, int bus_call_timeout_msec)',
             '{',
-            '  {}::Iface *iface = self->get_interface<{}> ();'.format(self.iface.emit_name, self.iface.emit_name),
-            '  if (G_UNLIKELY (iface->_peel_vfunc_{}_sync == {}_default_{}_sync))'.format(self.cpp_name, self.iface.emit_name, self.cpp_name),
+            '  {}::Iface *_peel_iface = self->get_interface<{}> ();'.format(self.iface.emit_name, self.iface.emit_name),
+            '  if (G_UNLIKELY (_peel_iface->_peel_vfunc_{}_sync == {}_default_{}_sync))'.format(self.cpp_name, self.iface.emit_name, self.cpp_name),
             '    {',
             '      g_critical ("{} of type \'%s\' does not implement {}::{}", self->get_type_name ());'.format(self.iface.emit_name, self.iface.emit_name, self.cpp_name),
             '      return;',
             '    }',
             '',
-            '  {}{}Data *task_data = g_slice_new ({}{}Data);'.format(self.iface.emit_name, self.dbus_name, self.iface.emit_name, self.dbus_name),
-            '  task_data->bus_call_flags = bus_call_flags;',
-            '  task_data->bus_call_timeout_msec = bus_call_timeout_msec;',
-            '  ::GTask *task = g_task_new (self, reinterpret_cast<::GCancellable *> (cancellable), callback, user_data);',
-            '  (g_task_set_source_tag) (task, (gpointer) {}_default_{}_async);'.format(self.iface.emit_name, self.cpp_name),
-            '#if GLIB_VERSION_MIN_REQUIRED >= GLIB_VERSION_2_76',
-            '  g_task_set_static_name (task, "{}::{}");'.format(self.iface.emit_name, self.cpp_name),
+            '  {}{}Data *_peel_task_data = g_slice_new ({}{}Data);'.format(self.iface.emit_name, self.dbus_name, self.iface.emit_name, self.dbus_name),
+            '  _peel_task_data->bus_call_flags = bus_call_flags;',
+            '  _peel_task_data->bus_call_timeout_msec = bus_call_timeout_msec;',
+        ])
+        for arg in self.arguments:
+            if arg.direction == 'in':
+                l.append('  _peel_task_data->{} = std::move ({});'.format(arg.cpp_name, arg.cpp_name))
+        l.extend([
+            '  ::GTask *_peel_task = g_task_new (self, reinterpret_cast<::GCancellable *> (cancellable), callback, user_data);',
+            '  (g_task_set_source_tag) (_peel_task, (gpointer) {}_default_{}_async);'.format(self.iface.emit_name, self.cpp_name),
+            '#if GLIB_CHECK_VERSION (2, 76, 0)',
+            '  g_task_set_static_name (_peel_task, "{}::{}");'.format(self.iface.emit_name, self.cpp_name),
             '#endif',
-            '  g_task_set_task_data (task, task_data, {}_{}_data_free);'.format(self.iface.emit_name, self.cpp_name),
-            '  g_task_run_in_thread (task, +[] (::GTask *task, gpointer source_object, gpointer d, ::GCancellable *cancellable)',
+            '  g_task_set_task_data (_peel_task, _peel_task_data, {}_{}_data_free);'.format(self.iface.emit_name, self.cpp_name),
+            '  g_task_run_in_thread (_peel_task, +[] (::GTask *task, gpointer source_object, gpointer d, ::GCancellable *cancellable)',
             '    {',
             '      {} *self = reinterpret_cast<{} *> (source_object);'.format(self.iface.emit_name, self.iface.emit_name),
             '      {}{}Data *task_data = reinterpret_cast<{}{}Data *> (d);'.format(self.iface.emit_name, self.dbus_name, self.iface.emit_name, self.dbus_name),
             '      ::peel::UniquePtr<::peel::GLib::Error> error;',
             '      ::peel::Gio::Cancellable *_peel_cancellable = reinterpret_cast<::peel::Gio::Cancellable *> (cancellable);',
             '      {}::Iface *iface = self->get_interface<{}> ();'.format(self.iface.emit_name, self.iface.emit_name),
-            '      bool _peel_return = true; //',
-            '      // iface->_peel_vfunc_{}_sync (self, /* TODO: in args, out args, */ &error, _peel_cancellable, task_data->bus_call_flags, task_data->bus_call_timeout_msec);'.format(self.cpp_name),
+            '      bool _peel_return = iface->_peel_vfunc_{}_sync (self, {}&error, _peel_cancellable, task_data->bus_call_flags, task_data->bus_call_timeout_msec);'.format(
+                self.cpp_name,
+                ''.join(
+                    'std::move (task_data->{}), '.format(arg.cpp_name) if arg.direction == 'in' else '&task_data->{}, '.format(arg.cpp_name)
+                    for arg in self.arguments
+                )
+            ),
             '      if (error)',
             '        g_task_return_error (task, reinterpret_cast<::GError *> (std::move (error).release_ref ()));',
             '      else',
             '        g_task_return_boolean (task, _peel_return);',
             '    });',
-            '  g_object_unref (task);',
+            '  g_object_unref (_peel_task);',
             '}',
             '',
             'static bool',
@@ -193,10 +207,26 @@ class Method:
             '  ::peel::UniquePtr<::peel::GLib::Error> *error)',
             '{',
             '  g_return_val_if_fail (::peel::Gio::Task::is_valid (async_result, self), false);',
-            '  ::peel::Gio::Task *task = async_result->cast<::peel::Gio::Task> ();',
-            '  g_return_val_if_fail (task->get_source_tag () == {}_default_{}_async, false);'.format(self.iface.emit_name, self.cpp_name),
-            '  // TODO: copy out args',
-            '  return task->propagate_boolean (error);',
+            '  ::peel::Gio::Task *_peel_task = async_result->cast<::peel::Gio::Task> ();',
+            '  g_return_val_if_fail (_peel_task->get_source_tag () == {}_default_{}_async, false);'.format(self.iface.emit_name, self.cpp_name),
+        ])
+        if any(arg.direction == 'out' for arg in self.arguments):
+            l.extend([
+                '  if (!_peel_task->had_error ())',
+                '    {',
+                '      {}{}Data *_peel_task_data = reinterpret_cast<{}{}Data *> (_peel_task->get_task_data ());'.format(
+                    self.iface.emit_name,
+                    self.dbus_name,
+                    self.iface.emit_name,
+                    self.dbus_name,
+                ),
+            ])
+            for arg in self.arguments:
+                if arg.direction == 'out':
+                    l.append('      *{} = std::move (_peel_task_data->{});'.format(arg.cpp_name, arg.cpp_name))
+            l.append('    }'),
+        l.extend([
+            '  return _peel_task->propagate_boolean (error);',
             '}',
             '',
             'static bool',
@@ -225,9 +255,9 @@ class Method:
             '  return _peel_result;',
             '}',
         ])
+        return '\n'.join(l)
 
     def generate_proxy_vfuncs(self):
-        self.generate_arg_lists()
         num_in_args = len([arg for arg in self.arguments if arg.direction == 'in'])
         in_args = ',\n'.join('      ' + arg.generate_make_variant() for arg in self.arguments if arg.direction == 'in')
 
@@ -243,7 +273,7 @@ class Method:
             ])
             index += 1
         out_args = '\n'.join(out_args)
-        return '\n'.join([
+        l = [
             'static void',
             '{}_proxy_{}_async ({} *self, {}'.format(self.iface.emit_name, self.cpp_name, self.iface.emit_name, self.in_args.strip()),
             '  ::GAsyncReadyCallback callback, gpointer user_data, ::peel::Gio::Cancellable *cancellable, ::peel::Gio::DBusCallFlags bus_call_flags, int bus_call_timeout_msec)',
@@ -254,28 +284,56 @@ class Method:
             in_args,
             '    };',
             '  g_dbus_proxy_call (proxy, "{}", g_variant_new_tuple (_peel_args, {}),'.format(self.dbus_name, num_in_args),
-            '    static_cast<::GDBusCallFlags> (bus_call_flags), bus_call_timeout_msec, reinterpret_cast<::GCancellable *> (cancellable), callback, user_data);',
+            '    static_cast<::GDBusCallFlags> (bus_call_flags), bus_call_timeout_msec, reinterpret_cast<::GCancellable *> (cancellable),',
+        ]
+        if not self.no_reply:
+            l.append('    callback, user_data);')
+        else:
+            l.extend([
+                '    nullptr, nullptr);',
+                '  /* Complete immediately */',
+                '  ::GTask *_peel_task = g_task_new (self, reinterpret_cast<::GCancellable *> (cancellable), callback, user_data);',
+                '  (g_task_set_source_tag) (_peel_task, (gpointer) {}_proxy_{}_async);'.format(self.iface.emit_name, self.cpp_name),
+                '#if GLIB_CHECK_VERSION (2, 76, 0)',
+                '  g_task_set_static_name (_peel_task, "{}::Proxy::{}");'.format(self.iface.emit_name, self.cpp_name),
+                '#endif',
+                '  g_task_return_boolean (_peel_task, true);',
+                '  g_object_unref (_peel_task);',
+            ])
+        l.extend([
             '}',
             '',
             'static bool',
             '{}_proxy_{}_finish ({} *self, ::peel::Gio::AsyncResult *async_result, {}'.format(self.iface.emit_name, self.cpp_name, self.iface.emit_name, self.out_args.strip()),
             '  ::peel::UniquePtr<::peel::GLib::Error> *error)',
             '{',
-            '  ::GDBusProxy *proxy = G_DBUS_PROXY (self);',
-            '  ::GError *_peel_error = nullptr;',
-            '  ::GVariant *_peel_return = g_dbus_proxy_call_finish (proxy, reinterpret_cast<::GAsyncResult *> (async_result), error ? &_peel_error : nullptr);',
-            '  if (!_peel_return)',
-            '    {',
-            '      if (error)',
-            '        *error = ::peel::UniquePtr<::peel::GLib::Error>::adopt_ref (reinterpret_cast<::peel::GLib::Error *> (_peel_error));',
-            '      return false;',
-            '    }',
-            '  if (error)',
-            '    *error = nullptr;',
-            '  ::GVariant *_peel_out_arg;',
-            out_args,
-            '  g_variant_unref (_peel_return);',
-            '  return true;',
+        ])
+        if not self.no_reply:
+            l.extend([
+                '  ::GDBusProxy *proxy = G_DBUS_PROXY (self);',
+                '  ::GError *_peel_error = nullptr;',
+                '  ::GVariant *_peel_return = g_dbus_proxy_call_finish (proxy, reinterpret_cast<::GAsyncResult *> (async_result), error ? &_peel_error : nullptr);',
+                '  if (!_peel_return)',
+                '    {',
+                '      if (error)',
+                '        *error = ::peel::UniquePtr<::peel::GLib::Error>::adopt_ref (reinterpret_cast<::peel::GLib::Error *> (_peel_error));',
+                '      return false;',
+                '    }',
+                '  if (error)',
+                '    *error = nullptr;',
+                '  ::GVariant *_peel_out_arg;',
+                out_args,
+                '  g_variant_unref (_peel_return);',
+                '  return true;',
+            ])
+        else:
+            l.extend([
+                '  g_return_val_if_fail (::peel::Gio::Task::is_valid (async_result, self), false);',
+                '  ::peel::Gio::Task *_peel_task = async_result->cast<::peel::Gio::Task> ();',
+                '  g_return_val_if_fail (_peel_task->get_source_tag () == {}_proxy_{}_async, false);'.format(self.iface.emit_name, self.cpp_name),
+                '  return _peel_task->propagate_boolean (error);',
+            ])
+        l.extend([
             '}',
             '',
             'static bool',
@@ -304,6 +362,7 @@ class Method:
             '  return true;',
             '}',
         ])
+        return '\n'.join(l)
 
     def generate_method_info(self):
         in_arg_infos = []
@@ -339,7 +398,7 @@ class Method:
             '  const_cast<char *> ("{}"),'.format(self.dbus_name),
             '  const_cast<::GDBusArgInfo **> ({}_{}_in_arg_infos),'.format(self.iface.emit_name, self.cpp_name),
             '  const_cast<::GDBusArgInfo **> ({}_{}_out_arg_infos),'.format(self.iface.emit_name, self.cpp_name),
-            '  nullptr',
+            '  nullptr /* annotations */',
             '};',
         ])
         return name, '\n'.join(l)
@@ -347,6 +406,8 @@ class Method:
     def generate_vtable_method(self):
         in_args = [arg for arg in self.arguments if arg.direction == 'in']
         num_in_args = len(in_args)
+        out_args = [arg for arg in self.arguments if arg.direction == 'out']
+        num_out_args = len(out_args)
         l = [
             'static void',
             '{}_vtable_method_{}_ready_cb (::GObject *_peel_source_object, ::GAsyncResult *_peel_res, gpointer _peel_user_data)'.format(
@@ -365,17 +426,30 @@ class Method:
                 self.iface.emit_name,
             ),
             '  ::GDBusMethodInvocation *_peel_invocation = G_DBUS_METHOD_INVOCATION (_peel_user_data);',
+        ]
+        for arg in out_args:
+            l.append('  {};'.format(arg.generate_cpp_type(no_out_asterisk=True)))
+        l.extend([
             '  ::peel::UniquePtr<::peel::GLib::Error> _peel_error;',
-            '  // _peel_iface->_peel_vfunc_{}_finish (self, _peel_res, /* TODO: out args */&_peel_error);'.format(self.cpp_name),
+            '  _peel_iface->_peel_vfunc_{}_finish (self, reinterpret_cast<::peel::Gio::AsyncResult *> (_peel_res), {}&_peel_error);'.format(
+                self.cpp_name,
+                ''.join('&{}, '.format(arg.cpp_name) for arg in out_args),
+            ),
             '  if (_peel_error)',
             '    {',
-            '#if GLIB_CHECK_VERSION(2, 30, 0)',
+            '#if GLIB_CHECK_VERSION (2, 30, 0)',
             '      g_dbus_method_invocation_take_error (_peel_invocation, reinterpret_cast<::GError *> (std::move (_peel_error).release_ref ()));',
             '#else',
             '      g_dbus_method_invocation_return_gerror (_peel_invocation, reinterpret_cast<::GError *> (static_cast<::peel::GLib::Error *> (_peel_error)));',
             '#endif',
             '      return;',
             '    }',
+            '  ::GVariant *_peel_out_args[{}];'.format(num_out_args),
+        ])
+        for i, arg in enumerate(out_args):
+            l.append('  _peel_out_args[{}] = {};'.format(i, arg.generate_make_variant()))
+        l.extend([
+            '  g_dbus_method_invocation_return_value (_peel_invocation, g_variant_new_tuple (_peel_out_args, {}));'.format(num_out_args),
             '}',
             '',
             'static void',
@@ -386,7 +460,7 @@ class Method:
             ),
             '{',
             '  ::GVariant *_peel_in_args[{}];'.format(num_in_args),
-        ]
+        ])
         for i, arg in enumerate(in_args):
             arg_expr = '_peel_in_args[{}]'.format(i)
             l.extend([
@@ -394,13 +468,19 @@ class Method:
                 '  {} = {};'.format(arg.generate_cpp_type(), arg.type.generate_variant_get(arg_expr)),
             ])
         l.extend([
-            '  bool _peel_no_reply = g_dbus_message_get_flags (g_dbus_method_invocation_get_message (_peel_invocation)) & G_DBUS_MESSAGE_FLAGS_NO_REPLY_EXPECTED;',
+            '  ::GDBusMessageFlags _peel_message_flags = g_dbus_message_get_flags (g_dbus_method_invocation_get_message (_peel_invocation));',
+            '  bool _peel_no_reply = _peel_message_flags & G_DBUS_MESSAGE_FLAGS_NO_REPLY_EXPECTED;',
+            '  ::peel::Gio::DBusCallFlags _peel_call_flags = ::peel::Gio::DBusCallFlags::NONE;',
+            '#if GLIB_CHECK_VERSION (2, 46, 0)',
+            '  if (_peel_message_flags & G_DBUS_MESSAGE_FLAGS_ALLOW_INTERACTIVE_AUTHORIZATION)',
+            '    _peel_call_flags |= ::peel::Gio::DBusCallFlags::ALLOW_INTERACTIVE_AUTHORIZATION;',
+            '#endif',
             '  {}::Iface *_peel_iface = G_TYPE_INSTANCE_GET_INTERFACE (self, ::peel::Type::of<{}> (), {}::Iface);'.format(
                 self.iface.emit_name,
                 self.iface.emit_name,
                 self.iface.emit_name,
             ),
-            '  _peel_iface->_peel_vfunc_{}_async (self, {}_peel_no_reply ? nullptr : {}_vtable_method_{}_ready_cb, _peel_invocation, nullptr, ::peel::Gio::DBusCallFlags::NONE, -1);'.format(
+            '  _peel_iface->_peel_vfunc_{}_async (self, {}_peel_no_reply ? nullptr : {}_vtable_method_{}_ready_cb, _peel_invocation, nullptr, _peel_call_flags, -1);'.format(
                 self.cpp_name,
                 self.in_args_forward,
                 self.iface.emit_name,
