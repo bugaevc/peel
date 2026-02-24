@@ -23,6 +23,7 @@ class Argument:
             default_direction = 'out'
         self.direction = attrs.get('direction', default_direction)
         self.type = Type(attrs.get('type'))
+        self.annotations = dict()
 
     def generate_cpp_type(self, bare=False, no_out_asterisk=False):
         from peel_dbus_gen.method import Method
@@ -52,15 +53,39 @@ class Argument:
         return '*{} = {}'.format(self.cpp_name, self.type.generate_variant_get(variant_expr))
 
     def generate_arg_info(self):
-        name = '{}_{}_{}_arg_info'.format(self.function.iface.emit_name, self.function.cpp_name, self.cpp_name)
-        l = [
+        basename = '{}_{}_{}'.format(self.function.iface.emit_name, self.function.cpp_name, self.cpp_name)
+        name = basename + '_arg_info'
+        l = []
+        for i, ann in enumerate(self.annotations):
+            l.extend([
+                'static const ::GDBusAnnotationInfo',
+                '{}_annotation_{}_info ='.format(basename, i),
+                '{',
+                '  -1, /* ref_count */',
+                '  const_cast<char *> ("{}"),'.format(ann),
+                '  const_cast<char *> ("{}"),'.format(self.annotations[ann]),
+                '  nullptr /* annotations */',
+                '}',
+                '',
+            ])
+        l.extend([
+            'static const ::GDBusAnnotationInfo * const',
+            '{}_annotation_infos[] ='.format(basename),
+            '{',
+        ])
+        for i in range(len(self.annotations)):
+            l.append('  {}_annotation_{}_info,'.format(basename, i))
+        l.extend([
+            '  nullptr',
+            '};',
+            '',
             'static const ::GDBusArgInfo',
             '{} ='.format(name),
             '{',
             '  -1, /* ref_count */',
             '  const_cast<char *> ("{}"),'.format(self.dbus_name),
             '  const_cast<char *> ("{}"),'.format(self.type.signature),
-            '  nullptr /* annotations */',
+            '  const_cast<::GDBusAnnotationInfo **> ({}_annotation_infos)'.format(basename),
             '};',
-        ]
+        ])
         return name, '\n'.join(l)

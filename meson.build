@@ -9,6 +9,7 @@ py = import('python').find_installation()
 
 subdir('include')
 subdir('peel_gen')
+subdir('peel_dbus_gen')
 subdir('tests')
 subdir('cmake')
 
@@ -43,12 +44,10 @@ peel_gen = configure_file(
 
 peel_dbus_gen = configure_file(
   input: 'peel-dbus-gen.py',
-  output: 'peen-dbus-gen',
+  output: 'peel-dbus-gen',
   install: not meson.is_subproject(),
   install_dir: get_option('bindir'),
-  configuration: {
-    'module_path': py.get_install_dir(),
-  }
+  configuration: conf,
 )
 
 if meson.is_subproject()
@@ -57,6 +56,7 @@ if meson.is_subproject()
   meson.override_find_program('peel-dbus-gen', peel_dbus_gen)
 else
   py.install_sources(peel_gen_files, subdir: 'peel_gen')
+  py.install_sources(peel_dbus_gen_files, subdir: 'peel_dbus_gen')
   install_data('api-tweaks.txt')
 endif
 
@@ -68,5 +68,6 @@ pkg.generate(
   url: 'https://gitlab.gnome.org/bugaevc/peel',
   variables: [
     'peel_gen=${bindir}/peel-gen',
+    'peel_dbus_gen=${bindir}/peel-dbus-gen',
   ],
 )

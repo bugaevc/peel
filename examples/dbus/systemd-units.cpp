@@ -1,15 +1,26 @@
 /*
- * Display the list of systemd units, along with their state, updated
- * live, in a GTK list view.
+ * Display the list of systemd units, along with their state, updated live,
+ * in a GTK list view.
  *
- * We use the Unit D-Bus object directly as an element of the list model.
- * The Unit object has properties that we're interested in, such as
- * active-state, with property change notifications. This is a perfect fit
- * for the GTK list view architecture. We use Gtk::BuilderListItemFactory
+ * We use the Systemd::Unit D-Bus object directly as an element of the list
+ * model. The Systemd::Unit object has properties that we're interested in,
+ * such as active-state, with property change notifications. This is a perfect
+ * fit for the GTK list view architecture. We use Gtk::BuilderListItemFactory
  * and Gtk::PropertyExpression to bind the view cells to the properties of
  * the units.
  *
  * https://www.freedesktop.org/wiki/Software/systemd/dbus/
+ *
+ * $ peel-dbus-gen \
+ *     --interface-prefix=org.freedesktop.systemd1 \
+ *     --namespace=Demo::Systemd \
+ *     /usr/share/dbus-1/interfaces/org.freedesktop.systemd1.Manager.xml \
+ *     SystemdManager.h SystemdManager.cpp
+ * $ peel-dbus-gen \
+ *     --interface-prefix=org.freedesktop.systemd1 \
+ *     --namespace=Demo::Systemd \
+ *     /usr/share/dbus-1/interfaces/org.freedesktop.systemd1.Unit.xml \
+ *     SystemdUnit.h SystemdUnit.cpp
  */
 
 #include "SystemdManager.h"
@@ -39,9 +50,41 @@ class UnitList final : public Gio::ListModel
   friend class Gio::ListModel::Iface;
 
   /* Our backing storage */
-  RefPtr<Manager> m_manager;
-  std::vector<RefPtr<Unit>> m_units;
+  RefPtr<Systemd::Manager> m_manager;
+  std::vector<RefPtr<Systemd::Unit>> m_units;
 
+  template<typename F>
+  static void
+  define_properties (F &f)
+  {
+    f.prop (prop_manager ())
+      .get (&UnitList::get_manager)
+      .set (&UnitList::set_manager)
+      .flags (peel::GObject::ParamFlags::CONSTRUCT_ONLY);
+    f.prop (prop_item_type ())
+      .get (&UnitList::vfunc_get_item_type);
+    f.prop (prop_n_items (), 0, G_MAXUINT, 0)
+      .get (&UnitList::vfunc_get_n_items);
+  }
+
+public:
+  Systemd::Manager *
+  get_manager ()
+  {
+    return m_manager;
+  }
+
+  PEEL_PROPERTY (Systemd::Manager, manager, "manager")
+  PEEL_PROPERTY (Type, item_type, "item-type")
+  PEEL_PROPERTY (unsigned, n_items, "n-items")
+
+  static RefPtr<UnitList>
+  create (Systemd::Manager *manager)
+  {
+    return Object::create<UnitList> (prop_manager (), manager);
+  }
+
+private:
   /* Tracking for units that we are in process of loading in */
   struct LoadingUnit
   {
@@ -106,7 +149,7 @@ class UnitList final : public Gio::ListModel
   Type
   vfunc_get_item_type ()
   {
-    return Type::of<Unit> ();
+    return Type::of<Systemd::Unit> ();
   }
 
   unsigned
@@ -126,20 +169,22 @@ class UnitList final : public Gio::ListModel
   void
   init (Class *)
   {
-    new (&m_units) std::vector<RefPtr<Unit>>;
+    new (&m_units) std::vector<RefPtr<Systemd::Unit>>;
     new (&m_loading_units) std::vector<LoadingUnit>;
+  }
 
-    UniquePtr<GLib::Error> error;
+  /* Construct-only setter for the manager */
+  void
+  set_manager (Systemd::Manager *manager)
+  {
+    g_return_if_fail (manager->check_type<Systemd::Manager> ());
+    g_assert (m_manager == nullptr);
 
-    /* Connect to systemd */
-    m_manager = Manager::Proxy::create_sync (Gio::BusType::SYSTEM,
-      "org.freedesktop.systemd1", "/org/freedesktop/systemd1", &error);
-    if (error)
-      g_printerr ("Failed to connect to systemd: %s", error->message);
+    m_manager = manager;
 
     m_manager->connect_unit_new (this, &UnitList::on_unit_new);
     m_manager->connect_unit_removed (this, &UnitList::on_unit_removed);
-    m_manager->subscribe_sync (&error);
+    m_manager->subscribe_sync (nullptr);
 
     /* Get the initial list of units known to systemd */
     m_manager->list_units_async ([self = WeakPtr (this), workaround = true] (Object *source_object, Gio::AsyncResult *res)
@@ -148,7 +193,7 @@ class UnitList final : public Gio::ListModel
           return;
         UniquePtr<GLib::Error> error;
         RefPtr<GLib::Variant> units;
-        Manager *manager = source_object->cast<Manager> ();
+        Systemd::Manager *manager = source_object->cast<Systemd::Manager> ();
         bool ok = manager->list_units_finish (res, &units, &error);
         if (!ok)
           {
@@ -167,13 +212,13 @@ class UnitList final : public Gio::ListModel
             /* Load this unit, concurrently with the others. Don't set up
              * any LoadingUnit tracking for this initial burst of units.
              */
-            Unit::Proxy::create (connection, name_owner, unit_path,
+            Systemd::Unit::Proxy::create (connection, name_owner, unit_path,
               [self, workaround = true] (Object *, Gio::AsyncResult *res)
               {
                 if (!self)
                   return;
                 UniquePtr<GLib::Error> error;
-                RefPtr<Unit> unit = Unit::Proxy::create_finish (res, &error);
+                RefPtr<Systemd::Unit> unit = Systemd::Unit::Proxy::create_finish (res, &error);
                 if (error)
                   {
                     g_warning ("Failed to create a proxy: %s", error->message);
@@ -182,13 +227,14 @@ class UnitList final : public Gio::ListModel
                 self->m_units.push_back (std::move (unit));
                 /* TODO: bulk-notify once all the initial units are loaded */
                 self->items_changed (self->m_units.size () - 1, 0, 1);
+                self->notify (prop_n_items ());
               });
           }
       });
   }
 
   void
-  on_unit_new (Manager *manager, const char *id, const char *unit_path)
+  on_unit_new (Systemd::Manager *manager, const char *id, const char *unit_path)
   {
     /* A new unit has been added. Delay loading it by a short timeout,
      * and if the unit is removed again during that time, don't even
@@ -204,7 +250,7 @@ class UnitList final : public Gio::ListModel
         if (!self || cancellable->is_cancelled ())
           return;
         /* Start loading the actual unit proxy */
-        Unit::Proxy::create (
+        Systemd::Unit::Proxy::create (
           self->m_manager->cast<Gio::DBusProxy> ()->get_connection (),
           self->m_manager->cast<Gio::DBusProxy> ()->get_name_owner (),
           unit_path, [id = std::move (id), self = std::move (self)] (Object *, Gio::AsyncResult *res)
@@ -214,7 +260,7 @@ class UnitList final : public Gio::ListModel
               return;
             /* Remove ourselves from the loading list, if not yet */
             self->remove_loading_unit (id);
-            RefPtr<Unit> unit = Unit::Proxy::create_finish (res, &error);
+            RefPtr<Systemd::Unit> unit = Systemd::Unit::Proxy::create_finish (res, &error);
             if (error)
               {
                 if (!error->matches (G_IO_ERROR, G_IO_ERROR_CANCELLED))
@@ -224,12 +270,13 @@ class UnitList final : public Gio::ListModel
             /* Push the new unit onto the list, and emit items-changed */
             self->m_units.push_back (std::move (unit));
             self->items_changed (self->m_units.size () - 1, 0, 1);
+            self->notify (prop_n_items ());
           }, Gio::DBusProxy::Flags::NONE, cancellable);
       });
   }
 
   void
-  on_unit_removed (Manager *manager, const char *id, const char *object_path)
+  on_unit_removed (Systemd::Manager *manager, const char *id, const char *object_path)
   {
     RefPtr<Gio::Cancellable> cancellable = remove_loading_unit (id);
     if (cancellable)
@@ -269,12 +316,12 @@ static const uint8_t id_template[] = R"(
         <property name="xalign">0</property>
         <property name="nat-chars">30</property>
         <binding name="text">
-          <lookup name="id" type="Unit">
+          <lookup name="id" type="DemoSystemdUnit">
             <lookup name="item">GtkListItem</lookup>
           </lookup>
         </binding>
         <binding name="tooltip-text">
-          <lookup name="description" type="Unit">
+          <lookup name="description" type="DemoSystemdUnit">
             <lookup name="item">GtkListItem</lookup>
           </lookup>
         </binding>
@@ -293,7 +340,7 @@ static const uint8_t active_state_template[] = R"(
         <property name="xalign">0</property>
         <property name="nat-chars">7</property>
         <binding name="text">
-          <lookup name="active-state" type="Unit">
+          <lookup name="active-state" type="DemoSystemdUnit">
             <lookup name="item">GtkListItem</lookup>
           </lookup>
         </binding>
@@ -312,7 +359,7 @@ static const uint8_t sub_state_template[] = R"(
         <property name="xalign">0</property>
         <property name="nat-chars">7</property>
         <binding name="text">
-          <lookup name="sub-state" type="Unit">
+          <lookup name="sub-state" type="DemoSystemdUnit">
             <lookup name="item">GtkListItem</lookup>
           </lookup>
         </binding>
@@ -332,9 +379,17 @@ make_template_bytes (const uint8_t (&templ)[size])
 int
 main ()
 {
+  UniquePtr<GLib::Error> error;
+
   Gtk::init ();
 
-  RefPtr<Gio::ListModel> unit_list = Object::create<Demo::UnitList> ();
+  /* Connect to systemd */
+  RefPtr<Demo::Systemd::Manager> manager = Demo::Systemd::Manager::Proxy::create_sync (
+    Gio::BusType::SYSTEM, "org.freedesktop.systemd1", "/org/freedesktop/systemd1", &error);
+  if (error)
+    g_printerr ("Failed to connect to systemd: %s", error->message);
+
+  RefPtr<Gio::ListModel> unit_list = Demo::UnitList::create (manager);
 
   FloatPtr<Gtk::ColumnView> column_view = Gtk::ColumnView::create (nullptr);
   column_view->add_css_class ("data-table");
@@ -348,7 +403,8 @@ main ()
   RefPtr<Gtk::ColumnView::Column> id_column = Gtk::ColumnView::Column::create (
     "ID", std::move (id_factory));
   id_column->set_expand (true);
-  RefPtr<Gtk::Sorter> sorter = Gtk::StringSorter::create (Gtk::PropertyExpression::create (Type::of<Unit> (), nullptr, "id"));
+  RefPtr<Gtk::Sorter> sorter = Gtk::StringSorter::create (Gtk::PropertyExpression::create (
+    Type::of<Demo::Systemd::Unit> (), nullptr, "id"));
   id_column->set_sorter (sorter);
   column_view->append_column (id_column);
 
@@ -356,7 +412,8 @@ main ()
   RefPtr<Gtk::BuilderListItemFactory> active_state_factory = Gtk::BuilderListItemFactory::create_from_bytes (nullptr, active_state_template_bytes);
   RefPtr<Gtk::ColumnView::Column> active_state_column = Gtk::ColumnView::Column::create (
     "Active state", std::move (active_state_factory));
-  sorter = Gtk::StringSorter::create (Gtk::PropertyExpression::create (Type::of<Unit> (), nullptr, "active-state"));
+  sorter = Gtk::StringSorter::create (Gtk::PropertyExpression::create (
+    Type::of<Demo::Systemd::Unit> (), nullptr, "active-state"));
   active_state_column->set_sorter (sorter);
   column_view->append_column (active_state_column);
 
@@ -364,16 +421,34 @@ main ()
   RefPtr<Gtk::BuilderListItemFactory> sub_state_factory = Gtk::BuilderListItemFactory::create_from_bytes (nullptr, sub_state_template_bytes);
   RefPtr<Gtk::ColumnView::Column> sub_state_column = Gtk::ColumnView::Column::create (
     "Sub-state", std::move (sub_state_factory));
-  sorter = Gtk::StringSorter::create (Gtk::PropertyExpression::create (Type::of<Unit> (), nullptr, "sub-state"));
+  sorter = Gtk::StringSorter::create (Gtk::PropertyExpression::create (
+    Type::of<Demo::Systemd::Unit> (), nullptr, "sub-state"));
   sub_state_column->set_sorter (sorter);
   column_view->append_column (sub_state_column);
 
   FloatPtr<Gtk::ScrolledWindow> scrolled_window = Gtk::ScrolledWindow::create ();
   scrolled_window->set_propagate_natural_width (true);
   scrolled_window->set_child (std::move (column_view));
+
+  FloatPtr<Gtk::Button> reload_button = Gtk::Button::create_with_label ("Reload");
+  reload_button->connect_clicked ([manager] (Gtk::Button *button)
+    {
+      manager->reload_async ([] (Object *source_object, Gio::AsyncResult *res)
+      {
+        UniquePtr<GLib::Error> error;
+        bool success = source_object->cast<Demo::Systemd::Manager> ()->reload_finish (res, &error);
+        if (!success)
+          g_printerr ("Failed to reload: %s\n", error->message);
+      }, nullptr /* cancellable */, Gio::DBusCallFlags::ALLOW_INTERACTIVE_AUTHORIZATION);
+    });
+
+  FloatPtr<Gtk::HeaderBar> header_bar = Gtk::HeaderBar::create ();
+  header_bar->pack_start (std::move (reload_button));
+
   Gtk::Window *window = Gtk::Window::create ();
   window->set_title ("systemd units");
   window->set_child (std::move (scrolled_window));
+  window->set_titlebar (std::move (header_bar));
   window->set_default_size (-1, 300);
   window->present ();
 
