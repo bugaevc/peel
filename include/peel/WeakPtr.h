@@ -8,6 +8,9 @@ peel_begin_header
 namespace peel
 {
 
+template<typename>
+class RefPtr;
+
 namespace GObject
 {
 class Object;
