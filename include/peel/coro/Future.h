@@ -45,7 +45,8 @@ public:
   {
     if (!promise)
       return;
-    void *ptr = promise->rendezvous.exchange (future_gone_token (), std::memory_order_relaxed);
+    /* Acquire so we can destroy the coroutine */
+    void *ptr = promise->rendezvous.exchange (future_gone_token (), std::memory_order_acquire);
     if (ptr == coro_completed_token ()) [[likely]]
       std::coroutine_handle<promise_type>::from_promise (*promise).destroy ();
     /* If the coroutine is still running, leave it be, it
@@ -71,6 +72,9 @@ public:
   bool
   await_suspend (std::coroutine_handle<> h) const noexcept
   {
+    /* Acquire so we can read the result if completed, release
+     * so the promise can later resume our coroutine if not.
+     */
     void *ptr = promise->rendezvous.exchange (h.address (), std::memory_order_acq_rel);
     /* If we read nullptr, the coroutine is still running */
     if (!ptr) [[likely]]
@@ -208,6 +212,9 @@ public:
   std::coroutine_handle<>
   await_suspend (std::coroutine_handle<> h) const noexcept
   {
+    /* Acquire so we can resume the waiting coroutine, release so
+     * our result can be later read if there is no coroutine yet.
+     */
     void *ptr = promise->rendezvous.exchange (coro_completed_token (), std::memory_order_acq_rel);
     if (ptr == future_gone_token ()) [[unlikely]]
       /* Our future is gone, destroy ourselves */
