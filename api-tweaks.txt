@@ -859,6 +859,8 @@ unowned	pango_scan_word			pos
 unowned	pango_skip_space		pos
 owned	pango_glyph_item_apply_attrs	glyph_item
 
+nullable pango_font_map_get_family	return
+
 # TODO: conflicts with a field, rename the field
 skip	pango_layout_line_is_paragraph_start
 
