@@ -242,6 +242,13 @@ vararg	g_strjoin			argv
 
 vararg	g_variant_builder_add		variant-new
 vararg	g_variant_builder_add_parsed	variant-new
+float	g_variant_builder_add_value	value
+float	g_variant_builder_end		return
+
+vararg	g_variant_dict_insert		variant-new
+vararg	g_variant_dict_lookup		variant-get
+float	g_variant_dict_insert_value	value
+float	g_variant_dict_end		return
 
 raw-params-overload	g_option_context_parse	argc,argv
 
@@ -977,6 +984,11 @@ onstack	GskShadow
 take-value GskRenderNode		gsk_value_take_render_node
 dup-value GskRenderNode			gsk_value_dup_render_node
 
+caller-allocates	gsk_path_get_next	point
+unowned			gsk_path_get_next	point
+caller-allocates	gsk_path_get_previous	point
+unowned			gsk_path_get_previous	point
+
 # Gtk
 skip	gtk_tree_model_rows_reordered
 skip	GtkTreeModel::vfunc_rows_reordered
@@ -1138,6 +1150,8 @@ float	gtk_scrollbar_set_adjustment	adjustment
 float	gtk_text_view_add_child_at_anchor child
 float	gtk_scrolled_window_set_hadjustment hadjustment
 float	gtk_scrolled_window_set_vadjustment vadjustment
+float	gtk_popover_bin_set_child	child
+float	gtk_popover_bin_set_popover	popover
 
 float	gtk_file_filter_to_gvariant	return
 float	gtk_page_setup_to_gvariant	return
@@ -1498,20 +1512,20 @@ out	gtk_source_view_get_mark_attributes	priority
 # These are actually inout caller-allocates parameters, but g-i fails
 # to support that properly. Turn them into unowned in parameters, since
 # those produce identical binding code.
-in	gtk_source_indenter_indent		iter
-unowned	gtk_source_indenter_indent		iter
-in	GtkSourceIndenter::vfunc_indent		iter
-unowned	GtkSourceIndenter::vfunc_indent		iter
-in	GtkSourceView::signal_push-snippet	location
-unowned	GtkSourceView::signal_push-snippet	location
-in	gtk_source_buffer_backward_iter_to_source_mark	iter
-unowned	gtk_source_buffer_backward_iter_to_source_mark	iter
-in	gtk_source_buffer_forward_iter_to_source_mark	iter
-unowned	gtk_source_buffer_forward_iter_to_source_mark	iter
-in	gtk_source_buffer_iter_backward_to_context_class_toggle	iter
-unowned	gtk_source_buffer_iter_backward_to_context_class_toggle	iter
-in	gtk_source_buffer_iter_forward_to_context_class_toggle	iter
-unowned	gtk_source_buffer_iter_forward_to_context_class_toggle	iter
+caller-allocates	gtk_source_indenter_indent		iter
+unowned			gtk_source_indenter_indent		iter
+caller-allocates	GtkSourceIndenter::vfunc_indent		iter
+unowned			GtkSourceIndenter::vfunc_indent		iter
+caller-allocates	GtkSourceView::signal_push-snippet	location
+unowned			GtkSourceView::signal_push-snippet	location
+caller-allocates	gtk_source_buffer_backward_iter_to_source_mark	iter
+unowned			gtk_source_buffer_backward_iter_to_source_mark	iter
+caller-allocates	gtk_source_buffer_forward_iter_to_source_mark	iter
+unowned			gtk_source_buffer_forward_iter_to_source_mark	iter
+caller-allocates	gtk_source_buffer_iter_backward_to_context_class_toggle	iter
+unowned			gtk_source_buffer_iter_backward_to_context_class_toggle	iter
+caller-allocates	gtk_source_buffer_iter_forward_to_context_class_toggle	iter
+unowned			gtk_source_buffer_iter_forward_to_context_class_toggle	iter
 
 
 # JavaScriptCore

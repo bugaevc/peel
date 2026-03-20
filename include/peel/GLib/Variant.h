@@ -13,6 +13,7 @@ namespace peel
 {
 namespace GLib
 {
+class /* record */ Bytes;
 
 class Variant
 {
@@ -209,6 +210,14 @@ public:
     ::GVariant *_peel_this = reinterpret_cast<::GVariant *> (this);
     gboolean _peel_type_annotate = static_cast<gboolean> (type_annotate);
     return peel::String::adopt_string (g_variant_print (_peel_this, _peel_type_annotate));
+  }
+
+  peel::RefPtr<Bytes>
+  get_data_as_bytes () noexcept
+  {
+    ::GVariant *_peel_this = reinterpret_cast<::GVariant *> (this);
+    ::GBytes *_peel_return = g_variant_get_data_as_bytes (_peel_this);
+    return peel::RefPtr<Bytes>::adopt_ref (reinterpret_cast<Bytes *> (_peel_return));
   }
 };
 
@@ -608,3 +617,5 @@ struct RefTraits<GLib::Variant, void>
 } /* namespace peel */
 
 peel_end_header
+
+#include <peel/GLib/Bytes.h>

@@ -50,7 +50,23 @@ class FunctionLike(NodeHandler):
                 self.visibility = 'protected'
             elif tweak[0] == 'include':
                 self.extra_includes.append(tweak[1])
-            elif tweak[0] in ('float', 'unowned', 'owned', 'in', 'out', 'inout', 'optional', 'nonnull', 'nullable', 'this', 'scope', 'type', 'array'):
+            elif tweak[0] in (
+                'float',
+                'unowned',
+                'owned',
+                'in',
+                'out',
+                'inout',
+                'optional',
+                'nonnull',
+                'nullable',
+                'this',
+                'scope',
+                'type',
+                'array',
+                'caller-allocates',
+                'callee-allocates',
+            ):
                 p = self.find_param_for_tweak(tweak[1])
                 assert(p is not None)
                 if tweak[0] == 'float':
@@ -81,6 +97,10 @@ class FunctionLike(NodeHandler):
                     p.nullable = True
                 elif tweak[0] == 'this':
                     p.force_cpp_this = True
+                elif tweak[0] == 'caller-allocates':
+                    p.caller_allocates = True
+                elif tweak[0] == 'callee-allocates':
+                    p.caller_allocates = False
                 elif tweak[0] == 'scope':
                     p.scope = tweak[2]
                 elif tweak[0] == 'type':
