@@ -19,9 +19,6 @@ public:
   class FinalSuspend;
   class promise_type;
 
-protected:
-  promise_type *promise;
-
 private:
   static void *
   coro_completed_token ()
@@ -34,6 +31,8 @@ private:
   {
     return reinterpret_cast<void *> (UINTPTR_MAX - 1);
   }
+
+  promise_type *promise;
 
   explicit constexpr
   Future (promise_type *promise) noexcept
