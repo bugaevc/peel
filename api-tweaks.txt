@@ -976,6 +976,8 @@ nest	GskTransformCategory		Transform::Category
 nest	GskPathPoint			Path::Point
 opaque	GskPathPoint
 
+pointer	GskRenderReplay
+
 onstack	GskColorStop
 onstack	GskRoundedRect
 onstack	GskPathPoint
