@@ -91,6 +91,7 @@ type_map = {
     'off_t': PlainType('off_t', 'off_t'),
     'pid_t': PlainType('pid_t', 'pid_t'),
     'uid_t': PlainType('uid_t', 'uid_t'),
+    'gid_t': PlainType('gid_t', 'gid_t'),
     'dev_t': PlainType('dev_t', 'dev_t'),
     'socklen_t': PlainType('socklen_t', 'socklen_t'),
 
