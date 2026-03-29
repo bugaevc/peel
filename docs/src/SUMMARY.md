@@ -1,6 +1,7 @@
 # Summary
 
 - [Introduction](introduction.md)
+    - [Projects built with peel](projects-built-with-peel.md)
 - [Build setup](build-setup.md)
     - [Running peel-gen](peel-gen.md)
     - [Using peel with CMake](using-peel-with-cmake.md)
