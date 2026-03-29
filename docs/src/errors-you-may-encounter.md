@@ -1,4 +1,4 @@
-# Errors You May Encounter
+# Errors you may encounter
 
 These page lists the various error messages you could get when using peel (from
 `peel-gen`, from your C++ compiler, or at runtime), and describes what they

@@ -1,4 +1,4 @@
-# Custom GObject Classes
+# Custom GObject classes
 
 While it's possible, to an extent, to use GTK by solely combining existing
 classes, idiomatic GTK usage involves writing one's own GObject classes, such

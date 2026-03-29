@@ -1,4 +1,4 @@
-# Gotchas and Pitfalls
+# Gotchas and pitfalls
 
 ## using namespace peel
 

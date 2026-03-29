@@ -1,4 +1,4 @@
-# The Basics
+# The basics
 
 Most GObject APIs are mapped straightforwardly into C++. GObject classes are
 mapped to C++ classes, and their methods are mapped to C++ methods.

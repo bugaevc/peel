@@ -1,4 +1,4 @@
-# GTK Widget Templates
+# GTK widget templates
 
 A common way to implement composite GTK widgets is by using [widget templates].
 

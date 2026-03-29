@@ -1,4 +1,4 @@
-# Defining Signals
+# Defining signals
 
 You can define [signals](signals.md) on classes
 using a `Signal<Instance, Ret (Args...)>`.
