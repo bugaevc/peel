@@ -26,9 +26,14 @@ class Array(NodeHandler, AnyType):
         return 'Array(item_type_name={})'.format(self.item_type_name)
 
     def start_child_element(self, name, attrs):
+        from peel_gen.list import List
+
         if is_type_element(name, attrs):
             self.item_type_name = attrs['name']
             self.item_c_type = attrs.get('c:type', None)
+            if List.is_list_type(self.ns, self.item_type_name):
+                self.item_type = List(self.item_type_name, self.ns)
+                return self.item_type
         elif name == 'array':
             self.item_type = Array(attrs, ns=self.ns)
             self.item_c_type = attrs.get('c:type', None)

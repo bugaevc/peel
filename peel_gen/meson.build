@@ -17,6 +17,7 @@ peel_gen_files = files(
   'function.py',
   'interface.py',
   'klass.py',
+  'list.py',
   'method.py',
   'namespace.py',
   'node_handler.py',

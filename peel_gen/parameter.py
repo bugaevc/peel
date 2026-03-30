@@ -7,6 +7,7 @@ from peel_gen.callback import Callback
 from peel_gen.enumeration import Enumeration
 from peel_gen.bitfield import Bitfield
 from peel_gen.defined_type import DefinedType
+from peel_gen.list import List
 from peel_gen.exceptions import UnsupportedForNowException
 from peel_gen import cpp_function_wrapper
 
@@ -41,6 +42,9 @@ class Parameter(NodeHandler):
             self.c_type = attrs.get('c:type', None)
             if self.c_type:
                 self.c_type = massage_c_type(self.c_type)
+            if List.is_list_type(self.ns, self.type_name):
+                self.type = List(self.type_name, self.ns)
+                return self.type
         elif name == 'array':
             # self.type_name = self.c_type = attrs['c:type']
             self.c_type = attrs.get('c:type', None)
@@ -158,13 +162,17 @@ class Parameter(NodeHandler):
         tp = chase_type_aliases(self.type)
         while isinstance(tp, Array):
             tp = chase_type_aliases(tp.item_type)
+        s = set()
+        if isinstance(tp, List):
+            s.add(tp.underlying_type())
+            tp = chase_type_aliases(tp.item_type)
         if isinstance(tp, Callback):
+            # FIXME: list of callbacks
             return tp.generate_extra_include_members()
         elif not isinstance(tp, DefinedType):
-            return set()
+            return s
         elif tp.ns.emit_raw or tp.gir_name is None:
-            return set()
-        s = set()
+            return s
         if tp.nested_in:
             # We have to fully include the containing type
             # to forward-declare the nested type.
@@ -187,6 +195,8 @@ class Parameter(NodeHandler):
         tp = chase_type_aliases(self.type)
         while isinstance(tp, Array):
             tp = chase_type_aliases(tp.item_type)
+        if isinstance(tp, List):
+            tp = chase_type_aliases(tp.item_type)
         if isinstance(tp, Callback):
             return tp.generate_extra_forward_members()
         elif not isinstance(tp, DefinedType):
@@ -200,6 +210,8 @@ class Parameter(NodeHandler):
         self.resolve_stuff()
         tp = chase_type_aliases(self.type)
         while isinstance(tp, Array):
+            tp = chase_type_aliases(tp.item_type)
+        if isinstance(tp, List):
             tp = chase_type_aliases(tp.item_type)
         if isinstance(tp, Callback):
             return tp.generate_extra_include_at_end_members()
@@ -335,6 +347,9 @@ class Parameter(NodeHandler):
             itp = chase_type_aliases(tp.item_type)
             if isinstance(itp, Array):
                 raise UnsupportedForNowException('array of arrays')
+        elif isinstance(tp, List):
+            # TODO: HashTable has two types
+            itp = chase_type_aliases(tp.item_type)
         else:
             itp = tp
         assert(not isinstance(itp, Array))
@@ -394,7 +409,15 @@ class Parameter(NodeHandler):
         constness1 = ' const' if len(constness) >= 2 and constness[1] else ''
 
         def make_type(s):
-            if not isinstance(tp, Array):
+            if isinstance(tp, List):
+                if strip_refs:
+                    assert(name is None)
+                    return s
+                tp_name = tp.emit_name_for_context(context, self.ownership, item_cpp_type=s)
+                if name is None:
+                    return tp_name
+                return tp_name + ' ' + out_asterisk + name
+            elif not isinstance(tp, Array):
                 if name is None:
                     return s
                 if not s.endswith('*'):
@@ -535,7 +558,7 @@ class Parameter(NodeHandler):
         elif self.ownership == 'container':
             if itp is not tp:
                 return make_type(constness0 + add_asterisk(type_name) + constness1)
-            raise UnsupportedForNowException('non-array transfer container')
+            raise UnsupportedForNowException('transfer container, but not an array or a list')
         else:
             if itp.is_refcounted:
                 return make_type('peel::RefPtr<{}{}>'.format(constness0, type_name))
@@ -811,6 +834,10 @@ class Parameter(NodeHandler):
                 return 'static_cast<{}> ({})'.format(c_type, cpp_name)
             if isinstance(tp, StrType) and self.ownership == 'full':
                 return 'std::move ({}).release_string ()'.format(cpp_name)
+            if isinstance(tp, List):
+                if self.ownership in ('full', 'container'):
+                    return 'std::move ({}).release_list ()'.format(cpp_name)
+                return '{}.raw_list ()'.format(cpp_name)
             return None
 
         if isinstance(tp, DefinedType) and tp.ns.emit_raw:
@@ -819,7 +846,7 @@ class Parameter(NodeHandler):
         if self.ownership in ('none', None) or self.caller_allocates or isinstance(tp, VoidAliasType):
             return 'reinterpret_cast<{}> ({})'.format(c_type, cpp_name)
         elif self.ownership == 'container':
-            raise UnsupportedForNowException('non-array transfer container')
+            raise UnsupportedForNowException('transfer container, but not an array or a list')
         elif self.ownership == 'floating':
             assert(not self.is_cpp_this())
             return 'reinterpret_cast<{}> (std::move ({}).release_floating_ptr ())'.format(c_type, cpp_name)
@@ -917,6 +944,12 @@ class Parameter(NodeHandler):
                 return 'static_cast<{}> ({})'.format(plain_cpp_type, c_name)
             if isinstance(tp, StrType) and self.ownership == 'full':
                 return 'peel::String::adopt_string ({})'.format(c_name)
+            if isinstance(tp, List):
+                tp_name = tp.emit_name_for_context(context, self.ownership, item_cpp_type=plain_cpp_type)
+                if self.ownership in ('full', 'container'):
+                    return '{}::adopt_list ({})'.format(tp_name, c_name)
+                else:
+                    return '{}::from_raw_list ({})'.format(tp_name, c_name)
             if isinstance(tp, Alias):
                 return 'static_cast<{}> ({})'.format(plain_cpp_type, c_name)
             return None

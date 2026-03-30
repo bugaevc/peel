@@ -8,6 +8,7 @@ static_headers = files(
   'peel/signal.h',
   'peel/callback.h',
   'peel/widget-template.h',
+  'peel/list.h',
 
   'peel/UniquePtr.h',
   'peel/ArrayRef.h',
@@ -38,6 +39,8 @@ static_headers = files(
   'peel/GLib/RecMutexLocker.h',
   'peel/GLib/RWLockReaderLocker.h',
   'peel/GLib/RWLockWriterLocker.h',
+  'peel/GLib/List.h',
+  'peel/GLib/SList.h',
 )
 
 if not meson.is_subproject()

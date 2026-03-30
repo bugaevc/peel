@@ -203,6 +203,12 @@ skip	GRWLockWriterLocker		GLib		manual
 skip	GRWLockReaderLocker		GLib		manual
 opaque	GSource
 
+skip	GList				GLib		manual
+skip	GSList				GLib		manual
+#skip	GHashTable			GLib		manual
+skip	g_clear_list
+skip	g_clear_slist
+
 skip	GQuark		GLib		manual
 newtype	GQuark		struct
 
