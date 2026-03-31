@@ -39,8 +39,8 @@ private:
     : promise (promise)
   { }
 
-public:
-  ~Future () noexcept
+  void
+  destroy () noexcept
   {
     if (!promise)
       return;
@@ -51,6 +51,17 @@ public:
     /* If the coroutine is still running, leave it be, it
      * is responsible for destroying itself when completed.
      */
+    promise = nullptr;
+  }
+
+public:
+  constexpr Future () noexcept
+    : promise (nullptr)
+  { }
+
+  ~Future () noexcept
+  {
+    destroy ();
   }
 
   Future (const Future &) = delete;
@@ -60,6 +71,17 @@ public:
     : promise (other.promise)
   {
     other.promise = nullptr;
+  }
+
+  Future &
+  operator = (Future &&other) noexcept
+  {
+    if (this == &other) [[unlikely]]
+      return *this;
+    destroy ();
+    promise = other.promise;
+    other.promise = nullptr;
+    return *this;
   }
 
   constexpr bool
