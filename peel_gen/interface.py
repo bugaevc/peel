@@ -171,6 +171,9 @@ class Interface(DefinedType):
             '  {} &'.format(self.own_name),
             '  operator = ({} &&) = delete;'.format(self.own_name),
             '',
+            'protected:',
+            '  ~{} () = default;'.format(self.own_name),
+            '',
             'public:'
         ]
         if self.cpp_base_type:
