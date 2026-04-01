@@ -101,6 +101,10 @@ class Record(DefinedType):
             elif tweak[0] == 'include':
                 self.extra_includes.append(tweak[1])
 
+        if self.c_type in ('GTypeInstance', 'GTypeInterface'):
+            # Make forward-declarations our manual bindings.
+            self.struct_kw = 'class'
+
         self.is_refcounted = bool(self.ref_func)
         for f in self.fields:
             f.resolve_stuff()

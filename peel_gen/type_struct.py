@@ -99,7 +99,7 @@ class TypeStruct(DefinedType):
         return s
 
     def generate_forward_decl(self):
-        return '  class {};'.format(self.own_name)
+        return 'class {};'.format(self.own_name)
 
     def should_emit_placeholder_member(self):
         # GInitiallyUnowned is typedefed from struct _GObject, not
