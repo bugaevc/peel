@@ -156,7 +156,11 @@ private:
        know at compile time that it's nullptr that we're dealing with. */
     if (!__builtin_constant_p (ptr == nullptr) || (ptr != nullptr))
 #endif
-#if GLIB_CHECK_VERSION (2, 76, 0)
+#if 0 && GLIB_CHECK_VERSION (2, 76, 0)
+      /* We cannot use this code path, since various libraries allocate
+         more space than they tell us about, such as for additional
+         zero-termination, or for amortizing re-allocations when building
+         up a vector incrementally. */
       g_free_sized (ptr, sizeof (T) * c);
 #else
       g_free (ptr);
