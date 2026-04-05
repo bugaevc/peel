@@ -4,6 +4,7 @@
 #include <atomic>
 #include <cstdint>
 #include <peel/lang.h>
+#include <glib.h>
 
 peel_begin_header
 
@@ -134,6 +135,22 @@ public:
     value.~T ();
   }
 
+  void *
+  operator new (size_t size) /* noexcept */
+  {
+    return g_malloc (size);
+  }
+
+  void
+  operator delete (void *ptr, size_t size) noexcept
+  {
+#if GLIB_CHECK_VERSION (2, 76, 0)
+    g_free_sized (ptr, size);
+#else
+    g_free (ptr);
+#endif
+  }
+
   Future
   get_return_object () noexcept
   {
@@ -184,6 +201,22 @@ public:
 
   ~promise_type () noexcept
   { }
+
+  void *
+  operator new (size_t size) /* noexcept */
+  {
+    return g_malloc (size);
+  }
+
+  void
+  operator delete (void *ptr, size_t size) noexcept
+  {
+#if GLIB_CHECK_VERSION (2, 76, 0)
+    g_free_sized (ptr, size);
+#else
+    g_free (ptr);
+#endif
+  }
 
   Future
   get_return_object () noexcept
