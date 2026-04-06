@@ -228,6 +228,7 @@ vararg	g_string_append_printf		format
 
 vararg	g_log				format
 vararg	g_prefix_error			format
+vararg	g_propagate_prefixed_error	format
 vararg	g_print				format
 vararg	g_printerr			format
 #vararg	printf				format
