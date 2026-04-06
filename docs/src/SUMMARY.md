@@ -10,6 +10,7 @@
 - [The basics](the-basics.md)
     - [Value](value.md)
     - [Signals](signals.md)
+    - [Errors](errors.md)
 - [Smart pointers]()
     - [RefPtr](ref-ptr.md)
     - [UniquePtr](unique-ptr.md)
