@@ -32,6 +32,6 @@
 - [GTK widget templates](gtk-widget-templates.md)
 - [Gotchas and pitfalls](gotchas-and-pitfalls.md)
 - [Errors you may encounter](errors-you-may-encounter.md)
-- [C++20 coroutines]()
+- [C++20 coroutines](cpp20-coroutines.md)
 - [peel internals]()
     - [Local copies](local-copies.md)
