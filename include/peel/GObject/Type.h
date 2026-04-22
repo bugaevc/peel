@@ -117,42 +117,49 @@ public:
     return tp != other.tp;
   }
 
+  G_GNUC_PURE
   const char *
   name () const noexcept
   {
     return g_type_name (tp);
   }
 
+  G_GNUC_PURE
   static Type
   from_name (const char *name) noexcept
   {
     return g_type_from_name (name);
   }
 
+  G_GNUC_PURE
   Type
   fundamental () const
   {
     return G_TYPE_FUNDAMENTAL (tp);
   }
 
+  G_GNUC_PURE
   Type
   parent () const noexcept
   {
     return g_type_parent (tp);
   }
 
+  G_GNUC_PURE
   unsigned int
   depth () const noexcept
   {
     return g_type_depth (tp);
   }
 
+  G_GNUC_PURE
   Type
   next_base (Type base_type) const noexcept
   {
     return g_type_next_base (tp, base_type);
   }
 
+  G_GNUC_PURE
   bool
   is_a (Type other) const noexcept
   {
@@ -160,6 +167,7 @@ public:
   }
 
   template<typename T>
+  G_GNUC_PURE
   bool
   is_a () const
   {
@@ -184,48 +192,56 @@ public:
     return !!G_TYPE_IS_DERIVED (tp);
   }
 
+  G_GNUC_PURE
   bool
   is_interface () const noexcept
   {
     return !!G_TYPE_IS_INTERFACE (tp);
   }
 
+  G_GNUC_PURE
   bool
   is_classed () const noexcept
   {
     return !!G_TYPE_IS_CLASSED (tp);
   }
 
+  G_GNUC_PURE
   bool
   is_instantiatable () const noexcept
   {
     return !!G_TYPE_IS_INSTANTIATABLE (tp);
   }
 
+  G_GNUC_PURE
   bool
   is_derivable () const noexcept
   {
     return !!G_TYPE_IS_DERIVABLE (tp);
   }
 
+  G_GNUC_PURE
   bool
   is_abstract () const noexcept
   {
     return !!G_TYPE_IS_ABSTRACT (tp);
   }
 
+  G_GNUC_PURE
   bool
   is_value_type () const noexcept
   {
     return !!G_TYPE_IS_VALUE_TYPE (tp);
   }
 
+  G_GNUC_PURE
   bool
   has_value_table () const noexcept
   {
     return !!G_TYPE_HAS_VALUE_TABLE (tp);
   }
 
+  G_GNUC_PURE
   bool
   is_final () const noexcept
   {
@@ -233,12 +249,14 @@ public:
   }
 
 #if defined (G_TYPE_IS_DEPRECATED)
+  G_GNUC_PURE
   bool
   is_deprecated () const noexcept
   {
     return !!G_TYPE_IS_DEPRECATED (tp);
   }
 #else
+  G_GNUC_PURE
   bool
   is_deprecated () const
   {
@@ -246,12 +264,14 @@ public:
   }
 #endif
 
+  G_GNUC_PURE
   bool
   is_object () const noexcept
   {
     return !!G_TYPE_IS_OBJECT (tp);
   }
 
+  G_GNUC_PURE
   bool
   is_boxed () const noexcept
   {

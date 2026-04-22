@@ -234,6 +234,7 @@ struct Variant::Traits<bool>
     return static_cast<gboolean> (b);
   }
 
+  G_GNUC_PURE
   static bool
   get (::GVariant *v)
   {
@@ -260,6 +261,7 @@ struct Variant::Traits<unsigned char>
     return c;
   }
 
+  G_GNUC_PURE
   static unsigned char
   get (::GVariant *v)
   {
@@ -286,6 +288,7 @@ struct Variant::Traits<double>
     return d;
   }
 
+  G_GNUC_PURE
   static double
   get (::GVariant *v)
   {
@@ -312,6 +315,7 @@ struct Variant::Traits<int16_t>
     return i;
   }
 
+  G_GNUC_PURE
   static int16_t
   get (::GVariant *v)
   {
@@ -338,6 +342,7 @@ struct Variant::Traits<uint16_t>
     return i;
   }
 
+  G_GNUC_PURE
   static uint16_t
   get (::GVariant *v)
   {
@@ -364,6 +369,7 @@ struct Variant::Traits<int32_t>
     return i;
   }
 
+  G_GNUC_PURE
   static int32_t
   get (::GVariant *v)
   {
@@ -390,6 +396,7 @@ struct Variant::Traits<uint32_t>
     return i;
   }
 
+  G_GNUC_PURE
   static uint32_t
   get (::GVariant *v)
   {
@@ -416,6 +423,7 @@ struct Variant::Traits<int64_t>
     return i;
   }
 
+  G_GNUC_PURE
   static int64_t
   get (::GVariant *v)
   {
@@ -442,6 +450,7 @@ struct Variant::Traits<uint64_t>
     return i;
   }
 
+  G_GNUC_PURE
   static uint64_t
   get (::GVariant *v)
   {
@@ -468,6 +477,7 @@ struct Variant::Traits<const char *>
     return s;
   }
 
+  G_GNUC_PURE
   static const char *
   get (::GVariant *v)
   {
@@ -495,6 +505,7 @@ struct Variant::Traits<Variant>
     return reinterpret_cast<::GVariant *> (std::move (v).release_floating_ptr ());
   }
 
+  /* not marked as pure */
   static peel::RefPtr<Variant>
   get (::GVariant *v)
   {
@@ -525,6 +536,7 @@ struct GObject::Value::Traits<GLib::Variant>
   typedef GLib::Variant *UnownedType;
   typedef RefPtr<GLib::Variant> OwnedType;
 
+  G_GNUC_PURE
   static GLib::Variant *
   get (const ::GValue *value)
   {

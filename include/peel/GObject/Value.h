@@ -78,14 +78,14 @@ public:
     g_value_reset (&value);
   }
 
-  G_GNUC_CONST
+  G_GNUC_PURE
   Type
   get_type () const noexcept
   {
     return G_VALUE_TYPE (&value);
   }
 
-  G_GNUC_CONST
+  G_GNUC_PURE
   bool
   holds (Type type) const noexcept
   {
@@ -99,7 +99,7 @@ public:
     return holds (Type::of<T> ());
   }
 
-  G_GNUC_CONST
+  G_GNUC_PURE
   bool
   is_interned_string () const noexcept
   {
@@ -107,7 +107,7 @@ public:
   }
 
   template<typename T>
-  G_GNUC_CONST
+  G_GNUC_PURE
   typename Traits<T>::UnownedType
   get () const noexcept
   {
@@ -185,7 +185,7 @@ struct Value::Traits<signed char>
 {
   typedef signed char UnownedType;
 
-  G_GNUC_CONST
+  G_GNUC_PURE
   static signed char
   get (const ::GValue *value) noexcept
   {
@@ -216,7 +216,7 @@ struct Value::Traits<unsigned char>
 {
   typedef unsigned char UnownedType;
 
-  G_GNUC_CONST
+  G_GNUC_PURE
   static unsigned char
   get (const ::GValue *value) noexcept
   {
@@ -247,7 +247,7 @@ struct Value::Traits<bool>
 {
   typedef bool UnownedType;
 
-  G_GNUC_CONST
+  G_GNUC_PURE
   static bool
   get (const ::GValue *value) noexcept
   {
@@ -278,7 +278,7 @@ struct Value::Traits<int>
 {
   typedef int UnownedType;
 
-  G_GNUC_CONST
+  G_GNUC_PURE
   static int
   get (const ::GValue *value) noexcept
   {
@@ -309,7 +309,7 @@ struct Value::Traits<unsigned int>
 {
   typedef unsigned int UnownedType;
 
-  G_GNUC_CONST
+  G_GNUC_PURE
   static unsigned int
   get (const ::GValue *value) noexcept
   {
@@ -340,7 +340,7 @@ struct Value::Traits<float>
 {
   typedef float UnownedType;
 
-  G_GNUC_CONST
+  G_GNUC_PURE
   static float
   get (const ::GValue *value) noexcept
   {
@@ -371,7 +371,7 @@ struct Value::Traits<double>
 {
   typedef double UnownedType;
 
-  G_GNUC_CONST
+  G_GNUC_PURE
   static double
   get (const ::GValue *value) noexcept
   {
@@ -402,7 +402,7 @@ struct Value::Traits<Long>
 {
   typedef Long UnownedType;
 
-  G_GNUC_CONST
+  G_GNUC_PURE
   static Long
   get (const ::GValue *value) noexcept
   {
@@ -433,7 +433,7 @@ struct Value::Traits<ULong>
 {
   typedef ULong UnownedType;
 
-  G_GNUC_CONST
+  G_GNUC_PURE
   static ULong
   get (const ::GValue *value) noexcept
   {
@@ -463,7 +463,7 @@ struct Value::Traits<int64_t>
 {
   typedef int64_t UnownedType;
 
-  G_GNUC_CONST
+  G_GNUC_PURE
   static int64_t
   get (const ::GValue *value) noexcept
   {
@@ -494,7 +494,7 @@ struct Value::Traits<uint64_t>
 {
   typedef uint64_t UnownedType;
 
-  G_GNUC_CONST
+  G_GNUC_PURE
   static uint64_t
   get (const ::GValue *value) noexcept
   {
@@ -526,7 +526,7 @@ struct Value::Traits<const char *>
   typedef const char *UnownedType;
   typedef String OwnedType;
 
-  G_GNUC_CONST
+  G_GNUC_PURE
   static const char *
   get (const ::GValue *value) noexcept
   {
@@ -587,7 +587,7 @@ struct Value::Traits<Strv>
   typedef StrvRef UnownedType;
   typedef Strv OwnedType;
 
-  G_GNUC_CONST
+  G_GNUC_PURE
   static StrvRef
   get (const ::GValue *value) noexcept
   {
@@ -625,7 +625,7 @@ struct Value::Traits<Type>
 {
   typedef Type UnownedType;
 
-  G_GNUC_CONST
+  G_GNUC_PURE
   static Type
   get (const ::GValue *value) noexcept
   {
@@ -656,7 +656,7 @@ struct Value::Traits<void *>
 {
   typedef void *UnownedType;
 
-  G_GNUC_CONST
+  G_GNUC_PURE
   static void *
   get (const ::GValue *value) noexcept
   {
@@ -687,7 +687,7 @@ struct Value::Traits<Value>
 {
   typedef Value *UnownedType;
 
-  G_GNUC_CONST
+  G_GNUC_PURE
   static Value *
   get (const ::GValue *value) noexcept
   {

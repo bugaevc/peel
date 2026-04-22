@@ -26,7 +26,7 @@ class TypeInstance;
 namespace internals
 {
 
-G_GNUC_CONST
+G_GNUC_PURE
 static inline gpointer
 value_peek_pointer (const ::GValue *value) noexcept
 {

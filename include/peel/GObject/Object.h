@@ -734,7 +734,7 @@ struct Value::Traits<T, peel::enable_if_derived<Object, T, void>>
   typedef T *UnownedType;
   typedef RefPtr<T> OwnedType;
 
-  G_GNUC_CONST
+  G_GNUC_PURE
   static T *
   get (const ::GValue *value) noexcept
   {
