@@ -12,6 +12,7 @@ class String final
 {
   char *str;
 
+  peel_always_inline
   void
   do_free () noexcept
   {
@@ -50,6 +51,7 @@ public:
     : str (g_strndup (ptr, n_chars))
   { }
 
+  peel_always_inline
   ~String () noexcept
   {
     do_free ();
@@ -73,6 +75,7 @@ public:
     return str != nullptr;
   }
 
+  peel_always_inline
   String &
   operator = (decltype (nullptr)) noexcept
   {
@@ -81,6 +84,7 @@ public:
     return *this;
   }
 
+  peel_always_inline
   String &
   operator = (String &&other) noexcept
   {
@@ -90,6 +94,7 @@ public:
     return *this;
   }
 
+  peel_always_inline
   String &
   operator = (const String &other) noexcept
   {
@@ -98,6 +103,7 @@ public:
     return *this;
   }
 
+  peel_always_inline
   bool
   set (const char *s) noexcept
   {
@@ -114,6 +120,7 @@ public:
     return true;
   }
 
+  peel_always_inline
   bool
   set (String &&other) noexcept
   {

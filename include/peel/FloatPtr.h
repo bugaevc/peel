@@ -60,7 +60,7 @@ public:
     other.ptr = nullptr;
   }
 
-  /* Upcast.  */
+  /* Upcast */
   template<typename U, peel::enable_if_derived<T, U, int> = 0>
   FloatPtr (FloatPtr<U> &&other) noexcept
     : ptr (other.ptr)
@@ -68,7 +68,7 @@ public:
     other.ptr = nullptr;
   }
 
-  /* Upcast from RefPtr.  */
+  /* Upcast from RefPtr */
   template<typename U, peel::enable_if_derived<T, U, int> = 0>
   FloatPtr (const RefPtr<U> &r) noexcept
     : ptr ((U *) r)
@@ -77,11 +77,13 @@ public:
   template<typename U>
   FloatPtr (RefPtr<U> &&) = delete;
 
+  peel_always_inline
   ~FloatPtr () noexcept
   {
     do_dispose ();
   }
 
+  peel_always_inline
   FloatPtr &
   operator = (T *ptr) noexcept
   {
@@ -92,6 +94,7 @@ public:
     return *this;
   }
 
+  peel_always_inline
   FloatPtr &
   operator = (const FloatPtr &other) noexcept
   {
@@ -102,6 +105,7 @@ public:
     return *this;
   }
 
+  peel_always_inline
   FloatPtr &
   operator = (FloatPtr &&other) noexcept
   {

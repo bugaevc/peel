@@ -82,12 +82,14 @@ public:
     : ptr (nullptr)
   { }
 
+  peel_always_inline
   RefPtr (T *ptr) noexcept
     : ptr (ptr)
   {
     do_ref (ptr);
   }
 
+  peel_always_inline
   RefPtr (const RefPtr &other) noexcept
     : ptr (other.ptr)
   {
@@ -117,15 +119,16 @@ public:
   }
   */
 
-  /* Upcast.  */
+  /* Upcast */
   template<typename U, peel::enable_if_derived<T, U, int> = 0>
+  peel_always_inline
   RefPtr (const RefPtr<U> &other) noexcept
     : ptr (other.ptr)
   {
     do_ref (ptr);
   }
 
-  /* Upcast.  */
+  /* Upcast */
   template<typename U, peel::enable_if_derived<T, U, int> = 0>
   RefPtr (RefPtr<U> &&other) noexcept
     : ptr (other.ptr)
@@ -143,6 +146,7 @@ public:
     : RefPtr (static_cast<FloatPtr<U> &&> (f).ref_sink ())
   { }
 
+  peel_always_inline
   ~RefPtr () noexcept
   {
     do_unref (ptr);
@@ -166,6 +170,7 @@ public:
   }
 
   template<typename U, peel::enable_if_derived<T, U, int> = 0>
+  peel_always_inline
   RefPtr &
   operator = (U *ptr) noexcept
   {
@@ -175,6 +180,7 @@ public:
     return *this;
   }
 
+  peel_always_inline
   RefPtr &
   operator = (const RefPtr &other) noexcept
   {
@@ -184,8 +190,9 @@ public:
     return *this;
   }
 
-  /* upcast */
+  /* Upcast */
   template<typename U, peel::enable_if_derived<T, U, int> = 0>
+  peel_always_inline
   RefPtr &
   operator = (const RefPtr<U> &other) noexcept
   {
@@ -195,6 +202,7 @@ public:
     return *this;
   }
 
+  peel_always_inline
   RefPtr &
   operator = (RefPtr &&other) & noexcept
   {
@@ -204,8 +212,9 @@ public:
     return *this;
   }
 
-  /* upcast */
+  /* Upcast */
   template<typename U, peel::enable_if_derived<T, U, int> = 0>
+  peel_always_inline
   RefPtr &
   operator = (RefPtr<U> &&other) & noexcept
   {
@@ -224,6 +233,7 @@ public:
   }
 
   template<typename U, peel::enable_if_derived<T, U, int> = 0>
+  peel_always_inline
   RefPtr &
   operator = (FloatPtr<U> &&other) & noexcept
   {
@@ -231,6 +241,7 @@ public:
     return *this;
   }
 
+  peel_always_inline
   RefPtr &
   operator = (decltype (nullptr)) noexcept
   {

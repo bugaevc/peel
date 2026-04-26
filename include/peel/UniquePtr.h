@@ -29,6 +29,7 @@ private:
 
   T *ptr;
 
+  peel_always_inline
   void
   do_free () noexcept
   {
@@ -62,6 +63,7 @@ public:
     other.ptr = nullptr;
   }
 
+  peel_always_inline
   ~UniquePtr () noexcept
   {
     do_free ();
@@ -87,6 +89,7 @@ public:
   UniquePtr &
   operator = (const UniquePtr &) = delete;
 
+  peel_always_inline
   UniquePtr &
   operator = (UniquePtr &&other) noexcept
   {
@@ -98,6 +101,7 @@ public:
     return *this;
   }
 
+  peel_always_inline
   UniquePtr &
   operator = (decltype (nullptr)) noexcept
   {
@@ -142,6 +146,7 @@ private:
   T *ptr;
   size_t c;
 
+  peel_always_inline
   void
   do_free () noexcept
   {
@@ -190,6 +195,7 @@ public:
 
   UniquePtr (const UniquePtr &) = delete;
 
+  peel_always_inline
   ~UniquePtr () noexcept
   {
     do_free ();
@@ -208,6 +214,7 @@ public:
   UniquePtr &
   operator = (const UniquePtr &) = delete;
 
+  peel_always_inline
   UniquePtr &
   operator = (UniquePtr &&other) noexcept
   {
@@ -221,6 +228,7 @@ public:
     return *this;
   }
 
+  peel_always_inline
   UniquePtr &
   operator = (decltype (nullptr)) noexcept
   {
