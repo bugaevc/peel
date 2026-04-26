@@ -1341,6 +1341,7 @@ nest	SoupCacheType			Cache::Type
 nest	SoupSessionFeature		Session::Feature
 nest	SoupLoggerLogLevel		Logger::LogLevel
 vararg	soup_session_new_with_options	object-new
+vararg	soup_form_encode		argv
 
 # Gst
 in	gst_buffer_extract		size
