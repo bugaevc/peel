@@ -984,10 +984,12 @@ class Parameter(NodeHandler):
         casted_name = self.generate_casted_name()
         # TODO: same for out/inout params
         tp = chase_type_aliases(self.type)
-        if thrown:
-            return ['peel_assume (!{});'.format(casted_name)]
+        if isinstance(tp, VoidType):
+            return None
         if not tp.is_passed_by_ref():
             return None
+        if thrown:
+            return ['peel_assume (!{});'.format(casted_name)]
         if self.nullable:
             return None
         return ['peel_assume ({});'.format(casted_name)]
