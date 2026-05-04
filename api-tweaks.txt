@@ -1332,6 +1332,8 @@ skip	dex_value_get_object
 skip	dex_value_set_object
 skip	dex_value_take_object
 nest	DexFutureStatus			Future::Status
+in	dex_aio_read			count
+in	dex_input_stream_read		count
 
 # Soup
 nest	SoupMessagePriority		Message::Priority
