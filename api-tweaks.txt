@@ -1477,6 +1477,8 @@ gst-pad-callback GstPadEventFullFunction	eventdata
 gst-pad-callback GstPadQueryFunction	querydata
 gst-pad-callback GstPadIterIntLinkFunction	iterintlinkdata
 
+skip	gst_iterator_new_list
+
 # GstBase
 
 # See https://gitlab.gnome.org/GNOME/gobject-introspection/-/issues/563
