@@ -59,7 +59,7 @@ public:
   length () const noexcept
   {
     size_t l = 0;
-    for (T *p = ptr; p; p++)
+    for (T *p = ptr; p && *p; p++)
       l++;
     return l;
   }
