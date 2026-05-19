@@ -293,7 +293,7 @@ public:
   }
 
   void
-  insert_before (ListRef<T>::iterator it, T item) noexcept
+  insert_before (typename ListRef<T>::iterator it, T item) noexcept
   {
     gpointer data = internals::ListPack<T>::pack (static_cast<T &&> (item));
     this->list = g_list_insert_before (this->list, it.list, data);
