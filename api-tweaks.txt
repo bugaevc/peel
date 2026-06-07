@@ -1519,6 +1519,7 @@ unowned GstElement::vfunc_request_new_pad	return
 no-autofree JsonNode
 nest	JsonNodeType			Node::Type
 nest	JsonObjectIter			Object::Iter
+array	JsonSerializable::vfunc_list_properties	return
 
 # GtkSource
 vararg	gtk_source_buffer_create_source_tag	object-new
