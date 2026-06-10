@@ -27,7 +27,7 @@ class DefinedType(NodeHandler, AnyType):
         self.nested_in_alias = None
         self.nested_types = []
         self.nested_type_aliases = []
-        if self.c_type is not None:
+        if self.c_type is not None and 'peel-fake-defined-type' not in attrs:
             for tweak in api_tweaks.lookup(self.c_type, 'nest'):
                 self.emit_name = self.emit_def_name = tweak[1]
                 self.nested_in_name, self.own_name = self.emit_name.rsplit('::', 1)
