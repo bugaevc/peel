@@ -9,3 +9,6 @@ might be useful as a reference:
 * [Corners](https://github.com/garaevdi/corners)
 * [Zapret2 peel GUI](https://gitlab.gnome.org/vbb/zapret2peelgui)
 * [Hyprtracker](https://github.com/NuttyShrimp/Hyprtracker)
+* [VocaDB Searcher](https://gitlab.gnome.org/talisein/vocadb_song_searcher)
+* [Milfeulle](https://gitlab.gnome.org/talisein/milfeulle)
+* [Purple-YouTube](https://github.com/csb6/purple-youtube)
