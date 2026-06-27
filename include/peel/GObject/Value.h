@@ -99,12 +99,14 @@ public:
     return holds (Type::of<T> ());
   }
 
+#ifdef G_VALUE_IS_INTERNED_STRING
   G_GNUC_PURE
   bool
   is_interned_string () const noexcept
   {
     return !!G_VALUE_IS_INTERNED_STRING (&value);
   }
+#endif
 
   template<typename T>
   G_GNUC_PURE

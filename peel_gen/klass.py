@@ -71,6 +71,8 @@ class Class(DefinedType):
                 self.ref_func = tweak[1]
             elif tweak[0] == 'ref-sink':
                 self.ref_sink_func = tweak[1]
+            elif tweak[0] == 'unref':
+                self.unref_func = tweak[1]
             elif tweak[0] == 'take-value':
                 self.take_value_func = tweak[1]
             elif tweak[0] == 'dup-value':

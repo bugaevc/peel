@@ -139,6 +139,10 @@ skip	g_utf8_to_ucs4_fast
 skip	g_utf8_to_utf16
 skip	g_utf16_to_utf8
 out	g_unichar_get_mirror_char	mirrored_ch
+out	g_unichar_compose		ch
+out	g_unichar_decompose		a
+out	g_unichar_decompose		b
+out	g_unichar_fully_decompose	result
 skip	GUnixPipeEnd
 skip	GUnixPipe
 skip	GHook
@@ -329,6 +333,8 @@ skip	GObject				GObject		manual
 ref	GObject				g_object_ref
 unref	GObject				g_object_unref
 ref-sink GObject			g_object_ref_sink
+# Broken in older GLib
+unref	GParamSpec			g_param_spec_unref
 skip	GTypeInstance			GObject		manual
 skip	GTypeClass			GObject		manual
 skip	GTypeInterface			GObject		manual
@@ -644,6 +650,14 @@ repo-skip gio/gunixfdmessage.h		Gio
 repo-skip gio/gunixinputstream.h	Gio
 repo-skip gio/gunixmounts.h		Gio
 repo-skip gio/gunixoutputstream.h	Gio
+# These have been moved into Gio proper in newer versions of Gio. We
+# skip them for the sake of older versions, but this should not break
+# on new Gio, because these headers are no longer listed explicitly in
+# Gio-2.0.gir, instead they are pulled in via the regular gio.h.
+repo-skip gio/gunixconnection.h		Gio
+repo-skip gio/gunixcredentialsmessage.h	Gio
+repo-skip gio/gunixfdlist.h		Gio
+repo-skip gio/gunixsocketaddress.h	Gio
 skip	GDesktopAppInfo			Gio
 skip	GDesktopAppInfoLookup		Gio
 skip	GDesktopAppLaunchCallback	Gio

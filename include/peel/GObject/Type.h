@@ -241,12 +241,14 @@ public:
     return !!G_TYPE_HAS_VALUE_TABLE (tp);
   }
 
+#if defined (G_TYPE_IS_FINAL)
   G_GNUC_PURE
   bool
   is_final () const noexcept
   {
     return !!G_TYPE_IS_FINAL (tp);
   }
+#endif
 
 #if defined (G_TYPE_IS_DEPRECATED)
   G_GNUC_PURE

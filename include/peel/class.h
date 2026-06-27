@@ -204,7 +204,11 @@ struct ClassHelper
   }
 
   template<typename ParentClass>
+#ifdef G_NO_INLINE
   G_NO_INLINE
+#else
+  G_GNUC_NO_INLINE
+#endif
   static ::GType
   register_type_static (const char *type_name) noexcept
   {
