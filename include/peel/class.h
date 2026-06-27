@@ -257,7 +257,6 @@ GObject::Type::of ()
   peel_friend_prop_helper (Subclass)                                           \
                                                                                \
 public:                                                                        \
-  G_GNUC_CONST                                                                 \
   static ::peel::GObject::Type                                                 \
   _peel_get_type () noexcept;                                                  \
                                                                                \
@@ -300,7 +299,6 @@ private:                                                                       \
 #endif
 
 #define PEEL_CLASS_IMPL(Subclass, type_name, ParentClass)                      \
-G_GNUC_CONST                                                                   \
 ::peel::GObject::Type                                                          \
 Subclass::_peel_get_type () noexcept                                           \
 {                                                                              \
