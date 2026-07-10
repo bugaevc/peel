@@ -88,6 +88,10 @@ class Record(DefinedType):
                 self.free_func = None
             elif tweak[0] == 'free':
                 self.free_func = tweak[1]
+            elif tweak[0] == 'ref':
+                self.ref_func = tweak[1]
+            elif tweak[0] == 'unref':
+                self.unref_func = tweak[1]
             elif tweak[0] == 'type-struct':
                 self.type_struct_for_name = tweak[1]
             elif tweak[0] == 'pointer':
