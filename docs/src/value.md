@@ -29,8 +29,8 @@ $
 $using namespace peel;
 $
 $Value value { Type::of<int> () };
-value->set<int> (42);
-int fourty_two = value->get<int> ();
+value.set<int> (42);
+int fourty_two = value.get<int> ();
 ```
 
 The template type argument used here
