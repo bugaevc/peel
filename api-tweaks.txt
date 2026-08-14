@@ -1557,6 +1557,8 @@ no-autofree JsonNode
 nest	JsonNodeType			Node::Type
 nest	JsonObjectIter			Object::Iter
 array	JsonSerializable::vfunc_list_properties	return
+# Has a wrong type on the C side, easier to skip it
+skip	json_parser_has_assignment
 
 # GtkSource
 vararg	gtk_source_buffer_create_source_tag	object-new
