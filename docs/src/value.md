@@ -21,7 +21,7 @@ $
 Value value { Type::of<int> () };
 ```
 
-To get and set the value, use the method templates `get` and `set`:
+To get and set the contained data, use the method templates `get` and `set`:
 
 ```cpp
 $#include <peel/GObject/Value.h>
@@ -33,4 +33,34 @@ value.set<int> (42);
 int fourty_two = value.get<int> ();
 ```
 
-The template type argument used here
+The template type argument used here is the [logical type].
+
+[logical type]: logical-type.md
+
+The type of data contained can be inspected dynamically with `value.get_type ()`
+and `value.holds<T> ()`.
+
+The use case for `Value` is wrapping data of some statically-unkown type, so it
+can be uniformly passed through some API boundary. For example, in GTK the
+[`Gdk::ContentProvider::get_value`] method outputs the contents into a value of
+a given type, and can be used like this:
+
+```cpp
+$#include <peel/GObject/Value.h>
+$#include <peel/Gdk/ContentProvider.h>
+$
+$using namespace peel;
+$
+Gdk::ContentProvider *provider = /* ... */;
+
+/* Read its contents as a string: */
+Value value { Type::of<String> () };
+bool ok = provider->get_value (&value, nullptr);
+if (ok)
+  {
+    /* Extract the string: */
+    const char *data = value->get<String> ();
+  }
+```
+
+[`Gdk::ContentProvider::get_value`]: https://docs.gtk.org/gdk4/method.ContentProvider.get_value.html
