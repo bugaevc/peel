@@ -93,6 +93,13 @@ static_assert (sizeof (Enum::Class) == sizeof (::GEnumClass),
 static_assert (alignof (Enum::Class) == alignof (::GEnumClass),
                "Enum::Class align mismatch");
 
+template<>
+constexpr inline Type
+Type::of<Enum> ()
+{
+  return G_TYPE_ENUM;
+}
+
 } /* namespace GObject */
 } /* namespace peel */
 

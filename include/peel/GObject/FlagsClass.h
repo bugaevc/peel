@@ -91,6 +91,13 @@ static_assert (sizeof (Flags::Class) == sizeof (::GFlagsClass),
 static_assert (alignof (Flags::Class) == alignof (::GFlagsClass),
                "Flags::Class align mismatch");
 
+template<>
+constexpr inline Type
+Type::of<Flags> ()
+{
+  return G_TYPE_FLAGS;
+}
+
 } /* namespace GObject */
 } /* namespace peel */
 
