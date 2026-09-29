@@ -8,7 +8,7 @@ namespace peel
 {
 
 template<typename T>
-class ZTArrayRef
+class peel_trivial_abi ZTArrayRef
 {
    T *ptr;
 

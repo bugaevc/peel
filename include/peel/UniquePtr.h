@@ -21,7 +21,7 @@ struct UniqueTraits;
 */
 
 template<typename T>
-class UniquePtr final
+class peel_trivial_abi UniquePtr final
 {
 private:
   template<typename U>
@@ -140,7 +140,7 @@ template<typename T>
 class ArrayRef;
 
 template<typename T>
-class UniquePtr<T[]> final
+class peel_trivial_abi UniquePtr<T[]> final
 {
 private:
   T *ptr;

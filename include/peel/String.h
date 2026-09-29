@@ -8,7 +8,7 @@ peel_begin_header
 namespace peel
 {
 
-class String final
+class peel_trivial_abi String final
 {
   char *str;
 

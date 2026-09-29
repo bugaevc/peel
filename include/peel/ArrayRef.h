@@ -8,7 +8,7 @@ namespace peel
 {
 
 template<typename T>
-class ArrayRef final
+class peel_trivial_abi ArrayRef final
 {
   T *p;
   size_t c;

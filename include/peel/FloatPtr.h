@@ -11,7 +11,7 @@ template<typename T>
 class RefPtr;
 
 template<typename T>
-class FloatPtr final
+class peel_trivial_abi FloatPtr final
 {
 private:
   template<typename U>

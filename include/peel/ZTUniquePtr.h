@@ -17,7 +17,7 @@ class ZTArrayRef;
 class String;
 
 template<typename T>
-class ZTUniquePtr<T[]>
+class peel_trivial_abi ZTUniquePtr<T[]>
 {
   T *ptr;
 

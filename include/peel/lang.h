@@ -55,6 +55,12 @@
 #define peel_unreachable peel_assume (false)
 #endif
 
+#if peel_has_attribute (trivial_abi) && !defined (PEEL_NO_TRIVIAL_ABI)
+#define peel_trivial_abi __attribute__ ((trivial_abi))
+#else
+#define peel_trivial_abi
+#endif
+
 #if defined (__GNUC__) && __GNUC__ >= 10
 #define peel_arg_in(index) __attribute__ ((access (read_only, (index))))
 #define peel_arg_out(index) __attribute__ ((access (write_only, (index))))
