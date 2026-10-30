@@ -1549,6 +1549,14 @@ onstack GstVideoColorimetry
 onstack GstVideoTileInfo
 onstack GstVideoFrame
 
+# GstCuda
+
+# Wraps cuMemExportToShareableHandle(). The output is a HANDLE on Windows
+# or an FD on Linux, passed through gpointer with (out caller-allocates).
+# Work around the unknown storage type by using 'in' to pass the pointer as is.
+# It is still an 'out' argument, and gpointer does not result in 'peel_arg_in'.
+in	gst_cuda_memory_export	os_handle
+
 # GstElement
 unowned GstElement::vfunc_request_new_pad	return
 
