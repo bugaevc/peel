@@ -82,6 +82,8 @@ type_map = {
     'gchar': PlainType('gchar', 'char'),
     'gunichar': PlainType('gunichar', 'gunichar'),
     'gunichar32': PlainType('gunichar32', 'gunichar32'),
+    'long long': PlainType('long long', 'long long'),
+    'unsigned long long': PlainType('unsigned long long', 'unsigned long long'),
     'long double': PlainType('long double', 'long double'),
     'utf8': StrType(),
     'filename': StrType(),
