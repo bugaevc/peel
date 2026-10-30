@@ -34,7 +34,7 @@ class Record(DefinedType):
         self.any_fields_exposed = False
         self.struct_kw = 'class /* record */'
         assert('glib:is-gtype-struct-for' not in attrs)
-        self.is_private = self.gir_name.endswith('Private')
+        self.is_private = self.gir_name is not None and self.gir_name.endswith('Private')
         self.extra_includes = []
 
     def is_passed_by_ref(self):
