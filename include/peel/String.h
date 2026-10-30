@@ -88,6 +88,8 @@ public:
   String &
   operator = (String &&other) noexcept
   {
+    if (this == &other)
+      return *this;
     do_free ();
     str = other.str;
     other.str = nullptr;
@@ -98,6 +100,8 @@ public:
   String &
   operator = (const String &other) noexcept
   {
+    if (this == &other)
+      return *this;
     do_free ();
     str = g_strdup (other.str);
     return *this;

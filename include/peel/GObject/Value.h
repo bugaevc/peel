@@ -66,6 +66,8 @@ public:
   Value &
   operator = (Value &&other) noexcept
   {
+    if (this == &other)
+      return *this;
     g_value_unset (&value);
     memcpy (&value, &other.value, sizeof (value));
     memset (&other.value, 0, sizeof (value));
