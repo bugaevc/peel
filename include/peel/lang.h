@@ -30,6 +30,12 @@
 #define peel_nodiscard(reason)
 #endif
 
+#if defined (peel_cpp_20)
+#define peel_constexpr_dtor constexpr
+#else
+#define peel_constexpr_dtor
+#endif
+
 #ifdef __GNUC__
 #define peel_no_warn_unused __attribute__ ((unused))
 #else

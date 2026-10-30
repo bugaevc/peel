@@ -32,6 +32,8 @@ class Parameter(NodeHandler):
         self.force_cpp_this = False
         self.vararg_mode = None
         self.has_resolved_stuff = False
+        self.is_inline_record_field = False
+        self.is_unionized_inline_record_field = False
 
     def __repr__(self):
         return 'Parameter({} {})'.format(self.c_type, self.name)
@@ -117,6 +119,13 @@ class Parameter(NodeHandler):
                 self.is_inline_record_field = True
             else:
                 self.is_inline_record_field = False
+
+            if self.is_inline_record_field:
+                from peel_gen.record import Record
+                from peel_gen.union import Union
+                self.is_unionized_inline_record_field = (
+                    isinstance(itp, (Record, Union)) and itp.clear_func is not None
+                )
 
 
     def append_skip_params_to(self, skip_params):
@@ -420,10 +429,19 @@ class Parameter(NodeHandler):
             elif not isinstance(tp, Array):
                 if name is None:
                     return s
-                if not s.endswith('*'):
-                    s = s + ' '
 
-                return s + out_asterisk + name
+                if self.is_record_field:
+                    assert(not out_asterisk)
+
+                    if self.is_unionized_inline_record_field:
+                        assert(not s.endswith('*'))
+                        return 'union {{ {} {}; }}'.format(s, name)
+                    else:
+                        return make_simple_decl(s, name)
+                else:
+                    if not s.endswith('*'):
+                        s = s + ' '
+                    return s + out_asterisk + name
             elif strip_refs:
                 assert(name is None)
                 return s
@@ -431,7 +449,11 @@ class Parameter(NodeHandler):
                 if self.is_record_field:
                     assert(name is not None)
                     assert(not out_asterisk)
-                    return '{}[{}]'.format(make_simple_decl(s, name), tp.fixed_size)
+
+                    if self.is_unionized_inline_record_field:
+                        return 'union {{ {}[{}]; }}'.format(make_simple_decl(s, name), tp.fixed_size)
+                    else:
+                        return '{}[{}]'.format(make_simple_decl(s, name), tp.fixed_size)
 
                 if out_asterisk:
                     raise UnsupportedForNowException('out fixed-size array')

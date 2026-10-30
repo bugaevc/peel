@@ -31,6 +31,7 @@ class Record(DefinedType):
         self.onstack = False
         self.init_func = None
         self.clear_func = None
+        self.has_unionized_fields = False
         self.is_initially_floating = False
         self.all_fields_supported = True
         self.any_fields_exposed = False
@@ -122,6 +123,8 @@ class Record(DefinedType):
                 self.all_fields_supported = False
             elif not f.private:
                 self.any_fields_exposed = True
+                if not self.opaque and f.param.is_unionized_inline_record_field:
+                    self.has_unionized_fields = True
 
             # If a field name conflicts with a method we need to
             # rename the field.
@@ -265,8 +268,10 @@ class Record(DefinedType):
                         '  {} (const {} &) = delete;'.format(self.own_name, self.own_name),
                         '  {} ({} &&) = delete;'.format(self.own_name, self.own_name),
                     ])
-                else:
-                    visibility.switch('private')
+                elif self.has_unionized_fields:
+                    l.append('  peel_constexpr_dtor ~{} () noexcept {{ }}'.format(self.own_name))
+            elif self.has_unionized_fields:
+                l.append('  peel_constexpr_dtor ~{} () noexcept {{ }}'.format(self.own_name))
         else:
             l.extend([
                 '  {} () = delete;'.format(self.own_name),
