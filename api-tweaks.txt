@@ -1503,6 +1503,10 @@ nest	GstIteratorItem			Iterator::Item
 onstack GstMapInfo
 onstack GstSegment
 
+# See https://gitlab.freedesktop.org/gstreamer/gstreamer/-/merge_requests/12913
+opaque	GstParamSpecArray
+opaque	GstParamSpecFraction
+
 raw-params-overload	gst_init	argc,argv
 raw-params-overload	gst_init_check	argc,argv
 
