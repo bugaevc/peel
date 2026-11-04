@@ -1557,6 +1557,19 @@ onstack GstVideoFrame
 # It is still an 'out' argument, and gpointer does not result in 'peel_arg_in'.
 in	gst_cuda_memory_export	os_handle
 
+# The CUDA stub typedefs show up in GIR as aliases to GLib types.
+# peel-gen follows those aliases and loses the CUDA type in the C++ signature.
+# Use gpointer to make peel-gen keep the original c:type.
+type	gst_cuda_context_new_wrapped	handler	gpointer
+type	gst_cuda_context_pop	cuda_ctx	gpointer
+type	gst_cuda_graphics_resource_map	stream	gpointer
+type	gst_cuda_graphics_resource_map	return	gpointer
+type	gst_cuda_graphics_resource_unmap	stream	gpointer
+type	gst_cuda_stream_get_handle	return	gpointer
+type	gst_cuda_memory_pool_get_handle	return	gpointer
+type	gst_cuda_allocator_alloc_wrapped	dev_ptr	gpointer
+type	gst_cuda_memory_get_texture	texture	gpointer
+
 # GstElement
 unowned GstElement::vfunc_request_new_pad	return
 
