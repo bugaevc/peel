@@ -54,7 +54,9 @@ class Model final : public Gio::ListModel
   RefPtr<Object>
   vfunc_get_item (unsigned position)
   {
-    g_return_val_if_fail (position < vfunc_get_n_items (), nullptr);
+    if (position >= vfunc_get_n_items ())
+      return nullptr;
+
     return items[position];
   }
 
