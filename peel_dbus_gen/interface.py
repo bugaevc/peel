@@ -635,7 +635,9 @@ class Interface:
             ),
             '  g_value_unset (&value);',
             '',
-            '  return v;',
+            # We could drop this ref_sink once generate_make_variant_from_value()
+            # no longer returns existing variants.
+            '  return g_variant_ref_sink (v);',
             '}',
             '',
             'static gboolean',

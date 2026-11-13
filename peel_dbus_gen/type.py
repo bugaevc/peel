@@ -165,7 +165,7 @@ class Type:
             return 'g_variant_new_variant (g_value_get_variant ({}))'.format(value_expr)
         else:
             # TODO
-            return 'g_variant_ref (g_value_get_variant ({}))'.format(value_expr)
+            return 'g_value_get_variant ({})'.format(value_expr)
 
     def generate_make_pspec(self, name, nick, blurb, flags):
         if self.signature == 'b':
