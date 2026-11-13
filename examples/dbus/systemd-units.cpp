@@ -97,6 +97,7 @@ private:
     { }
   };
   std::vector<LoadingUnit> m_loading_units;
+  size_t m_initial_loading_units;
 
   RefPtr<Gio::Cancellable>
   remove_loading_unit (const char *id)
@@ -155,13 +156,18 @@ private:
   unsigned
   vfunc_get_n_items ()
   {
+    if (m_initial_loading_units)
+      return 0;
     return m_units.size ();
   }
 
   RefPtr<Object>
   vfunc_get_item (unsigned position)
   {
-    g_return_val_if_fail (position < m_units.size (), nullptr);
+    if (position >= m_units.size ())
+      return nullptr;
+    else if (m_initial_loading_units)
+      return nullptr;
 
     return m_units[position];
   }
@@ -212,24 +218,28 @@ private:
             /* Load this unit, concurrently with the others. Don't set up
              * any LoadingUnit tracking for this initial burst of units.
              */
+            self->m_initial_loading_units++;
             Systemd::Unit::Proxy::create (connection, name_owner, unit_path,
               [self, workaround = true] (Object *, Gio::AsyncResult *res)
               {
                 if (!self)
                   return;
+                self->m_initial_loading_units--;
                 UniquePtr<GLib::Error> error;
                 RefPtr<Systemd::Unit> unit = Systemd::Unit::Proxy::create_finish (res, &error);
                 if (error)
+                  g_warning ("Failed to create a proxy: %s", error->message);
+                else
+                  self->m_units.push_back (std::move (unit));
+                /* Bulk-notify once all the initial units are loaded */
+                if (self->m_initial_loading_units == 0)
                   {
-                    g_warning ("Failed to create a proxy: %s", error->message);
-                    return;
+                    self->items_changed (0, 0, self->m_units.size ());
+                    self->notify (prop_n_items ());
                   }
-                self->m_units.push_back (std::move (unit));
-                /* TODO: bulk-notify once all the initial units are loaded */
-                self->items_changed (self->m_units.size () - 1, 0, 1);
-                self->notify (prop_n_items ());
               });
           }
+        self->m_units.reserve (self->m_initial_loading_units);
       });
   }
 
