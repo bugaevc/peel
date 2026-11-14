@@ -1377,6 +1377,10 @@ skip	dex_value_take_object
 nest	DexFutureStatus			Future::Status
 in	dex_aio_read			count
 in	dex_input_stream_read		count
+out	dex_coroutine_context_resume	pc
+out	dex_coroutine_context_resume	future
+owned	dex_coroutine_context_resume	future
+owned	dex_coroutine_context_suspend	future
 
 # Soup
 nest	SoupMessagePriority		Message::Priority
